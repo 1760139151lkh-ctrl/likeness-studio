@@ -12,6 +12,9 @@
 from __future__ import annotations
 
 import asyncio
+import base64
+import binascii
+import hashlib
 import json
 import os
 import secrets
@@ -27,7 +30,7 @@ from fastapi.staticfiles import StaticFiles
 from . import __version__, engines, paths, settings
 from .engines import EngineError, Work
 from .estimates import Estimates
-from .jobs import Job, Jobs
+from .jobs import Job, Jobs, QueueFull, SubmissionConflict
 from .rooms import normalise_backdrops, normalise_look, normalise_room
 from .store import MAX_UPLOAD, Store
 from .turns import BackdropAsk, Inputs, LookAsk, RoomAsk, Turn
@@ -36,6 +39,17 @@ LOOPBACK = {"127.0.0.1", "::1", "localhost"}
 NOT_PAIRED = """<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Likeness</title>
 <body style="margin:0;min-height:100vh;display:grid;place-items:center;background:#121110;color:#ede6da;font:17px/1.5 Georgia,serif">
 <p style="max-width:20em;padding:2em">This studio only opens for devices it has paired with.<br><br>Scan the code that <code>likeness serve</code> prints to pair this one.</p>"""
+
+
+def owner_authenticated(header: str, secret: bytes) -> bool:
+    scheme, _, encoded = header.partition(" ")
+    if scheme.lower() != "basic" or len(encoded) > 256:
+        return False
+    try:
+        credentials = base64.b64decode(encoded, validate=True)
+    except (ValueError, binascii.Error):
+        return False
+    return secrets.compare_digest(credentials, b"likeness:" + secret)
 
 
 def pairing_key(home: Path) -> str:
@@ -54,12 +68,30 @@ def create_app(engine: engines.Engine | None = None, home: Path | None = None, o
     store, jobs, key = Store(home), Jobs(int(config["studio"].get("workers", 2))), pairing_key(home)
     estimates = Estimates(home / f"estimates-{engine.kind}.json", engine.kind)
     open_door = bool(os.environ.get("LIKENESS_OPEN")) if open_door is None else open_door
+    owner_file = os.environ.get("LIKENESS_OWNER_SECRET_FILE")
+    owner_secret = Path(owner_file).read_bytes().strip() if owner_file else b""
+    if owner_file and (not owner_secret.isascii() or not 32 <= len(owner_secret) <= 90):
+        raise ValueError("The owner secret must contain 32 to 90 ASCII bytes.")
     app = FastAPI(title="Likeness", version=__version__, docs_url="/api/docs", openapi_url="/api/openapi.json", redoc_url=None)
     app.state.engine, app.state.store, app.state.jobs, app.state.key = engine, store, jobs, key
 
     @app.middleware("http")
     async def paired(request: Request, call_next):
         """Only this machine, or a device that has scanned the pairing code, may come in."""
+        if owner_secret:
+            if not owner_authenticated(request.headers.get("authorization", ""), owner_secret):
+                return HTMLResponse("Sign in to Likeness Studio.", status_code=401, headers={
+                    "WWW-Authenticate": 'Basic realm="Likeness Studio", charset="UTF-8"', "Cache-Control": "no-store",
+                })
+            origin = request.headers.get("origin")
+            if request.method not in {"GET", "HEAD"} and origin and origin != f"{request.url.scheme}://{request.url.netloc}":
+                return HTMLResponse("Open Likeness Studio to make changes.", status_code=403)
+            response = await call_next(request)
+            response.headers["Cache-Control"] = "private, no-store"
+            response.headers["Referrer-Policy"] = "no-referrer"
+            response.headers["X-Frame-Options"] = "DENY"
+            response.headers["Permissions-Policy"] = "geolocation=()"
+            return response
         offered = request.query_params.get("pair")
         if offered and secrets.compare_digest(offered, key):
             response = RedirectResponse(str(request.url.remove_query_params("pair")))
@@ -79,6 +111,7 @@ def create_app(engine: engines.Engine | None = None, home: Path | None = None, o
 
     def describe() -> dict:
         return {"ok": True, "edition": "live", "version": __version__, "engine": engine.describe(),
+                "events": "poll" if owner_secret else "stream",
                 "eta": {pace: estimates.expect("edit", pace) for pace in ("quick", "fine", "deep")}}
 
     app.get("/studio.json")(describe)
@@ -126,7 +159,16 @@ def create_app(engine: engines.Engine | None = None, home: Path | None = None, o
             estimates.record(body.intent.op, body.pace, body.n, ms)
             job.emit("done", ms=ms)
 
-        return {"job": jobs.submit(work).id, "eta": eta}
+        submission = None
+        if owner_secret and body.id:
+            wire = json.dumps(body.model_dump(mode="json"), sort_keys=True, separators=(",", ":")).encode()
+            submission = (body.id, hashlib.sha256(wire).hexdigest())
+        try:
+            return {"job": jobs.submit(work, submission).id, "eta": eta}
+        except SubmissionConflict:
+            raise HTTPException(422, "This turn ID was already used for a different request.") from None
+        except QueueFull:
+            raise HTTPException(429, "The studio is busy. Try again when a turn finishes.", headers={"Retry-After": "10"}) from None
 
     def find(job_id: str) -> Job:
         job = jobs.jobs.get(job_id)

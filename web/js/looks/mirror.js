@@ -241,6 +241,7 @@ export function openMirror(o) {
   /** A part, chosen: it is outlined on the face, and its styles come up in place of the parts. @param {string} id */
   function choose(id) {
     const p = partById(id); if (!p) return;
+    stopGreeting();
     part = id; read.classList.toggle('is-quiet', fresh().some(q => q.part === id));
     chips.forEach(c => c.setAttribute('aria-pressed', String(c.dataset.part === id))); lit();
     stylesRow.replaceChildren(h('button.mr-styles__back', { type: 'button', 'aria-label': 'Every part', html: icon('back'), onclick: () => unchoose() }),
@@ -515,9 +516,11 @@ export function openMirror(o) {
   // a tap picks the part under it, and holding shows the face as it was
   let hold = 0, comparing = false, turning = /** @type {null | { ring: string[], p: number, a: HTMLImageElement, b: HTMLImageElement, at: number }} */ (null), p0 = 0, anim = /** @type {{ stop(): void } | null} */ (null);
   let leaning = false, ready = false, pitchNow = 0, stampWas = /** @type {[string, string] | null} */ (null);
+  let greeting = false;
   drag(frame, {
     start: e => {
       if (/** @type {HTMLElement} */ (e.target).closest('button')) return false;
+      stopGreeting();
       anim?.stop(); if (turning) { p0 = turning.p; return; }
       if (turn && face) { ready = false; mount().then(ok => { ready = ok; }).catch(() => {}); }
       hold = setTimeout(() => { if (leaning || (shown < 0 && !picks.length)) return; comparing = true; frame.classList.add('is-comparing'); over.src = origin.url; over.classList.add('is-held'); }, 280);
@@ -582,20 +585,26 @@ export function openMirror(o) {
   }
   /** The mirror, once it has read you: the face turns a little one way, then the other, and comes back to you. */
   async function hello() {
-    if (!turn || reduced || !(await mount())) return;
+    if (!turn || reduced || part || !(await mount()) || part || !el.isConnected) return;
     ready = true;
+    greeting = true;
     const keys = [[0, 0, 0], [640, .22, .03], [1400, -.16, -.015], [1950, 0, 0]], t0 = performance.now();
     const ease = (/** @type {number} */ u) => u * u * (3 - 2 * u);
     await new Promise(done => {
       const tick = (/** @type {number} */ now) => {
-        const t = now - t0; if (!el.isConnected || leaning) { done(undefined); return; }
+        const t = now - t0; if (!el.isConnected || !greeting || leaning) { done(undefined); return; }
         let k = 1; while (k < keys.length - 1 && t > keys[k][0]) k++;
         const [ta, ya, pa] = keys[k - 1], [tb, yb, pb] = keys[k], u = ease(clamp((t - ta) / (tb - ta)));
         lean(ya + (yb - ya) * u, pa + (pb - pa) * u);
-        if (t < keys[keys.length - 1][0]) requestAnimationFrame(tick); else { lean(0, 0); done(undefined); }
+        if (t < keys[keys.length - 1][0]) requestAnimationFrame(tick); else { stopGreeting(); done(undefined); }
       };
       requestAnimationFrame(tick);
     });
+  }
+  function stopGreeting() {
+    if (!greeting) return;
+    greeting = false;
+    lean(0, 0);
   }
 
   /** Tries the picks (and any words) on: four takes from a live studio, a sketch here. */

@@ -43,4 +43,6 @@ timeout = 150
 
 [codex.images]
 # How the brief tells Codex to make pictures. Tune this to whatever image tool Codex has on the machine.
-hint = "Use your image generation tool (GPT Image). Where the work changes a picture, give the tool that picture from in/ as its input image, and the edit mask where regions are marked, rather than describing it from scratch."
+hint = """
+Use the built-in image_gen tool now. Put the requested size, aspect ratio, and quality in the prompt text, not in separate tool arguments. For an edit, pass the staged source picture and any supplied guide mask in referenced_image_paths. Explain which reference is the source and which marks the region. Use the tool's returned picture, and copy its saved file into out/ if it lands elsewhere. If the tool is unavailable, report the failure instead of drawing a stand-in with shell code.
+"""

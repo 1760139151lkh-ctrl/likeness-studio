@@ -14,6 +14,14 @@ class Cancelled(Exception):
     """Raised inside work that noticed it was asked to stop."""
 
 
+class SubmissionConflict(Exception):
+    """This submission ID already refers to a different turn."""
+
+
+class QueueFull(Exception):
+    """The studio already has as many active turns as it can hold."""
+
+
 class Job:
     def __init__(self) -> None:
         self.id = secrets.token_hex(6)
@@ -22,6 +30,7 @@ class Job:
         self.created = time.time()
         self.stop = threading.Event()
         self._lock = threading.Lock()
+        self.submission: tuple[str, str] | None = None
 
     def emit(self, kind: str, **data) -> None:
         with self._lock:
@@ -41,14 +50,26 @@ class Jobs:
     def __init__(self, workers: int = 2, keep: int = 200) -> None:
         self.jobs: dict[str, Job] = {}
         self.keep = keep
+        self._submissions: dict[str, Job] = {}
+        self._lock = threading.Lock()
         self._pool = ThreadPoolExecutor(max_workers=max(1, workers), thread_name_prefix="likeness-job")
 
-    def submit(self, work: Callable[[Job], None]) -> Job:
-        job = Job()
-        self.jobs[job.id] = job
-        self._forget_old()
-        self._pool.submit(self._run, job, work)
-        return job
+    def submit(self, work: Callable[[Job], None], submission: tuple[str, str] | None = None) -> Job:
+        with self._lock:
+            if submission and (existing := self._submissions.get(submission[0])):
+                if existing.submission != submission:
+                    raise SubmissionConflict()
+                return existing
+            if sum(not job.finished for job in self.jobs.values()) >= 8:
+                raise QueueFull()
+            job = Job()
+            job.submission = submission
+            self.jobs[job.id] = job
+            if submission:
+                self._submissions[submission[0]] = job
+            self._forget_old()
+            self._pool.submit(self._run, job, work)
+            return job
 
     def cancel(self, job_id: str) -> bool:
         job = self.jobs.get(job_id)
@@ -79,3 +100,5 @@ class Jobs:
             for old in sorted(self.jobs.values(), key=lambda j: j.created)[: len(self.jobs) - self.keep]:
                 if old.finished:
                     self.jobs.pop(old.id, None)
+                    if old.submission:
+                        self._submissions.pop(old.submission[0], None)
