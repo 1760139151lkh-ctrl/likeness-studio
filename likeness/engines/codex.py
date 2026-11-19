@@ -44,7 +44,6 @@ IMAGE_HINT = ("Use your image generation tool (GPT Image). Where the work change
 MARK = re.compile(r"^[\s>*_\x60]*(PLAN|DONE|FAILED)\b[\s:*_\x60]*(\{.*\})[\s*_\x60]*$", re.M)
 NUMBERED = re.compile(r"^(\d+)\.(png|jpe?g|webp)$", re.I)
 PICTURES = {".png", ".jpg", ".jpeg", ".webp"}
-KEEP = 40
 
 
 def resolve(command: list[str]) -> list[str]:
@@ -291,8 +290,6 @@ class Codex:
     def _folder(self, kind: str) -> Path:
         root = self.home / kind
         root.mkdir(parents=True, exist_ok=True)
-        for old in sorted(p for p in root.iterdir() if p.is_dir())[:-KEEP]:
-            shutil.rmtree(old, ignore_errors=True)
         folder = root / f"{time.strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(3)}"
         folder.mkdir()
         return folder
@@ -343,7 +340,12 @@ class Codex:
         follow = Follow(work)
         follow.spill = folder / "tool"
         argv = self.argv(folder, pace, attach if self.config.get("attach", True) else [])
-        code = self._run(argv, text, folder, follow, work, turn.n, float(pace.get("timeout") or 600))
+        region = None
+        if turn.intent.op == "region" and files.get("edit"):
+            with Image.open(folder / files["edit"]) as guide:
+                original = guide.convert("RGB")
+                region = (original, ImageOps.invert(guide.getchannel("A")))
+        code = self._run(argv, text, folder, follow, work, turn.n, float(pace.get("timeout") or 600), region)
         if follow.failed:
             raise EngineError(*follow.failed)
         if not work.results:
@@ -359,7 +361,8 @@ class Codex:
         reply = follow.reply or {}
         work.reply(str(reply.get("reply") or ""), [str(s) for s in reply.get("suggestions") or []])
 
-    def _run(self, argv: list[str], text: str, folder: Path, follow: Follow, work: Work, n: int, timeout: float) -> int:
+    def _run(self, argv: list[str], text: str, folder: Path, follow: Follow, work: Work, n: int, timeout: float,
+             region: tuple[Image.Image, Image.Image] | None = None) -> int:
         events = (folder / "events.jsonl").open("w", encoding="utf-8")
         errors = (folder / "stderr.log").open("w", encoding="utf-8")
         try:
@@ -387,6 +390,13 @@ class Codex:
         for thread in threads:
             thread.start()
         watcher, deadline = Watcher(folder / "out", n), time.monotonic() + timeout
+
+        def deliver(index: int, picture: Image.Image) -> None:
+            if region:
+                original, mask = region
+                picture = Image.composite(picture.resize(original.size, Image.Resampling.LANCZOS), original, mask)
+            work.result(index, picture, follow.prompt)
+
         try:
             while proc.poll() is None:
                 if work.job.stop.is_set():
@@ -396,14 +406,14 @@ class Codex:
                     kill(proc)
                     raise EngineError("The studio took too long and was stopped.", "Try the Quick pace, or fewer pictures at once.")
                 for index, picture in watcher.ready():
-                    work.result(index, picture, follow.prompt)
+                    deliver(index, picture)
                 time.sleep(0.3)
             threads[1].join(10)
             if len(watcher.taken) < n:   # an image tool that saved elsewhere: bring its pictures in
                 for i, loose in enumerate(follow.loose[: n - len(watcher.taken)]):
                     shutil.copy(loose, folder / "out" / f"loose-{i}{loose.suffix.lower()}")
             for index, picture in watcher.ready(final=True):
-                work.result(index, picture, follow.prompt)
+                deliver(index, picture)
             return proc.returncode or 0
         finally:
             kill(proc)

@@ -50,6 +50,8 @@ def turn_brief(turn: Turn, inputs: Inputs, files: dict[str, str], *, size: str, 
         lines.append(f"- Region {PIN_MARKS[n - 1]} ({mask}; white = change, black = keep): {note or 'change this'}")
     if files.get("edit"):
         lines.append(f"- The same regions as one edit mask, in the convention image-edit tools expect (transparent = change): {files['edit']}")
+        if turn.intent.op == "region":
+            lines.append("The studio composites the requested regions onto the source after generation. Save the tool's images directly. Leave resizing, compositing, and pixel checks to the studio.")
     if inputs.subject_mask is not None:
         lines.append(f"- The subject to keep is marked in {files['subject']} (white = keep in front).")
     if turn.look:
