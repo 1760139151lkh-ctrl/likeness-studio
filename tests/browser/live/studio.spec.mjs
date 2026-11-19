@@ -1,83 +1,87 @@
-import { STAGES, develop, expect, fixture, on, sheet, shot, spills, test } from '../kit.mjs';
+/** The live studio on the simulator engine: the same app, talking to likeness serve. Its pictures are stand-ins
+and say so, in the app and on the picture itself. */
+import { test, expect } from '@playwright/test';
+import { made, mirrorOn, open, pinAndSend, samples, say } from '../kit.mjs';
 
-test.describe('the live studio, with the simulator', () => {
-  test('the studio describes itself, and the app repeats it everywhere', async ({ page, request }, testInfo) => {
-    for (const path of ['/studio.json', '/api/health']) {
-      expect(await (await request.get(path)).json()).toMatchObject({ ok: true, edition: 'live', engine: { id: 'mock', kind: 'simulator' }, worlds: ['noir', 'oil', 'clay', 'cinema', 'brick', 'cel', 'knight'] });
-    }
-    await page.goto('/');
-    await expect(page.locator('html')).toHaveAttribute('data-mode', 'simulator');
-    const cover = on(page, 'catalogue').locator('.cover');
-    await expect(cover.locator('.pill')).toHaveText(/^live \u00b7 simulator$/i);
-    await expect(cover.locator('.pill')).toHaveAttribute('data-mode', 'simulator');
-    await cover.locator('.pill').click();
-    await expect(sheet(page)).toContainText('Live, with a simulator in place of the GPU.');
-    await expect(sheet(page)).toContainText('Plates made here are marked \u201cSimulator render\u201d.');
-    await shot(page, testInfo, 'edition');
-    await sheet(page).getByRole('button', { name: 'Understood' }).click();
-    await expect(sheet(page)).toHaveCount(0);
-  });
+test('the live studio says it is a simulator, and so do its pictures', async ({ page }) => {
+  await open(page);
+  await expect(page.locator('.edition')).toHaveText(/Live · Simulator/);
+  await say(page, 'Snow falling on a red roof at night');
+  await expect(page.locator('.job__notes')).not.toBeEmpty();
+  await expect(made(page, 'Simulated')).toHaveCount(1, { timeout: 30_000 });
+  await expect(page.locator('button.chip.idea').first()).toBeVisible();
+});
 
-  test('a photograph makes the round trip: upload, gate, job, events, render, and a measured trace', async ({ page }, testInfo) => {
-    const posts = [];
-    page.on('request', r => { if (r.method() === 'POST') posts.push(new URL(r.url()).pathname.replace(/[0-9a-f]{12}/, ':id')); });
-    await page.goto('/#/sitting?world=noir');
-    const sit = on(page, 'sitting');
-    await sit.locator('.sit__controls input[type=file]').setInputFiles(fixture('lena'));
-    await expect(sit).toHaveAttribute('data-state', 'review', { timeout: 90_000 });
-    await expect(sit.locator('.review__reading > .mono').first()).toHaveText(/the reading \u00b7 sent as notes/i);
-    await expect(sit.locator('.review__cta')).toHaveText('Develop in Neon Noir');
-    expect(posts).toEqual([]);                                                     // nothing leaves until the sitter says develop
+test('Stop reaches the studio', async ({ page }) => {
+  await open(page);
+  await say(page, 'A very slow picture, please');
+  await expect(page.locator('.job__stage')).toBeVisible();
+  await page.waitForTimeout(600);
+  await page.locator('button.job__stop').click();
+  await expect(page.locator('.job__stage', { hasText: 'Stopped.' })).toBeVisible();
+  await page.waitForTimeout(4000);
+  await expect(made(page, 'Simulated')).toHaveCount(0);
+});
 
-    const reveal = await develop(page);
-    expect(posts).toEqual(['/api/sittings', '/api/sittings/:id/portraits']);
-    await reveal.locator('.tissue').click();
-    await expect(reveal).toHaveClass(/is-revealed/);
-    await expect(reveal.locator('.stamp')).toHaveText(/^render$/i);
-    await expect(reveal.locator('.stamp')).toHaveAttribute('data-kind', 'render');
-    await expect(reveal.locator('.reveal__caption')).toContainText(/Simulator render \u00b7 mock \u00b7 8 steps \u00b7 seed \d+ \u00b7 \d+\.\d s/i);
-    expect(await reveal.locator('.reveal__plate > img').first().evaluate(img => [img.naturalWidth, img.naturalHeight])).toEqual([896, 1200]);
-    expect(await spills(page)).toEqual([]);
-    await shot(page, testInfo, 'reveal');
+test('a trip is drawn on the device even here, and its sheet says it is a sketch', async ({ page }) => {
+  await open(page);
+  await page.locator('button.starter').first().click();
+  const [chooser] = await Promise.all([page.waitForEvent('filechooser'), page.locator('button.bring__opt').first().click()]);
+  await chooser.setFiles('tests/fixtures/sitters/ruth.jpg');
+  await expect(page.locator('figure.print')).toHaveCount(1);
+  await say(page, 'take @A on a trip');
+  await expect(page.getByText(/A, on a trip: Lisbon at dawn/)).toBeVisible({ timeout: 40_000 });
+  await expect(made(page, 'Sketch')).toHaveCount(1);
+  await expect(made(page, 'Simulated')).toHaveCount(0);
+});
 
-    // Behind it: measured by the studio, and honest about what the score is.
-    await reveal.getByRole('button', { name: 'Behind it' }).click();
-    const lab = on(page, 'lab'), sections = lab.locator('.lab__section'), cells = lab.locator('.tri__cell');
-    await expect(sections.nth(0).locator('.badge')).toHaveText(/rendered/i);
-    await expect(cells.nth(1)).toContainText(/not yet rendered/i);
-    await expect(cells.nth(2).locator('b.num')).toHaveText(/^-?\d\.\d\d$/);
-    await expect(cells.nth(2)).toContainText(/tone proxy/i);
-    await expect(sections.nth(2).locator('.badge')).toHaveText(/measured/i);
-    await expect(sections.nth(2).locator('.fall__row > .mono')).toHaveText(STAGES);
-    await expect(sections.nth(2).locator('.lab__honest')).toContainText('Measured by the studio on');
-    await expect(sections.nth(2).locator('.fall__row[data-stage="gate"] .fall__note')).toContainText('no face model installed');
-    await expect(sections.nth(2).locator('.fall__row[data-stage="render"] .fall__note')).toHaveText('8 steps, 896 \u00d7 1200');
+test('a pinned change goes up with its mask and comes back simulated', async ({ page }) => {
+  await open(page);
+  await samples(page);
+  await pinAndSend(page, 'make it golden');
+  await expect(made(page, 'Simulated')).toHaveCount(1, { timeout: 30_000 });
+});
 
-    // The comparison is a second real job, made from the description alone.
-    await lab.getByRole('button', { name: 'Render the words-only plate to compare' }).click();
-    await expect(cells.locator('img.is-in')).toHaveCount(3, { timeout: 40_000 });
-    await expect(cells.locator('b.num')).toHaveText([/^-?\d\.\d\d$/, /^-?\d\.\d\d$/]);
-    await expect(sections.nth(0).locator('.lab__verdict')).toContainText('No face model is installed there, so the score is only a proxy');
-    expect(posts).toEqual(['/api/sittings', '/api/sittings/:id/portraits', '/api/sittings/:id/portraits']);   // one upload, two orders
-    await shot(page, testInfo, 'lab');
-  });
+test('a turn still developing when the page reloads is picked up again, and lands once', async ({ page }) => {
+  await open(page);
+  await say(page, 'A harbour in the morning, three boats');
+  await expect(page.locator('.job__stage')).toBeVisible();
+  await page.waitForTimeout(900);
+  await page.reload();
+  await expect(page.locator('.desk__bar .edition')).toBeVisible();
+  await expect(made(page, 'Simulated')).toHaveCount(1, { timeout: 30_000 });
+  await page.waitForTimeout(2500);
+  await expect(made(page, 'Simulated')).toHaveCount(1);
+  await expect(page.locator('.job__stage', { hasText: 'Stopped.' })).toHaveCount(0);
+});
 
-  test('a house sitter stays a showcase study, even with the studio connected', async ({ page }) => {
-    const posts = [];
-    page.on('request', r => { if (r.method() === 'POST') posts.push(r.url()); });
-    await page.goto('/#/sitting?world=brick');
-    const sit = on(page, 'sitting');
-    await sit.getByRole('button', { name: 'House sitter' }).click();
-    await sheet(page).locator('.sitters__item').nth(5).click();
-    await expect(sit).toHaveAttribute('data-state', 'review');
-    await sit.locator('.review .btn--primary').click();
-    await expect(on(page, 'developing').locator('.dev__foot')).toHaveText(/the atelier \u00b7 drawn on this device/i);
-    const reveal = on(page, 'reveal');
-    await expect(reveal.locator('.tissue')).toBeVisible({ timeout: 40_000 });
-    await reveal.locator('.tissue').click();
-    await expect(reveal.locator('.stamp')).toHaveText(/^study$/i);
-    await expect(reveal.locator('.reveal__caption')).toContainText(/Showcase study \u00b7 drawn on this device/i);
-    await expect(reveal.locator('.pill')).toHaveText(/^live \u00b7 simulator$/i);
-    expect(posts).toEqual([]);
-  });
+test('the mirror tries a look on: four takes inside the part\'s mask, one kept, then every angle of it', async ({ page }) => {
+  const turns = [];
+  page.on('request', r => { if (r.method() === 'POST' && r.url().endsWith('/api/turns')) turns.push(r.postDataJSON()); });
+  await page.goto('/');
+  await mirrorOn(page, 'tests/fixtures/sitters/kofi.jpg');
+  const mirror = page.locator('section.mr');
+  await expect(mirror.locator('.mr-note')).toHaveCount(7, { timeout: 30_000 });
+  await mirror.locator('.mr-note[data-part="brows"]').click();
+  await mirror.locator('.mr-style[data-style="bold"]').click();
+  // shaped by its handle (here with the keys): the arch raised, and the words for it go to the studio
+  const arch = mirror.locator('.mr-handle[data-control="arch"]');
+  await arch.focus();
+  for (let k = 0; k < 5; k++) await page.keyboard.press('ArrowUp');
+  await expect(mirror.locator('.mr-token__shape')).toHaveText('higher arch');
+  await mirror.locator('.mr-ask__go').click();
+  await expect(mirror.locator('.mr-take.is-pending')).toHaveCount(4);
+  await expect(mirror.locator('.mr-take:not(.is-origin):not(.is-pending)')).toHaveCount(4, { timeout: 60_000 });
+  await expect(mirror.locator('.mr-stamp')).toHaveText('Simulated');
+  const region = turns.find(t => t.intent.op === 'region');
+  expect(region.n).toBe(4);
+  expect(region.pins[0].mask).toBeTruthy();
+  expect(region.pins[0].note).toContain('bold, fuller, darker brows — with a higher, lifted arch');
+  await mirror.locator('.mr-take').nth(3).click();
+  await expect(mirror.locator('.mr-take').nth(3)).toHaveAttribute('aria-selected', 'true');
+  await mirror.locator('.mr-keep').click();
+  await expect(mirror.locator('.mr-keep')).toHaveAttribute('aria-pressed', 'true');
+  await mirror.locator('.mr-turn').click();
+  await expect(mirror).toHaveClass(/is-turning/, { timeout: 60_000 });
+  expect(turns.find(t => t.intent.op === 'angles').n).toBe(3);
 });
