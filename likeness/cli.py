@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import socket
 import sys
 from pathlib import Path
@@ -62,7 +63,8 @@ def serve(args) -> int:
         print("  The phone must be on the same network. Scan the code once; it stays paired.")
     print("  Ctrl+C stops the studio.\n", flush=True)
     tls = {"ssl_certfile": args.cert, "ssl_keyfile": args.key} if scheme == "https" else {}
-    uvicorn.run(app, host=args.host, port=args.port, log_level="warning", **tls)
+    uvicorn.run(app, host=args.host, port=args.port, log_level="warning",
+                access_log=os.environ.get("LIKENESS_OWNER_LINK") != "1", **tls)
     return 0
 
 

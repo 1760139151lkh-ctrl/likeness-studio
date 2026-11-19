@@ -15,6 +15,7 @@ import asyncio
 import base64
 import binascii
 import hashlib
+import hmac
 import json
 import os
 import secrets
@@ -39,6 +40,27 @@ LOOPBACK = {"127.0.0.1", "::1", "localhost"}
 NOT_PAIRED = """<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Likeness</title>
 <body style="margin:0;min-height:100vh;display:grid;place-items:center;background:#121110;color:#ede6da;font:17px/1.5 Georgia,serif">
 <p style="max-width:20em;padding:2em">This studio only opens for devices it has paired with.<br><br>Scan the code that <code>likeness serve</code> prints to pair this one.</p>"""
+OWNER_OPEN = """<!doctype html><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Likeness Studio</title>
+<p id="status" role="status">Opening Likeness Studio...</p>
+<script>
+const key = location.hash.slice(1);
+history.replaceState(null, "", location.pathname);
+if (/^[0-9a-f]{64}$/.test(key)) {
+  fetch(location.pathname, { method: "POST", headers: { "Content-Type": "text/plain" }, body: key })
+    .then(response => { if (!response.ok) throw Error(); location.replace("/"); })
+    .catch(() => { document.getElementById("status").textContent = "Could not open the studio. Reopen your access link."; });
+} else {
+  document.getElementById("status").textContent = "Open Likeness Studio using your access link.";
+}
+</script>"""
+OWNER_HEADERS = {"Cache-Control": "private, no-store", "Referrer-Policy": "no-referrer",
+                 "X-Frame-Options": "DENY", "Permissions-Policy": "geolocation=()"}
+
+
+def owner_link_token(secret: bytes) -> str:
+    return hmac.new(secret, b"likeness-owner-open-v1", hashlib.sha256).hexdigest()
 
 
 def owner_authenticated(header: str, secret: bytes) -> bool:
@@ -72,6 +94,9 @@ def create_app(engine: engines.Engine | None = None, home: Path | None = None, o
     owner_secret = Path(owner_file).read_bytes().strip() if owner_file else b""
     if owner_file and (not owner_secret.isascii() or not 32 <= len(owner_secret) <= 90):
         raise ValueError("The owner secret must contain 32 to 90 ASCII bytes.")
+    link_only = bool(owner_secret and os.environ.get("LIKENESS_OWNER_LINK") == "1")
+    link_key = owner_link_token(owner_secret) if link_only else ""
+    session_key = hmac.new(owner_secret, b"likeness-owner-session-v1", hashlib.sha256).hexdigest() if link_only else ""
     app = FastAPI(title="Likeness", version=__version__, docs_url="/api/docs", openapi_url="/api/openapi.json", redoc_url=None)
     app.state.engine, app.state.store, app.state.jobs, app.state.key = engine, store, jobs, key
 
@@ -79,7 +104,33 @@ def create_app(engine: engines.Engine | None = None, home: Path | None = None, o
     async def paired(request: Request, call_next):
         """Only this machine, or a device that has scanned the pairing code, may come in."""
         if owner_secret:
-            if not owner_authenticated(request.headers.get("authorization", ""), owner_secret):
+            if link_only and request.method == "GET" and request.url.path.startswith("/open/"):
+                supplied = request.url.path[len("/open/"):]
+                if len(supplied) == 64 and secrets.compare_digest(supplied.encode("utf-8"), link_key.encode("ascii")):
+                    response = RedirectResponse("/", status_code=303, headers=OWNER_HEADERS)
+                    response.set_cookie("__Host-likeness", session_key, max_age=604800,
+                                        secure=True, httponly=True, samesite="strict", path="/")
+                    return response
+                return HTMLResponse("Open your access link again.", status_code=403, headers=OWNER_HEADERS)
+            if link_only and request.url.path == "/open":
+                if request.method == "GET":
+                    return HTMLResponse(OWNER_OPEN, headers=OWNER_HEADERS)
+                if request.method == "POST":
+                    expected_origin = f"{request.url.scheme}://{request.url.netloc}"
+                    if request.headers.get("origin") == expected_origin:
+                        async for chunk in request.stream():
+                            if len(chunk) == 64 and secrets.compare_digest(chunk, link_key.encode("ascii")):
+                                response = HTMLResponse("", status_code=204, headers=OWNER_HEADERS)
+                                response.set_cookie("__Host-likeness", session_key, max_age=604800,
+                                                    secure=True, httponly=True, samesite="strict", path="/")
+                                return response
+                            break
+                    return HTMLResponse("Open your access link again.", status_code=403, headers=OWNER_HEADERS)
+            if link_only:
+                cookie = request.cookies.get("__Host-likeness", "").encode("utf-8")
+                if not secrets.compare_digest(cookie, session_key.encode("ascii")):
+                    return HTMLResponse("Open Likeness Studio using your access link.", status_code=401, headers=OWNER_HEADERS)
+            elif not owner_authenticated(request.headers.get("authorization", ""), owner_secret):
                 return HTMLResponse("Sign in to Likeness Studio.", status_code=401, headers={
                     "WWW-Authenticate": 'Basic realm="Likeness Studio", charset="UTF-8"', "Cache-Control": "no-store",
                 })
@@ -87,10 +138,7 @@ def create_app(engine: engines.Engine | None = None, home: Path | None = None, o
             if request.method not in {"GET", "HEAD"} and origin and origin != f"{request.url.scheme}://{request.url.netloc}":
                 return HTMLResponse("Open Likeness Studio to make changes.", status_code=403)
             response = await call_next(request)
-            response.headers["Cache-Control"] = "private, no-store"
-            response.headers["Referrer-Policy"] = "no-referrer"
-            response.headers["X-Frame-Options"] = "DENY"
-            response.headers["Permissions-Policy"] = "geolocation=()"
+            response.headers.update(OWNER_HEADERS)
             return response
         offered = request.query_params.get("pair")
         if offered and secrets.compare_digest(offered, key):
