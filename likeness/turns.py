@@ -10,12 +10,17 @@ from pydantic import BaseModel, Field, StringConstraints
 
 Op = Literal["create", "edit", "restyle", "reference", "blend", "region", "backdrop", "remove", "vary", "angles"]
 Pace = Literal["quick", "fine", "deep"]
+Aspect = Literal["portrait", "square", "tall"]
+# what an image model is asked for, by format (a tall wallpaper is painted portrait and composed for the phone)
+SIZES = {"portrait": "1024x1536", "square": "1024x1024", "tall": "1024x1536"}
 Handle = Annotated[str, StringConstraints(pattern=r"^[A-Z]{1,8}$")]
 
 
 class Ref(BaseModel):
     asset: str = Field(max_length=40)
-    role: Literal["style", "backdrop", "with"] = "with"
+    # look: a picture whose look (a cut, a colour, make-up, clothes) is borrowed for the subject; marks: the subject with
+    # the person's own marks drawn on it, showing where and how to change it
+    role: Literal["style", "backdrop", "with", "look", "marks"] = "with"
 
 
 class Intent(BaseModel):
@@ -27,7 +32,7 @@ class Intent(BaseModel):
 
 class Pin(BaseModel):
     n: int = Field(ge=1, le=9)
-    note: str = Field("", max_length=300)
+    note: str = Field("", max_length=1200)   # a look mixed from several parts, with marks and a reference, says a lot
     print: str | None = Field(None, max_length=40)
     mask: str | None = Field(None, max_length=40)
 
@@ -65,6 +70,7 @@ class Turn(BaseModel):
     room: RoomIn | None = None
     mood: str | None = Field(None, max_length=40)
     taste: str = Field("", max_length=600)   # what the person always wants, in their words
+    aspect: Aspect | None = None   # the portrait studio's format: portrait 2:3, a square avatar, a tall wallpaper
 
     def asset_ids(self) -> list[str]:
         ids = list(self.handles.values()) + [r.asset for r in self.intent.refs] + [p.mask for p in self.pins if p.mask]

@@ -1,11 +1,12 @@
 /** Every side of you: the browser's fake camera plays a drawn sitter turning their head, straight on, to one side, to the other. */
+import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { test, expect } from '@playwright/test';
 
 test.use({ launchOptions: { args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream', '--use-file-for-fake-video-capture=' + resolve('tests/fixtures/camera/kofi-turn.mjpeg')] } });
 
 test('every side of you: a turn of the head catches the front and each side, and the mirror turns through them', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/?looks');
   // left alone, the line says things by itself and the ring wears them: what it said is no one's look, and is not taken along
   await expect(page.locator('.lb-caption__shape')).toHaveText('to the jaw', { timeout: 8_000 });
   await page.locator('.lb-part[data-part="brows"]').click();
@@ -34,7 +35,25 @@ test('every side of you: a turn of the head catches the front and each side, and
   await expect(turn).toBeVisible();
   await turn.click();
   await expect(mirror).toHaveClass(/is-turning/);
-  await expect(mirror.locator('.mr-angle')).toHaveCount(2);
+  await expect(mirror.locator('img.mr-angle')).toHaveCount(2);
+  // between two sides the head turns on the device, each side towards the next, rather than one fading into another
+  await expect(mirror.locator('canvas.mr-meet')).toHaveCount(2);
   await turn.click();
   await expect(mirror).not.toHaveClass(/is-turning/);
+  // shown: the tools fall away, every side of you turns slowly, the look is set out in its words, and kept as a card
+  await mirror.locator('.mr-bar__show').click();
+  await expect(mirror).toHaveClass(/is-showing/);
+  await expect(mirror.locator('.mr-dock')).toBeHidden();
+  await expect(mirror.locator('.mr-show__style')).toHaveText(['High arch']);
+  await expect(mirror).toHaveClass(/is-turning/, { timeout: 5_000 });
+  const saved = page.waitForEvent('download');
+  await mirror.locator('.mr-show__save').click();
+  const card = await saved;
+  expect(card.suggestedFilename()).toMatch(/^likeness-\d{4}-\d{2}-\d{2}\.png$/);
+  const png = readFileSync(/** @type {string} */ (await card.path()));
+  expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([1080, 1350]);
+  await mirror.locator('.mr-show__done').click();
+  await expect(mirror).not.toHaveClass(/is-showing/);
+  await expect(mirror).not.toHaveClass(/is-turning/);
+  await expect(mirror.locator('.mr-dock')).toBeVisible();
 });

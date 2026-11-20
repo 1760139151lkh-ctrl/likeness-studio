@@ -49,20 +49,31 @@ const P = {
   room: '<path d="M4 20V9.5L12 4l8 5.5V20"/><path d="M9.5 20v-6h5v6"/>',
   dial: '<circle cx="12" cy="12" r="8"/><path d="M12 12l4-3"/>',
   undo: '<path d="M9 7L4.5 11.5 9 16M5 11.5h9a5 5 0 0 1 0 10h-2"/>',
+  share: '<path d="M12 15V4M8 7.5L12 3.5l4 4"/><path d="M6 11H5v9h14v-9h-1"/>',
   film: '<rect x="4" y="4.5" width="16" height="15" rx="2"/><path d="M8 4.5v15M16 4.5v15M4 9.5h4M4 14.5h4M16 9.5h4M16 14.5h4"/>',
   trash: '<path d="M5 7h14M10 7V4.5h4V7M7 7l1 13h8l1-13"/>',
   text: '<path d="M5 6h14M12 6v13"/>',
   palette: '<path d="M12 3.5a8.5 8.5 0 1 0 0 17c1.2 0 1.8-.8 1.8-1.7 0-1.2-1-1.5-1-2.6 0-1 .8-1.7 1.8-1.7H17a3.5 3.5 0 0 0 3.5-3.5c0-4.2-3.8-7.5-8.5-7.5z"/><circle cx="7.8" cy="11" r="1.1"/><circle cx="10.5" cy="7.5" r="1.1"/><circle cx="15" cy="7.8" r="1.1"/>',
   expand: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
   orbit: '<ellipse cx="12" cy="13" rx="9" ry="3.6"/><path d="M14.6 7.4l2.6 2.1-3.2.9"/><circle cx="12" cy="8.6" r="2.4"/>',
+  lenses: '<circle cx="6.8" cy="12" r="4.3" fill="currentColor"/><circle cx="17.2" cy="12" r="4.3"/>',
+  weeks: '<path d="M7 3.5h10M7 20.5h10M8 3.5c0 4.6 4 5.6 4 8.5s-4 3.9-4 8.5M16 3.5c0 4.6-4 5.6-4 8.5s4 3.9 4 8.5"/><path d="M10 18.5c.6-1.4 1.3-2 2-2s1.4.6 2 2z" fill="currentColor"/>',
 };
 /** An inline stroke icon. */
 export const icon = (name, cls = '') => `<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[name] || ''}</svg>`;
 
 export const sleep = ms => new Promise(r => setTimeout(r, ms));
 export const frame = () => new Promise(r => requestAnimationFrame(() => r(undefined)));
+/** Yield to the current frame before preparing a more expensive visual result. */
+export const afterPaint = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(r, 0))));
 export const stage = () => /** @type {HTMLElement} */ (document.getElementById('stage'));
 export const screens = () => /** @type {HTMLElement} */ (document.getElementById('screens'));
+const versions = JSON.parse(document.getElementById('studio-versions')?.textContent || '{}');
+/** A site asset keyed by the files in its group, or an ordinary relative URL on the static edition. @param {string} path */
+export const assetUrl = path => {
+  const version = versions[path.split('/')[0]];
+  return new URL(version ? '/' + version + '/' + path : path, document.baseURI);
+};
 export const clamp = (v, lo = 0, hi = 1) => Math.max(lo, Math.min(hi, v));
 export const lerp = (a, b, t) => a + (b - a) * t;
 export const uid = (p = '') => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -117,10 +128,21 @@ export function sheet(build, { cls = '', label = '' } = {}) {
     const scrim = h('div.scrim'), body = h('div.sheet__body'), grip = h('div.sheet__grip');
     const panel = h('div.sheet' + (cls ? '.' + cls : ''), { role: 'dialog', 'aria-modal': 'true', 'aria-label': label }, grip, body);
     let done = false;
+    // Escape puts the sheet on top away (only that one), and the keys go back where they were
+    const was = /** @type {HTMLElement | null} */ (document.activeElement);
+    const onKey = (/** @type {KeyboardEvent} */ e) => {
+      if (e.key !== 'Escape' || done) return;
+      const all = stage().querySelectorAll('.sheet'); if (all[all.length - 1] !== panel) return;
+      e.preventDefault(); e.stopPropagation(); close(); was?.focus?.({ preventScroll: true });
+    };
+    window.addEventListener('keydown', onKey, true);
     const close = value => {
       if (done) return; done = true;
+      window.removeEventListener('keydown', onKey, true);
+      scrim.inert = panel.inert = true;
       scrim.classList.remove('is-in'); panel.classList.remove('is-in'); panel.style.transform = '';
-      setTimeout(() => { scrim.remove(); panel.remove(); resolve(value); }, reduced ? 0 : 380);
+      resolve(value);
+      setTimeout(() => { scrim.remove(); panel.remove(); }, reduced ? 0 : 200);
     };
     body.append(...build(close, panel));
     scrim.addEventListener('click', () => close());
@@ -129,16 +151,18 @@ export function sheet(build, { cls = '', label = '' } = {}) {
       move: d => { panel.style.transform = `translateY(${Math.max(0, d.dy)}px)`; },
       end: d => { panel.classList.remove('is-dragging'); if (d.dy > 90 || d.vy > 600) close(); else panel.style.transform = ''; },
     });
+    scrim.classList.add('is-in');
+    panel.classList.add('is-in');
     stage().append(scrim, panel);
-    requestAnimationFrame(() => requestAnimationFrame(() => { scrim.classList.add('is-in'); panel.classList.add('is-in'); }));
   });
 }
 
 /** Reads a file chooser and resolves the chosen files (images only). */
-export function chooseFiles({ multiple = true, capture = false } = {}) {
+/** @param {{ multiple?: boolean, capture?: boolean | 'user' | 'environment' }} [o] */
+export function chooseFiles({ multiple = true, capture = /** @type {boolean | 'user' | 'environment'} */ (false) } = {}) {
   return new Promise(resolve => {
     const input = h('input', { type: 'file', accept: 'image/*', multiple, hidden: true });
-    if (capture) input.setAttribute('capture', 'environment');
+    if (capture) input.setAttribute('capture', capture === true ? 'environment' : String(capture));
     input.addEventListener('change', () => { resolve([...(input.files || [])]); input.remove(); });
     input.addEventListener('cancel', () => { resolve([]); input.remove(); });
     document.body.append(input);

@@ -6,7 +6,9 @@
 const json = async res => {
   if (res.ok) return res.json();
   const body = await res.json().catch(() => null);
-  throw Object.assign(new Error(body?.detail || `The studio answered ${res.status}`), { status: res.status, hint: body?.hint || '' });
+  // the studio's own sentence where it gave one; a request it could not read (a list of field errors) said plainly
+  const said = typeof body?.detail === 'string' ? body.detail : body?.detail ? 'The studio could not read that request.' : '';
+  throw Object.assign(new Error(said || `The studio answered ${res.status}`), { status: res.status, hint: typeof body?.hint === 'string' ? body.hint : '' });
 };
 const post = (path, body) => fetch(path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }).then(json);
 const sent = new Map();
@@ -43,7 +45,7 @@ async function* follow(job, pollOnly) {
     while (!finished) {
       const res = await fetch(`api/jobs/${job}`).catch(() => null);
       if (res?.status === 404) { push({ type: 'failed', message: 'The studio was restarted and this turn went with it.', hint: 'Try again.' }); return; }
-      if (res?.status === 401 || res?.status === 403) { push({ type: 'failed', message: 'Sign in to reopen your studio.' }); return; }
+      if (res?.status === 401 || res?.status === 403) { push({ type: 'failed', message: 'Reopen the studio with your access link.' }); return; }
       const state = res?.ok ? await res.json().catch(() => null) : null;
       if (state) { state.events.slice(seen).forEach(push); seen = state.events.length; }
       await new Promise(r => setTimeout(r, 700));
@@ -67,7 +69,7 @@ async function* follow(job, pollOnly) {
 async function* events(job, pollOnly) {
   for await (const ev of follow(job, pollOnly)) {
     if (ev.type === 'partial') yield { type: 'partial', index: ev.index, blob: await fetchBlob(ev.url) };
-    else if (ev.type === 'result') yield { type: 'result', index: ev.index, blob: await fetchBlob(ev.url), w: ev.w, h: ev.h, provenance: ev.provenance, prompt: ev.prompt };
+    else if (ev.type === 'result') yield { type: 'result', index: ev.index, blob: await fetchBlob(ev.url), url: ev.url, w: ev.w, h: ev.h, provenance: ev.provenance, prompt: ev.prompt };
     else if (ev.type === 'failed') throw Object.assign(new Error(ev.message || 'The studio could not finish this.'), { hint: ev.hint, cancelled: ev.cancelled });
     else if (ev.type !== 'accepted') yield ev;
   }
@@ -126,7 +128,7 @@ async function send(spec, inputs, retry = false) {
     look: it.look ? { id: it.look.id, name: it.look.name, prompt: it.look.prompt } : null,
     backdrop: spec.backdrop ? { name: spec.backdrop.name, words: spec.backdrop.words } : null, subject_mask: subjectMask, pins,
     room: { id: spec.room.id, name: spec.room.name, line: spec.room.line, colors: spec.room.colors, voice: spec.room.voice?.done || [] }, mood: spec.mood || null,
-    taste: spec.taste || '',
+    taste: spec.taste || '', aspect: spec.aspect || null,
   };
   return postTurn(body, retry);
 }

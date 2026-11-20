@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import socket
 import sys
 from pathlib import Path
@@ -63,8 +62,7 @@ def serve(args) -> int:
         print("  The phone must be on the same network. Scan the code once; it stays paired.")
     print("  Ctrl+C stops the studio.\n", flush=True)
     tls = {"ssl_certfile": args.cert, "ssl_keyfile": args.key} if scheme == "https" else {}
-    uvicorn.run(app, host=args.host, port=args.port, log_level="warning",
-                access_log=os.environ.get("LIKENESS_OWNER_LINK") != "1", **tls)
+    uvicorn.run(app, host=args.host, port=args.port, log_level="warning", access_log=False, **tls)
     return 0
 
 
@@ -79,7 +77,7 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="command", required=True)
 
     p = sub.add_parser("serve", help="start the studio")
-    p.add_argument("--engine", default="", help="auto, simulator or codex (default: studio.toml, then auto)")
+    p.add_argument("--engine", default="", help="auto, simulator, codex or openai (default: studio.toml, then auto)")
     p.add_argument("--host", default="127.0.0.1")
     p.add_argument("--port", type=int, default=8787)
     p.add_argument("--open", action="store_true", help="let any device on the network in without pairing")

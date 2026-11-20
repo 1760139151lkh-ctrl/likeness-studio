@@ -10,14 +10,16 @@
 import { h, icon, stage } from '../core/dom.js';
 import { reduced, flip } from '../core/motion.js';
 import * as P from '../studio/painter.js';
-import { follower, hairFollower, reframed, notHair, LIPS, MOUTH } from '../studio/face.js';
+import { follower, followerAside, hairFollower, reframed, clearNotHair, bearded, faceOf, yawOf, LIPS, MOUTH } from '../studio/face.js';
 import { addPrint, addItem } from '../state.js';
 import { studio } from '../studio/studio.js';
 import { partById, styleOf, plateSVG, tintOf } from './vocab.js';
 import { markup } from './markup.js';
-import { coat } from './tint.js';
+import { coat, dyeHair } from './tint.js';
+import { paintLook, coloursOf, PAINTED, refreshHairTexture } from './paint.js';
 
 /** @typedef {{ part: string, style: import('./vocab.js').Style, shape?: Record<string, number>, said?: string }} Pick */
+/** One side of you, caught: the picture with the look on it, and the face in it (null where it could not be read again). @typedef {{ src: string, face?: import('../studio/face.js').Face | null }} Side */
 
 /** Whether there is a camera to be a mirror (found without asking for it). */
 export async function canLive() {
@@ -28,10 +30,20 @@ export async function canLive() {
 /** The parts a live sketch can show, in the order they are offered. */
 const LIVE = ['bangs', 'brows', 'lashes', 'lips', 'beard', 'cut', 'colour'];
 /** How long the picture takes to come apart into tiles, or back. */
-const GRID_MS = 560;
+const GRID_MS = 320;
+// a face read aside is of a frame a moment old: it is carried on the way it was moving, for up to this long (ms)
+const AHEAD = 100;
+/**
+ * The face moved on by how it was moving (pixels a millisecond) for ms.
+ * @param {import('../studio/face.js').Face} f @param {number} vx @param {number} vy @param {number} ms
+ * @returns {import('../studio/face.js').Face}
+ */
+function ahead(f, vx, vy, ms) {
+  const dx = vx * ms, dy = vy * ms;
+  if (Math.abs(dx) < .5 && Math.abs(dy) < .5) return f;
+  return { ...f, pts: f.pts.map(p => ({ x: p.x + dx, y: p.y + dy, z: p.z })), box: [f.box[0] + dx, f.box[1] + dy, f.box[2], f.box[3]] };
+}
 const pc = (/** @type {number} */ v) => (v * 100).toFixed(3) + '%';
-/** How far a face is turned, as you see it: the nose from between the cheeks, from -1 (to your left) to 1. @param {any} f */
-const yawOf = (f) => { const L = f.pts[234], R = f.pts[454], N = f.pts[1]; return (N.x - (L.x + R.x) / 2) / (Math.abs(R.x - L.x) / 2 || 1); };
 const ease = (/** @type {number} */ t) => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const mix = (/** @type {number[]} */ a, /** @type {number[]} */ b, /** @type {number} */ t) => a.map((v, i) => v + (b[i] - v) * t);
 /** Where n tiles go in a w × h picture ([x, y, w, h] each): two across (three past six), the last row centred. @param {number} n @param {number} w @param {number} hh */
@@ -58,7 +70,7 @@ let current = /** @type {null | (() => void)} */ (null);
  * The live mirror, on a look. Resolves with the photo taken and the look it was taken in; with a photo chosen
  * instead (by the fallback) and only the looks that were chosen (here, or before: keep); or null when it is closed.
  * @param {{ picks: Pick[], keep?: Pick[], fallback: () => Promise<any>, from?: Element | null }} o
- * @returns {Promise<{ print: any, picks: Pick[], from?: Element, face?: import('../studio/face.js').Face | null, turns?: string[] } | null>}
+ * @returns {Promise<{ print: any, picks: Pick[], from?: Element, face?: import('../studio/face.js').Face | null, turns?: Side[] } | null>}
  */
 export function openLive(o) {
   current?.();
@@ -67,6 +79,9 @@ export function openLive(o) {
     if (!picks.length) { const s = styleOf('bangs', 'curtain'); if (s) picks = [{ part: 'bangs', style: s }]; }
     let part = picks[picks.length - 1]?.part || 'bangs', stream = /** @type {MediaStream | null} */ (null), raf = 0, done = false;
     let follow = /** @type {null | ((v: HTMLVideoElement, c: import('../studio/face.js').Crop, w: number, h: number) => any)} */ (null);
+    // the face read aside from the page where it can be (a worker), so the mirror is drawn on every frame meanwhile
+    let aside = /** @type {Awaited<ReturnType<typeof followerAside>>} */ (null), asideAt = 0;
+    let held = /** @type {import('../studio/face.js').Face | null} */ (null), heldFrom = 0, vx = 0, vy = 0;
     let hair = /** @type {null | ((f: HTMLCanvasElement, now?: boolean) => HTMLCanvasElement | null)} */ (null), hairAsked = false;
     let face = /** @type {any} */ (null), seen = 0, read = 0, slow = 0, chose = false;
     // every style of a part, on you at once: the part shown as tiles, how far apart they have come (0 one picture, 1 all
@@ -74,9 +89,15 @@ export function openLive(o) {
     let grid = '', gt = 0, gAt = 0, gDir = 0, lead = '', nudged = false;
     // every side of you: what has been caught (front, one side, the other: the picture with the look on it), the front
     // kept clean as well for the photo, how far the head is turned now, and how long it has been in the side it is in
-    let sides = /** @type {null | { got: Record<string, string>, front: null | { still: HTMLCanvasElement, face: any }, yaw: number, zone: string, since: number }} */ (null);
+    let sides = /** @type {null | { got: Record<string, Promise<Side>>, front: null | { still: HTMLCanvasElement, face: any }, yaw: number, zone: string, since: number }} */ (null);
 
     const video = /** @type {HTMLVideoElement} */ (h('video', { autoplay: true, playsinline: true }));
+    // when the camera's newest frame came: the mirror is drawn once for each (drawing more often shows nothing new and
+    // takes time from reading the face), and a face carried on is carried to that frame
+    let frameAt = 0, drawnAt = -1;
+    const perFrame = typeof video.requestVideoFrameCallback === 'function';
+    const onFrame = () => { frameAt = performance.now(); if (!done) video.requestVideoFrameCallback(onFrame); };
+    if (perFrame) video.requestVideoFrameCallback(onFrame);
     video.muted = true; video.setAttribute('playsinline', ''); video.setAttribute('muted', '');
     const view = /** @type {HTMLCanvasElement} */ (h('canvas.lv-view', { 'aria-hidden': 'true' }));
     const name = h('p.lv-name', { 'aria-live': 'polite' }), hint = h('p.lv-hint', null, 'Look into the camera');
@@ -118,7 +139,7 @@ export function openLive(o) {
       if (sides) turning();
       part = id; grid = id; lead = picks.find(q => q.part === id)?.style.id || ''; gDir = 1; gAt = performance.now() - (gt * GRID_MS);
       paintParts(); paintTiles(); frame.classList.add('is-grid');
-      if (id === 'colour' && !hairAsked) { hairAsked = true; hairFollower().then(f => { hair = f; }).catch(() => {}); }
+      if ((id === 'colour' || id === 'bangs') && !hairAsked) { hairAsked = true; hairFollower().then(f => { hair = f; }).catch(() => {}); }
     }
     /** Back to the one picture, closing on the tile chosen (or the look as it is). @param {string} [on] */
     function closeGrid(on) {
@@ -133,7 +154,7 @@ export function openLive(o) {
       picks = off ? picks.filter(q => q !== had) : [...picks.filter(q => q.part !== part), { part, style: s }];
       paintParts(); if (grid) paintTiles();
       say(off ? 'As you are' : s.name + (part === 'bangs' || part === 'brows' ? ' ' + (partById(part)?.name || '').toLowerCase() : ''));
-      if (part === 'colour' && !hairAsked) { hairAsked = true; hairFollower().then(f => { hair = f; }).catch(() => {}); }
+      if ((part === 'colour' || part === 'bangs') && !hairAsked) { hairAsked = true; hairFollower().then(f => { hair = f; }).catch(() => {}); }
     }
     /** The look's name, over the face for a moment. @param {string} text */
     function say(text) { name.textContent = text; name.classList.remove('is-on'); void name.offsetWidth; name.classList.add('is-on'); }
@@ -148,6 +169,7 @@ export function openLive(o) {
 
     // —— the mirror itself: each frame, the camera (mirrored, as you see yourself) and the look on the face in it ——
     const small = P.make(192, 256), base = P.make(2, 2);
+    const previewSource = P.make(2, 2);
     let mask = /** @type {HTMLCanvasElement | null} */ (null);
     /** @type {Map<string, { c: HTMLCanvasElement, at: number }>} each colour laid on the hair, kept a moment (a tile each) */
     const tints = new Map();
@@ -166,22 +188,47 @@ export function openLive(o) {
       const c = crop(), x = ctx(view), w = view.width, hh = view.height;
       // the face is read as often as the device keeps up with, and drawn on every frame between; its points are turned
       // round with the picture, as you see yourself, so a look that leans one way leans that way here and in the photo
-      if (follow && now - read > slow) {
-        const t0 = performance.now(); read = now;
+      let fresh = false;
+      if (aside) {
+        aside.ask(video, c, w, hh);
+        if (aside.at !== asideAt) {
+          fresh = true; asideAt = aside.at; el.dataset.read = String(Math.round(aside.took));
+          const f = aside.face ? reframed(aside.face, w, hh, true) : null, dt = aside.from - heldFrom, cap = w / 400;
+          // how fast the face was going between the last two readings, eased so one jumpy reading doesn't throw it
+          if (f && held && dt > 0 && dt < 400) {
+            const [x0, y0, bw, bh] = f.box, [x1, y1, cw, ch] = held.box;
+            vx = Math.max(-cap, Math.min(cap, vx * .4 + (x0 + bw / 2 - x1 - cw / 2) / dt * .6));
+            vy = Math.max(-cap, Math.min(cap, vy * .4 + (y0 + bh / 2 - y1 - ch / 2) / dt * .6));
+          } else vx = vy = 0;
+          held = f; heldFrom = aside.from; if (f) seen = now;
+        }
+      } else if (follow && now - read > slow) {
+        const t0 = performance.now(); read = now; fresh = true;
         let f = null; try { f = follow(video, c, w, hh); } catch { f = null; }
         face = f ? reframed(f, w, hh, true) : null; if (face) seen = now;
         const took = performance.now() - t0; slow = Math.min(400, Math.max(28, took * 1.1)); el.dataset.read = String(Math.round(took));
       }
+      // nothing new to show (the camera's frame, the face and the tiles all as last drawn): wait for the next
+      if (perFrame && !fresh && frameAt === drawnAt && !gDir) return;
+      drawnAt = frameAt;
+      if (aside) face = held ? ahead(held, vx, vy, Math.max(0, Math.min(AHEAD, (perFrame ? frameAt : performance.now()) - heldFrom))) : null;
       const there = !!face && now - seen < 450;
       // the camera, mirrored as you see yourself, once a frame: the view, or each of its tiles, is drawn from it
       if (base.width !== w || base.height !== hh) { base.width = w; base.height = hh; }
       const b = ctx(base); b.save(); b.translate(w, 0); b.scale(-1, 1); b.drawImage(video, c.sx, c.sy, c.sw, c.sh, 0, 0, w, hh); b.restore();
-      if (hair && (grid === 'colour' || picks.some(q => q.part === 'colour'))) hairMask();
+      if (hair && (grid === 'colour' || grid === 'bangs' || picks.some(q => q.part === 'colour' || q.part === 'bangs'))) {
+        // Move the mask with small motions, and reread it when the visible side of the head has changed.
+        const turned = fresh && there && maskE && now - maskRead > 80 && Math.abs(yawOf(face) - maskYaw) > .18;
+        hairMask(!!turned);
+        if (turned) { paints.clear(); tone = null; }
+      }
+      ticks++;
+      for (const [key, p] of paints) if (now - p.used > 2500) paints.delete(key);
       // how far the tiles have come apart
       if (gDir) { const p = Math.min(1, (now - gAt) / (reduced ? 1 : GRID_MS)); gt = gDir > 0 ? p : 1 - p; if (p >= 1) { if (gDir < 0) { grid = ''; tiles.replaceChildren(); } gDir = 0; } }
       x.setTransform(1, 0, 0, 1, 0, 0);
       const full = [0, 0, w, hh];
-      if (!grid) draw(x, picks, there, full, full, 1, 0);
+      if (!grid) draw(x, picks, there, full, full, 1, 0, Math.min(400, w * .58));
       else {
         // every style of the part, on you: the picture comes apart into tiles, each close on the part, the one picked on top
         x.fillStyle = '#0d0a09'; x.fillRect(0, 0, w, hh);
@@ -189,7 +236,7 @@ export function openLive(o) {
         const order = all.map((_, i) => i).sort((i, j) => Number(all[i].id === lead) - Number(all[j].id === lead));
         for (const i of order) {
           const s = all[i], aspect = at[i][2] / at[i][3], to = there ? partCrop(face, grid, aspect) : fitCrop(w, hh, aspect);
-          draw(x, [...picks.filter(q => q.part !== grid), { part: grid, style: s }], there, mix(full, at[i], e), mix(full, to, e), gDir < 0 && s.id !== lead ? e : 1, e * w * .035);
+          draw(x, [...picks.filter(q => q.part !== grid), { part: grid, style: s }], there, mix(full, at[i], e), mix(full, to, e), gDir < 0 && s.id !== lead ? e : 1, e * w * .035, Math.min(260, w * .36));
         }
       }
       el.classList.toggle('has-face', there);
@@ -222,32 +269,48 @@ export function openLive(o) {
       if (zone !== s.zone) { s.zone = zone; s.since = now; }
       if (zone && !s.got[zone] && now - s.since > 160) catchSide(zone);
     }
-    /** One side of you, caught: the picture as it is, the look on it, a soft flash, and its mark on the level filled with it. @param {string} zone */
+    /**
+     * One side of you, caught: the frame as it is, kept at once (with the hair's new colour, read again in this very
+     * frame), a soft flash; then the face in it read whole (the one followed is smoothed over the frames before), the
+     * look drawn on that face, and its mark on the level filled with it. The mirror turns each side towards the next by
+     * these faces, so they meet with nothing doubled.
+     * @param {string} zone
+     */
     function catchSide(zone) {
       const s = sides; if (!s) return;
-      const w = view.width, hh = view.height, shot = P.make(w, hh), full = [0, 0, w, hh];
-      // the hair read again in this very frame, so its new colour is where the hair is now, not where it was
-      if (hair && picks.some(q => q.part === 'colour')) hairMask(true);
-      draw(ctx(shot), picks, true, full, full, 1, 0);
-      s.got[zone] = shot.toDataURL('image/jpeg', .86);
-      if (zone === 'front') s.front = { still: stillNow(), face };
-      const m = /** @type {HTMLElement | null} */ (level.querySelector('.lv-level__mark[data-side="' + zone + '"]'));
-      if (m) { m.style.backgroundImage = 'url("' + s.got[zone] + '")'; m.classList.add('is-caught'); }
+      const w = view.width, hh = view.height, clean = P.make(w, hh); ctx(clean).drawImage(base, 0, 0);
+      const colour = picks.find(q => q.part === 'colour'), followed = face, still = zone === 'front' ? stillNow() : null;
+      let tint = /** @type {HTMLCanvasElement | null} */ (null);
+      if (hair && colour) {
+        hairMask(true);
+        const t = hairTint(tintOf('colour', colour.style.id, colour.shape?.shade || 0));
+        if (t) { tint = P.make(t.width, t.height); ctx(tint).drawImage(t, 0, 0); }
+      }
+      s.got[zone] = (async () => {
+        const f = (await faceOf(clean).catch(() => null)) || followed;
+        const shot = P.make(w, hh), x = ctx(shot); x.drawImage(clean, 0, 0);
+        if (tint) x.drawImage(tint, 0, 0, w, hh);
+        if (f) look(x, f, picks, 1, { pic: clean, px: 560 });
+        const src = shot.toDataURL('image/jpeg', .86);
+        if (still) s.front = { still, face: f };
+        const m = /** @type {HTMLElement | null} */ (level.querySelector('.lv-level__mark[data-side="' + zone + '"]'));
+        if (m) { m.style.backgroundImage = 'url("' + src + '")'; m.classList.add('is-caught'); }
+        return { src, face: f };
+      })();
       const fl = h('div.lv-flash.is-soft'); frame.append(fl); setTimeout(() => fl.remove(), 700);
       const n = Object.keys(s.got).length;
       tell(n === 3 ? 'Every side of you' : !s.got.front ? 'Now look straight at the camera' : n === 1 ? 'Now slowly to one side' : 'And the other side');
-      if (n === 3 && s.front) {
+      if (n === 3) {
+        cancelAnimationFrame(raf); follow = null; aside?.stop(); aside = null; el.classList.add('is-taking');
         // in the order the mirror turns through them, as with the studio's angles: the nose to the right, straight on, to the left
-        const { still, face: held } = s.front, turns = [s.got.b, s.got.front, s.got.a];
-        cancelAnimationFrame(raf); follow = null; el.classList.add('is-taking');
-        setTimeout(() => keep(still, held, turns), reduced ? 0 : 700);
+        Promise.all(['b', 'front', 'a'].map(z => s.got[z])).then(turns => setTimeout(() => { if (s.front) keep(s.front.still, s.front.face, turns); }, reduced ? 0 : 700));
       }
     }
     /**
      * The mirror, or one tile of it: the part of the camera's picture in crop, filling rect, with the looks in ps on the face.
-     * @param {CanvasRenderingContext2D} x @param {Pick[]} ps @param {boolean} there @param {number[]} rect @param {number[]} crop @param {number} alpha @param {number} radius
+     * @param {CanvasRenderingContext2D} x @param {Pick[]} ps @param {boolean} there @param {number[]} rect @param {number[]} crop @param {number} alpha @param {number} radius @param {number} px how many pixels across a head is painted at
      */
-    function draw(x, ps, there, rect, crop, alpha, radius) {
+    function draw(x, ps, there, rect, crop, alpha, radius, px) {
       const [tx, ty, tw, th] = rect, [cx, cy, cw, ch] = crop, k = Math.max(tw / cw, th / ch), ox = tx + (tw - cw * k) / 2 - cx * k, oy = ty + (th - ch * k) / 2 - cy * k;
       x.save(); x.globalAlpha = alpha;
       if (radius > .5) { x.beginPath(); x.roundRect(tx, ty, tw, th, radius); x.clip(); }
@@ -260,14 +323,88 @@ export function openLive(o) {
         if (t) x.drawImage(t, sx * s, sy * s, sw * s, sh * s, sx * k + ox, sy * k + oy, sw * k, sh * k);
       }
       x.setTransform(k, 0, 0, k, ox, oy);
-      if (there) look(x, face, ps, k);
+      if (there) look(x, face, ps, k, { px });
       x.restore();
     }
-    /** The looks on a face (the hair, if it is recoloured, is already done): the lips tinted, then the strokes, a little finer up close. @param {CanvasRenderingContext2D} x @param {any} f @param {Pick[]} ps @param {number} [k] */
-    function look(x, f, ps, k = 1) {
+    // —— painted, as on a photograph: what a look can be painted from the picture itself (a fringe combed from your own
+    // hair, brows, liner, a beard) is painted now and then, as often as the device keeps up with, and carried with the
+    // face (by the corners of the eyes) between paintings ——
+    /** @typedef {HTMLCanvasElement & { painted: Set<string> }} Painted a painting, and which parts of the look it has */
+    /** @type {Map<string, { layer: Painted, box: number[], e: { x: number, y: number }[], at: number, used: number }>} */
+    const paints = new Map();
+    /** @type {ReturnType<typeof coloursOf> | null} */ let tone = null;
+    let toneAt = -1e9, cost = 40, nextPaint = 0, ticks = 0, paintedTick = -1;
+    let paintScale = .72;
+    let paintYaw = 1, textureAt = 0;
+    const corners = (/** @type {any} */ f) => [f.pts[33], f.pts[263]];
+    /** The painted parts of a look, as a key. @param {Pick[]} ps */
+    const keyOf = (ps) => ps.filter(q => PAINTED.has(q.part) || q.part === 'colour').map(q => q.part + ':' + q.style.id + ':' + JSON.stringify(q.shape || {})).join('|');
+    /**
+     * The looks in ps painted on f from pic, the head about px across. @param {HTMLCanvasElement} pic @param {any} f @param {Pick[]} ps @param {number} px
+     * @returns {{ layer: Painted, box: number[] } | null}
+     */
+    function paintNow(pic, f, ps, px) {
+      const now = performance.now();
+      const hm = maskNow();
+      // read again now and then, and at once when the hair is first found (until then a fringe waits, in pencil)
+      if (!tone || now - toneAt > 1200 || (hm && !tone.mask)) { tone = coloursOf(pic, f, hm, pic === previewSource); toneAt = now; }
+      const [bx, by, bw, bh] = f.box, box = [bx - bw * .5, by - bh * .8, bw * 2, bh * 2.05];
+      const colour = ps.find(q => q.part === 'colour'), dye = colour ? tintOf('colour', colour.style.id, colour.shape?.shade || 0) : '';
+      const layer = paintLook(pic, f, ps.filter(q => PAINTED.has(q.part)).map(q => ({ part: q.part, style: q.style.id, shape: q.shape })), box, px / box[2], { ...tone, mask: hm, dye: dye || '' });
+      return layer ? { layer, box } : null;
+    }
+    /**
+     * The painted parts of ps on f: painted again if it is time (one painting a frame, and no more of the device's time
+     * than about a third), else the last painting, moved with the face. @param {CanvasRenderingContext2D} x @param {any} f @param {Pick[]} ps @param {number} px
+     */
+    function carry(x, f, ps, px) {
+      /** @returns {{ layer: Painted, box: number[] } | null} the painting shown, if there was one */
+      const key = keyOf(ps) + '@' + Math.round(px / 60), had = paints.get(key), now = performance.now();
+      if ((!had || now >= nextPaint) && paintedTick !== ticks) {
+        paintedTick = ticks;
+        const t0 = performance.now();
+        const shrink = Math.min(1, 448 / Math.max(base.width, base.height));
+        const w = Math.max(2, Math.round(base.width * shrink)), h = Math.max(2, Math.round(base.height * shrink));
+        const yaw = yawOf(f);
+        if (Math.abs(yaw - paintYaw) > .16 || now - textureAt > 3000 || previewSource.width !== w || previewSource.height !== h) {
+          if (previewSource.width !== w || previewSource.height !== h) { previewSource.width = w; previewSource.height = h; }
+          paintYaw = yaw; textureAt = now;
+          refreshHairTexture(previewSource);
+        }
+        ctx(previewSource).drawImage(base, 0, 0, w, h);
+        const smallFace = reframed(f, w, h);
+        const got = paintNow(previewSource, smallFace, ps, Math.max(120, px * paintScale)), took = performance.now() - t0;
+        paintScale = Math.max(.46, Math.min(1, paintScale * Math.max(.82, Math.min(1.04, Math.sqrt(18 / Math.max(1, took))))));
+        cost = cost * .6 + took * .4; nextPaint = now + Math.max(100, cost * 3); el.dataset.paint = String(Math.round(cost));
+        if (got) {
+          const [x, y, width, height] = got.box;
+          paints.set(key, { ...got, box: [x * base.width / w, y * base.height / h, width * base.width / w, height * base.height / h], e: corners(f), at: now, used: now });
+        }
+      }
+      const p = paints.get(key); if (!p) return null;
+      p.used = now;
+      const [a1, b1] = p.e, [a2, b2] = corners(f);
+      const s = Math.hypot(b2.x - a2.x, b2.y - a2.y) / Math.max(1, Math.hypot(b1.x - a1.x, b1.y - a1.y)), th = Math.atan2(b2.y - a2.y, b2.x - a2.x) - Math.atan2(b1.y - a1.y, b1.x - a1.x);
+      x.save(); x.translate(a2.x, a2.y); x.rotate(th); x.scale(s, s); x.translate(-a1.x, -a1.y);
+      x.drawImage(p.layer, p.box[0], p.box[1], p.box[2], p.box[3]); x.restore();
+      return p;
+    }
+    /**
+     * The looks on a face (the hair, if it is recoloured, is already done): the lips tinted, what can be painted painted
+     * (carried with the face between paintings, or for a picture kept, painted on it there and then), and what cannot
+     * (a cut) a pencil line, a little finer up close.
+     * @param {CanvasRenderingContext2D} x @param {any} f @param {Pick[]} ps @param {number} [k] @param {{ px?: number, pic?: HTMLCanvasElement }} [o]
+     */
+    function look(x, f, ps, k = 1, o = {}) {
       for (const q of ps) {
         const tint = q.part === 'lips' && tintOf(q.part, q.style.id, q.shape?.shade || 0);
         if (tint) lips(x, f, tint);
+      }
+      if (ps.some(q => PAINTED.has(q.part))) {
+        const got = o.pic ? paintNow(o.pic, f, ps, o.px || 560) : o.px ? carry(x, f, ps, o.px) : null;
+        if (o.pic && got) x.drawImage(got.layer, got.box[0], got.box[1], got.box[2], got.box[3]);
+        // what is painted is done; what is not (a tile's first moments, a fringe before the hair is found) is pencilled
+        ps = ps.filter(q => !got?.layer.painted.has(q.part));
       }
       x.strokeStyle = '#fff4e0'; x.lineCap = 'round'; x.lineJoin = 'round'; x.shadowColor = 'rgba(0,0,0,.55)'; x.shadowBlur = Math.max(2, view.width / 320);
       const fine = 1 / Math.sqrt(Math.max(1, k));
@@ -286,25 +423,41 @@ export function openLive(o) {
       if (small.height !== sh) { small.height = sh; tints.clear(); }
       ctx(small).drawImage(base, 0, 0, sw, sh);
       mask = hair?.(small, now) || mask;
-      if (now) tints.clear();
+      // a new reading is of this frame: the face in it is where the hair was
+      const read = mask && /** @type {any} */ (mask).readAt;
+      if (read && read !== maskRead && face) {
+        maskRead = read; maskE = corners(face); maskYaw = yawOf(face); tints.clear();
+      } else if (now) tints.clear();
+    }
+    let maskRead = 0, maskYaw = 0, maskE = /** @type {{ x: number, y: number }[] | null} */ (null), aligned = /** @type {HTMLCanvasElement | null} */ (null);
+    /** The hair where it is now: the last reading of it, moved with the face since (by the corners of the eyes). */
+    function maskNow() {
+      if (!mask || !maskE || !face) return mask;
+      const [a1, b1] = maskE, [a2, b2] = corners(face);
+      if (Math.hypot(a2.x - a1.x, a2.y - a1.y) + Math.hypot(b2.x - b1.x, b2.y - b1.y) < 1.5) return mask;
+      if (!aligned || aligned.width !== mask.width || aligned.height !== mask.height) aligned = P.make(mask.width, mask.height);
+      const x = ctx(aligned), sc = mask.width / base.width;
+      const s = Math.hypot(b2.x - a2.x, b2.y - a2.y) / Math.max(1, Math.hypot(b1.x - a1.x, b1.y - a1.y)), th = Math.atan2(b2.y - a2.y, b2.x - a2.x) - Math.atan2(b1.y - a1.y, b1.x - a1.x);
+      x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, aligned.width, aligned.height);
+      x.setTransform(sc, 0, 0, sc, 0, 0); x.translate(a2.x, a2.y); x.rotate(th); x.scale(s, s); x.translate(-a1.x, -a1.y);
+      x.drawImage(mask, 0, 0, base.width, base.height); x.setTransform(1, 0, 0, 1, 0, 0);
+      return aligned;
     }
     /** The hair recoloured: the small copy coated and kept only where the hair is, to lay over the picture (made again when a few frames old). @param {string} tint */
     function hairTint(tint) {
       if (!mask) return null;
       let k = tints.get(tint); const now = performance.now();
-      if (k && now - k.at < 90) return k.c;
-      if (!k) { k = { c: P.make(small.width, small.height), at: 0 }; tints.set(tint, k); }
+      if (k && now - k.at < 60) return k.c;
+      const hm = /** @type {HTMLCanvasElement} */ (maskNow());
+      const mw = Math.min(480, base.width), mh = Math.max(1, Math.round(mw * base.height / base.width));
+      if (!k) { k = { c: P.make(mw, mh), at: 0 }; tints.set(tint, k); }
+      if (k.c.width !== mw || k.c.height !== mh) { k.c.width = mw; k.c.height = mh; }
       const t = ctx(k.c); k.at = now;
-      t.globalCompositeOperation = 'source-over'; t.globalAlpha = 1; t.clearRect(0, 0, k.c.width, k.c.height); t.drawImage(small, 0, 0);
-      coat(t, tint, 'colour');
-      t.globalCompositeOperation = 'destination-in'; t.drawImage(mask, 0, 0, k.c.width, k.c.height);
+      t.globalCompositeOperation = 'source-over'; t.globalAlpha = 1; t.clearRect(0, 0, mw, mh); t.drawImage(base, 0, 0, mw, mh);
+      dyeHair(t, tint, hm);
+      t.globalCompositeOperation = 'destination-in'; t.drawImage(hm, 0, 0, k.c.width, k.c.height);
       // the hair on the head, not a beard or the brows (the segmenter counts them as hair), as in the mirror
-      if (face) {
-        const z = k.c.width / base.width;
-        t.globalCompositeOperation = 'destination-out'; t.fillStyle = '#fff'; t.filter = 'blur(1px)';
-        for (const s of notHair(face)) { t.beginPath(); s.forEach((p, i) => (i ? t.lineTo(p.x * z, p.y * z) : t.moveTo(p.x * z, p.y * z))); t.closePath(); t.fill(); }
-        t.filter = 'none';
-      }
+      if (face) { t.filter = 'blur(1px)'; clearNotHair(t, face, bearded(small, face), k.c.width / base.width); t.filter = 'none'; }
       t.globalCompositeOperation = 'source-over';
       return k.c;
     }
@@ -315,8 +468,13 @@ export function openLive(o) {
         if (done) { stream.getTracks().forEach(t => t.stop()); return; }
         video.srcObject = stream; await video.play().catch(() => {});
         size(); raf = requestAnimationFrame(tick);
-        follow = await follower().catch(() => null);
-        if (picks.some(q => q.part === 'colour')) { hairAsked = true; hair = await hairFollower().catch(() => null); }
+        // read aside only with a core to spare for it: where there are two, drawing the mirror needs both, a reading
+        // aside comes back late and the look trails a turning head, so the page reads between frames instead
+        aside = (navigator.hardwareConcurrency || 2) > 2 ? await followerAside().catch(() => null) : null;
+        if (done) { aside?.stop(); aside = null; return; }
+        if (!aside) follow = await follower().catch(() => null);
+        el.dataset.reader = aside ? 'aside' : follow ? 'page' : 'none';
+        if (picks.some(q => q.part === 'colour' || q.part === 'bangs')) { hairAsked = true; hair = await hairFollower().catch(() => null); }
       } catch {
         el.classList.add('no-camera');
         frame.append(h('div.lv-msg', null, h('p', null, 'The camera isn’t available here. Allow it in the browser, or choose a photo instead.'),
@@ -327,7 +485,7 @@ export function openLive(o) {
     async function take() {
       if (!video.videoWidth || done) return;
       // the moment held: the frame stops where it is (the reading with it) while the photo is kept
-      cancelAnimationFrame(raf); follow = null;
+      cancelAnimationFrame(raf); follow = null; aside?.stop(); aside = null;
       const held = face && performance.now() - seen < 450 ? face : null;
       frame.append(h('div.lv-flash')); el.classList.add('is-taking');
       await keep(stillNow(), held);
@@ -340,7 +498,7 @@ export function openLive(o) {
     }
     /**
      * A still kept as your photo, and the mirror opened on it with the look picked (and every side of you, if caught).
-     * @param {HTMLCanvasElement} still @param {any} held the face read in it @param {string[]} [turns]
+     * @param {HTMLCanvasElement} still @param {any} held the face read in it @param {Side[]} [turns]
      */
     async function keep(still, held, turns) {
       const blob = await P.toBlob(still, 'image/jpeg', .92);
@@ -351,10 +509,10 @@ export function openLive(o) {
       const known = held ? reframed(held, still.width, still.height) : null;
       setTimeout(() => finish({ print: p, picks, from: frame, face: known, ...(turns ? { turns } : {}) }), reduced ? 0 : 280);
     }
-    /** @param {{ print: any, picks: Pick[], from?: Element, face?: any, turns?: string[] } | null} result @param {boolean} [instead] a photo chosen instead */
+    /** @param {{ print: any, picks: Pick[], from?: Element, face?: any, turns?: Side[] } | null} result @param {boolean} [instead] a photo chosen instead */
     function finish(result, instead = false) {
       if (done) return; done = true; if (current) current = null;
-      cancelAnimationFrame(raf); stream?.getTracks().forEach(t => t.stop()); stream = null; video.srcObject = null;
+      cancelAnimationFrame(raf); aside?.stop(); aside = null; stream?.getTracks().forEach(t => t.stop()); stream = null; video.srcObject = null;
       removeEventListener('resize', size); document.removeEventListener('keydown', onKey);
       el.classList.remove('is-in'); setTimeout(() => el.remove(), reduced ? 0 : 380);
       // a photo chosen instead takes only the looks someone chose, not the one the mirror opened on to show itself

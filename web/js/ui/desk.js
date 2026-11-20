@@ -47,6 +47,14 @@ export function deskScreen() {
   const handlers = { onOpen: open, onIdea: (text, item) => sendIdea(text, item.prints), onRetry: item => send({ text: item.retry?.text || '', intent: readIntent(item.retry?.text || '', ctx()), pace: item.retry?.pace || 'fine' }) };
   const ctx = () => ({ prints: threadPrints().map(p => ({ id: p.id, handle: p.handle })), tray: [], looks: [...LOOKS, ...app.looks] });
 
+  // words from the Lookbook's line that were not a look: a picture, painted here (the Lookbook steps aside to show it),
+  // or "take me to …", which moves the whole place and leaves the Lookbook where it was
+  on('desk-ask', (/** @type {any} */ s) => {
+    if (!s?.text) return;
+    const intent = readIntent(s.text, ctx());
+    if (intent.op !== 'room') s.away?.();
+    send({ text: s.text, intent, pace: intent.pace || settings.get('pace', 'fine'), n: intent.n, flight: s.flight || null });
+  });
   let flight = null;
   async function send(t) {
     if (!t.text && !t.intent?.pins?.length) return;
@@ -100,7 +108,7 @@ export function deskScreen() {
     if (empty) box.append(h('div.starters', null,
       starter(0, 'image', 'Bring a picture', 'A photo, a screenshot, a drawing', () => attach()),
       starter(1, 'sparkle', 'Start from words', 'Describe it and watch it appear', () => comp.setText('Paint ')),
-      starter(2, 'room', 'Change the room', 'Seven rooms, or invent your own', e => openRooms(e)),
+      starter(2, 'room', 'Change the room', 'A room for every mood, or invent your own', e => openRooms(e)),
       h('button.link.t-mono.t-soft', { style: { justifySelf: 'center', marginTop: '1cqw', padding: '2cqw' }, onclick: () => samples() }, 'or play with two sample pictures')));
     else box.querySelector('.hello__sky').append(h('button.hello__new', { onclick: async () => { await newThread(); toast('A fresh page'); } }, 'New page'));
     return box;

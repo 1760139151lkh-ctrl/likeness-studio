@@ -16,6 +16,9 @@ from __future__ import annotations
 
 import base64
 import binascii
+import hashlib
+import io
+import itertools
 import json
 import os
 import re
@@ -27,12 +30,12 @@ import threading
 import time
 from pathlib import Path
 
-from PIL import Image, ImageChops, ImageOps
+from PIL import Image, ImageChops, ImageFilter, ImageOps, ImageStat
 
 from .. import brief, paths
 from ..jobs import Cancelled
 from ..rooms import BACKDROPS_SCHEMA, LOOK_SCHEMA, ROOM_SCHEMA
-from ..turns import BackdropAsk, Inputs, LookAsk, RoomAsk, Turn
+from ..turns import SIZES, BackdropAsk, Inputs, LookAsk, RoomAsk, Turn
 from . import EngineError, Work
 
 PACES = {"quick": "Quick", "fine": "Fine", "deep": "Deep"}
@@ -44,6 +47,62 @@ IMAGE_HINT = ("Use your image generation tool (GPT Image). Where the work change
 MARK = re.compile(r"^[\s>*_\x60]*(PLAN|DONE|FAILED)\b[\s:*_\x60]*(\{.*\})[\s*_\x60]*$", re.M)
 NUMBERED = re.compile(r"^(\d+)\.(png|jpe?g|webp)$", re.I)
 PICTURES = {".png", ".jpg", ".jpeg", ".webp"}
+KEEP = 40
+LOCAL_FILE = re.compile(r'''(?ix)
+    (?: [a-z]:[\\/] | \\\\ | file:/+ | /(?:home|Users|private|mnt|tmp|var)/ )
+    [^\s"'<>]*
+''')
+
+
+def _composite_region(generated: Image.Image, original: Image.Image, mask: Image.Image) -> Image.Image:
+    """Register the new image near the selection, then feather the edge inward."""
+    width, height = original.size
+    scale = min(1.0, 180.0 / max(width, height))
+    sample_size = (max(24, round(width * scale)), max(24, round(height * scale)))
+    source = original.resize(sample_size, Image.Resampling.BILINEAR)
+    selection = mask.resize(sample_size, Image.Resampling.NEAREST)
+    radius = max(9, (min(sample_size) // 6) | 1)
+    collar = ImageChops.subtract(selection.filter(ImageFilter.MaxFilter(radius)), selection)
+    if sum(collar.histogram()[1:]) < 40:
+        collar = ImageOps.invert(selection)
+
+    def warp(size: tuple[int, int], mode: str, zoom: float, dx: float, dy: float) -> Image.Image:
+        w, h = size
+        sx, sy = w / generated.width, h / generated.height
+        if mode == "fill":
+            sx = sy = max(sx, sy)
+        elif mode == "fit":
+            sx = sy = min(sx, sy)
+        ax, ay = 1 / (sx * zoom), 1 / (sy * zoom)
+        return generated.transform(size, Image.Transform.AFFINE,
+                                   (ax, 0, generated.width / 2 - w * (.5 + dx) * ax,
+                                    0, ay, generated.height / 2 - h * (.5 + dy) * ay), Image.Resampling.BICUBIC)
+
+    def error(mode: str, zoom: float, dx: float, dy: float) -> float:
+        difference = ImageChops.difference(source, warp(sample_size, mode, zoom, dx, dy))
+        return sum(ImageStat.Stat(difference, mask=collar).mean) / 3
+
+    aligned = generated.resize(original.size, Image.Resampling.LANCZOS)
+    if collar.getbbox() and max(ImageStat.Stat(source, mask=collar).stddev) > 4:
+        baseline = error("stretch", 1.0, 0.0, 0.0)
+        best = (baseline, "stretch", 1.0, 0.0, 0.0)
+        if baseline > 3.5 or abs(generated.width / generated.height - width / height) > .02:
+            coarse = itertools.product(("stretch", "fill", "fit"), (.94, .97, 1.0, 1.03, 1.06, 1.10),
+                                       (-.05, -.025, 0.0, .025, .05), (-.08, -.04, 0.0, .04, .08))
+            best = min(best, min((error(*pose), *pose) for pose in coarse), key=lambda result: result[0])
+            for step in (.015, .006, .002):
+                _, mode, zoom, x, y = best
+                offsets = itertools.product((-step, 0.0, step), repeat=3)
+                poses = ((mode, zoom + dz, x + dx, y + dy) for dz, dx, dy in offsets)
+                best = min(best, min((error(*pose), *pose) for pose in poses), key=lambda result: result[0])
+        if best[0] < baseline - .8:
+            aligned = warp(original.size, *best[1:])
+
+    softness = max(1.5, min(width, height) / 180)
+    soft = mask.filter(ImageFilter.GaussianBlur(softness))
+    core = mask.filter(ImageFilter.MinFilter(5)).filter(ImageFilter.GaussianBlur(softness * .7))
+    feathered = ImageChops.multiply(ImageChops.lighter(soft, core), mask)
+    return Image.composite(aligned, original, feathered)
 
 
 def resolve(command: list[str]) -> list[str]:
@@ -102,6 +161,7 @@ class Follow:
         self.work = work
         self.prompt = ""
         self.planned = False
+        self.thread_id = ""
         self.reply: dict | None = None
         self.failed: tuple[str, str] | None = None
         self.error = ""
@@ -127,7 +187,11 @@ class Follow:
         if isinstance(event.get("msg"), dict):
             return self._legacy(event["msg"])
         kind = event.get("type", "")
-        if kind.startswith("item."):
+        if kind == "thread.started":
+            thread_id = str(event.get("thread_id") or "")
+            if re.fullmatch(r"[A-Za-z0-9_-]{8,128}", thread_id):
+                self.thread_id = thread_id
+        elif kind.startswith("item."):
             self._item(event.get("item") or {}, kind.split(".", 1)[1])
         elif kind == "turn.failed":
             self.error = str((event.get("error") or {}).get("message") or "Codex stopped.")
@@ -205,42 +269,62 @@ class Follow:
 
 
 class Watcher:
-    """Pictures landing in out/, each taken once it has stopped growing and opens cleanly."""
+    """Collect complete images from the job and this Codex thread, once per image."""
 
     def __init__(self, folder: Path, n: int) -> None:
         self.folder, self.n = folder, n
-        self.sizes: dict[str, tuple[int, int]] = {}
-        self.taken: set[str] = set()
+        self.sizes: dict[Path, tuple[int, int]] = {}
+        self.taken: set[Path] = set()
+        self.hashes: set[bytes] = set()
         self.used: set[int] = set()
 
     def _index(self, name: str) -> int:
         numbered = NUMBERED.match(name)
-        if numbered and 0 < int(numbered.group(1)) <= max(self.n, 9) and int(numbered.group(1)) - 1 not in self.used:
+        if numbered and 0 < int(numbered.group(1)) <= self.n and int(numbered.group(1)) - 1 not in self.used:
             index = int(numbered.group(1)) - 1
         else:
-            index = next(i for i in range(64) if i not in self.used)
+            index = next(i for i in range(self.n) if i not in self.used)
         self.used.add(index)
         return index
 
-    def ready(self, final: bool = False) -> list[tuple[int, Image.Image]]:
+    def ready(self, generated: Path | None = None, loose: tuple[Path, ...] = (), *, final: bool = False) -> list[tuple[int, Image.Image]]:
+        candidates = sorted(self.folder.iterdir()) if self.folder.is_dir() else []
+        if generated and generated.is_dir():
+            stamped = []
+            for path in generated.iterdir():
+                try:
+                    stamped.append((path.stat().st_mtime_ns, path))
+                except OSError:
+                    continue
+            candidates.extend(path for _, path in sorted(stamped))
+        candidates.extend(loose)
         found = []
-        for path in sorted(self.folder.iterdir()) if self.folder.exists() else []:
-            if path.suffix.lower() not in PICTURES or path.name in self.taken:
-                continue
-            stat = path.stat()
-            mark = (stat.st_size, stat.st_mtime_ns)
-            if not final and self.sizes.get(path.name) != mark:
-                self.sizes[path.name] = mark
+        for path in candidates:
+            if len(self.used) >= self.n:
+                break
+            if path.suffix.lower() not in PICTURES or path in self.taken:
                 continue
             try:
-                with Image.open(path) as image:
+                stat = path.stat()
+            except OSError:
+                continue
+            mark = (stat.st_size, stat.st_mtime_ns)
+            if not final and self.sizes.get(path) != mark:
+                self.sizes[path] = mark
+                continue
+            try:
+                raw = path.read_bytes()
+                digest = hashlib.sha256(raw).digest()
+                if digest in self.hashes:
+                    self.taken.add(path)
+                    continue
+                with Image.open(io.BytesIO(raw)) as image:
                     image.load()
                     picture = ImageOps.exif_transpose(image).convert("RGB")
             except Exception:
-                if final:
-                    self.taken.add(path.name)
                 continue
-            self.taken.add(path.name)
+            self.taken.add(path)
+            self.hashes.add(digest)
             found.append((self._index(path.name), picture))
         return found
 
@@ -290,11 +374,13 @@ class Codex:
     def _folder(self, kind: str) -> Path:
         root = self.home / kind
         root.mkdir(parents=True, exist_ok=True)
+        for old in sorted(p for p in root.iterdir() if p.is_dir())[:-KEEP]:
+            shutil.rmtree(old, ignore_errors=True)
         folder = root / f"{time.strftime('%Y%m%d-%H%M%S')}-{secrets.token_hex(3)}"
         folder.mkdir()
         return folder
 
-    def lay_out(self, folder: Path, inputs: Inputs) -> tuple[dict[str, str], list[Path]]:
+    def lay_out(self, folder: Path, inputs: Inputs) -> tuple[dict[str, str], list[Path], Image.Image | None]:
         """The turn's pictures and masks in in/, named so the brief can point at them."""
         (folder / "in").mkdir()
         (folder / "out").mkdir()
@@ -326,14 +412,14 @@ class Codex:
             with Image.open(inputs.subject_mask) as m:
                 m.convert("L").resize(sizes[subject]).save(folder / "in" / f"{subject}.subject.png")
             files["subject"] = f"in/{subject}.subject.png"
-        return files, attach
+        return files, attach, union
 
     # ---- a turn ---------------------------------------------------------------------------------------------------
     def turn(self, turn: Turn, inputs: Inputs, work: Work) -> None:
         folder = self._folder("jobs")
-        files, attach = self.lay_out(folder, inputs)
+        files, attach, mask = self.lay_out(folder, inputs)
         pace = self.pace(turn.pace)
-        text = brief.turn_brief(turn, inputs, files, size=str(self.config.get("size") or "1024x1536"), quality=str(pace.get("quality") or "medium"),
+        text = brief.turn_brief(turn, inputs, files, size=SIZES.get(turn.aspect or "", "") or str(self.config.get("size") or "1024x1536"), quality=str(pace.get("quality") or "medium"),
                                 image_hint=str((self.config.get("images") or {}).get("hint") or IMAGE_HINT))
         (folder / "brief.md").write_text(text, encoding="utf-8")
         work.stage("read")
@@ -341,20 +427,21 @@ class Codex:
         follow.spill = folder / "tool"
         argv = self.argv(folder, pace, attach if self.config.get("attach", True) else [])
         region = None
-        if turn.intent.op == "region" and files.get("edit"):
+        if turn.intent.op == "region" and mask is not None:
+            # The tool needs the hard edit mask. The final composite keeps the selection's soft edges.
             with Image.open(folder / files["edit"]) as guide:
-                original = guide.convert("RGB")
-                region = (original, ImageOps.invert(guide.getchannel("A")))
-        code = self._run(argv, text, folder, follow, work, turn.n, float(pace.get("timeout") or 600), region)
+                region = guide.convert("RGB"), mask
+        single_portrait = turn.intent.op == "restyle" and turn.aspect is not None and turn.n == 1
+        code = self._run(argv, text, folder, follow, work, turn.n, float(pace.get("timeout") or 600), region,
+                         single_portrait=single_portrait)
         if follow.failed:
-            raise EngineError(*follow.failed)
+            raise EngineError(*(LOCAL_FILE.sub("a local file", part) for part in follow.failed))
         if not work.results:
             stderr = (folder / "stderr.log").read_text(encoding="utf-8", errors="replace")[-2000:]
             if re.search(r"log ?in|auth|unauthori[sz]ed|401", stderr + follow.error, re.I):
                 raise EngineError("Codex is not signed in on the workstation.", "Run  codex login  there, then try again.")
             if follow.error or code:
-                reason = follow.error or (stderr.strip().splitlines() or ["no reason given"])[-1]
-                raise EngineError(f"Codex stopped without a picture: {reason[:200]}", "Try again; if it keeps happening, the job's folder in private/jobs has the whole story.")
+                raise EngineError("Codex stopped without a picture.", "Try again. If it keeps happening, check the Studio on the workstation.")
             raise EngineError("The studio finished without a picture.", "Try again, perhaps in fewer words.")
         if len(work.results) < turn.n:
             work.note(f"{len(work.results)} of {turn.n} came back")
@@ -362,16 +449,16 @@ class Codex:
         work.reply(str(reply.get("reply") or ""), [str(s) for s in reply.get("suggestions") or []])
 
     def _run(self, argv: list[str], text: str, folder: Path, follow: Follow, work: Work, n: int, timeout: float,
-             region: tuple[Image.Image, Image.Image] | None = None) -> int:
+             region: tuple[Image.Image, Image.Image] | None = None, *, single_portrait: bool = False) -> int:
         events = (folder / "events.jsonl").open("w", encoding="utf-8")
         errors = (folder / "stderr.log").open("w", encoding="utf-8")
         try:
             proc = subprocess.Popen(argv, cwd=folder, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=errors, text=True, encoding="utf-8",
                                     errors="replace", start_new_session=os.name != "nt")
-        except OSError as error:
+        except OSError:
             events.close()
             errors.close()
-            raise EngineError("Codex could not be started on the workstation.", f"Check [codex] command in studio.toml ({error}).") from None
+            raise EngineError("Codex could not be started on the workstation.", "Check the Studio's command on the workstation.") from None
 
         def feed() -> None:
             try:
@@ -390,30 +477,39 @@ class Codex:
         for thread in threads:
             thread.start()
         watcher, deadline = Watcher(folder / "out", n), time.monotonic() + timeout
+        generated_root = Path(os.environ.get("CODEX_HOME") or Path.home() / ".codex") / "generated_images"
+        reply_deadline = None
 
-        def deliver(index: int, picture: Image.Image) -> None:
-            if region:
-                original, mask = region
-                picture = Image.composite(picture.resize(original.size, Image.Resampling.LANCZOS), original, mask)
-            work.result(index, picture, follow.prompt)
+        def deliver(*, final: bool = False) -> None:
+            thread_id = follow.thread_id
+            generated = generated_root / thread_id if thread_id else None
+            for index, picture in watcher.ready(generated, tuple(follow.loose), final=final):
+                if region is not None:
+                    original, mask = region
+                    picture = _composite_region(picture, original, mask)
+                work.result(index, picture, follow.prompt)
 
         try:
             while proc.poll() is None:
                 if work.job.stop.is_set():
                     kill(proc)
                     raise Cancelled()
-                if time.monotonic() > deadline:
+                deliver()
+                now = time.monotonic()
+                # A finished portrait is usable even if Codex stalls writing its closing message.
+                if single_portrait and work.results and reply_deadline is None:
+                    reply_deadline = min(deadline, now + 10)
+                if reply_deadline is not None and now >= reply_deadline and not follow.failed:
                     kill(proc)
-                    raise EngineError("The studio took too long and was stopped.", "Try the Quick pace, or fewer pictures at once.")
-                for index, picture in watcher.ready():
-                    deliver(index, picture)
+                    threads[1].join(10)
+                    return 0
+                if now >= deadline:
+                    kill(proc)
+                    hint = "Try again, or ask for fewer pictures." if n > 1 else "Try again in a moment."
+                    raise EngineError("The studio took too long and was stopped.", hint)
                 time.sleep(0.3)
             threads[1].join(10)
-            if len(watcher.taken) < n:   # an image tool that saved elsewhere: bring its pictures in
-                for i, loose in enumerate(follow.loose[: n - len(watcher.taken)]):
-                    shutil.copy(loose, folder / "out" / f"loose-{i}{loose.suffix.lower()}")
-            for index, picture in watcher.ready(final=True):
-                deliver(index, picture)
+            deliver(final=True)
             return proc.returncode or 0
         finally:
             kill(proc)
@@ -435,8 +531,8 @@ class Codex:
             done = subprocess.run(argv, input=text, cwd=folder, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=float(settings["timeout"]))
         except subprocess.TimeoutExpired:
             raise EngineError("The studio took too long to answer.", "Try again in a moment.") from None
-        except OSError as error:
-            raise EngineError("Codex could not be started on the workstation.", str(error)) from None
+        except OSError:
+            raise EngineError("Codex could not be started on the workstation.", "Check the Studio's command on the workstation.") from None
         (folder / "events.jsonl").write_text(done.stdout, encoding="utf-8")
         (folder / "stderr.log").write_text(done.stderr, encoding="utf-8")
         answer = folder / "answer.json"

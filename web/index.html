@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-<meta name="theme-color" content="#f3eee4">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=overlays-content">
+<meta name="theme-color" content="#fcedf0">
 <title>Likeness</title>
-<meta name="description" content="Try a look on before you commit to it: bangs, brows, colour, a cut. Pick it on your own face, see four takes, and turn it to every angle.">
+<!-- studio-state -->
+<meta name="description" content="An artistic portrait studio: choose a style, add one photo, and get your portrait painted in it. Tune every detail, keep every version.">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preload" href="fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
@@ -15,10 +16,12 @@
 <link rel="stylesheet" href="css/focus.css">
 <link rel="stylesheet" href="css/sheets.css">
 <link rel="stylesheet" href="css/looks.css">
+<link rel="stylesheet" href="css/portrait.css">
 <script>
   /* Paint the last room before anything else loads, so a reload never flashes the default one. */
   try {
-    const last = JSON.parse(localStorage.getItem('likeness.paint') || 'null');
+    const device = JSON.parse(document.getElementById('studio-state')?.textContent || '{}')?.storage;
+    const last = JSON.parse(localStorage.getItem(device ? 'likeness.' + device + '.paint' : 'likeness.paint') || 'null');
     if (last) { for (const [k, v] of Object.entries(last.vars)) document.documentElement.style.setProperty(k, v); Object.assign(document.documentElement.dataset, last.data); }
   } catch { /* first visit */ }
 </script>

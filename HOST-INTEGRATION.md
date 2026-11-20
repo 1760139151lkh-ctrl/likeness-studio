@@ -1,16 +1,21 @@
 # Host integration and acceptance
 
-The Studio edition uses the OpenAI Codex CLI on the host for live image jobs.
+[Open the Windows workstation](https://arlington-brakes-gradually-nelson.trycloudflare.com/open). A paired browser opens Studio directly. On a new browser, open the owner's private Likeness link once, then use the link here or the repository's Website link.
 
-    uv sync --locked
-    uv run likeness probe codex --smoke
-    uv run likeness serve --engine codex --host 127.0.0.1
+Open **Studio** to send a message to the workstation. The app uses the workstation's signed-in Codex CLI for live requests. The private pairing link, credentials, site data, and results are kept by the owner.
 
-Sign in to Codex on the host. Confirm the probe's synthetic create and edit outputs before relying on the live engine. Keep account state, images, pairing keys, and logs in ignored local storage. Set outbound proxy variables in the host process environment and keep the Codex listener local.
+## Download and run a local copy
 
-For owner access outside the home network, put the studio behind an authenticated HTTPS ingress with an outbound connection from the host. The ingress must authenticate every request before it reaches the loopback service. Keep the host address and the ingress configuration private. Client devices need no provider credentials or provider proxy.
+```sh
+git clone --branch studio --single-branch https://github.com/1760139151lkh-ctrl/likeness-studio.git
+cd likeness-studio
+npm ci
+npm run build
+uv sync --locked
+uv run likeness serve --engine codex --host 127.0.0.1
+```
 
-For a temporary tunnel that cannot carry server-sent events, set LIKENESS_OWNER_SECRET_FILE to a local file containing a random ASCII password of at least 32 characters. Run the Studio on loopback and point the HTTPS tunnel at that listener. Open the HTTPS root URL in the device's browser and sign in as likeness with that password. This mode uses polling and requires the password on every request, including requests from the relay. Supply the URL and password separately. The URL changes when a temporary tunnel restarts.
+For a workstation of your own, sign in to Codex on that host. Set any outbound proxy in the server process environment. Owner access over HTTPS uses `LIKENESS_OWNER_LINK=1` and `LIKENESS_OWNER_SECRET_FILE` pointing to a random secret kept in the host's private storage. The tunnel forwards to the loopback listener. If the temporary gateway address changes, update the Website link and this guide.
 
 ## Phone handoff
 

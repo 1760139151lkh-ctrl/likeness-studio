@@ -3,11 +3,17 @@
  * small settings in localStorage. Nothing here leaves the device unless a live studio is asked to paint.
  */
 let opening = null;
+/** Every store the device keeps. */
+export const STORES = ['prints', 'threads', 'looks', 'rooms', 'sittings', 'portraits'];
+const info = document.getElementById('studio-state');
+const namespace = info ? JSON.parse(info.textContent || '{}').storage : null;
+const prefix = namespace ? 'likeness.' + namespace + '.' : 'likeness.';
 /** @returns {Promise<IDBDatabase>} */
 function db() {
   opening ||= new Promise((resolve, reject) => {
-    const req = indexedDB.open('likeness-studio', 1);
-    req.onupgradeneeded = () => { for (const name of ['prints', 'threads', 'looks', 'rooms']) req.result.createObjectStore(name, { keyPath: 'id' }); };
+    // version 2 adds the portrait studio's sittings (your photos) and portraits (everything painted), beside the rest
+    const req = indexedDB.open(namespace ? 'likeness-studio-' + namespace : 'likeness-studio', 2);
+    req.onupgradeneeded = () => { for (const name of STORES) if (!req.result.objectStoreNames.contains(name)) req.result.createObjectStore(name, { keyPath: 'id' }); };
     req.onsuccess = () => resolve(req.result); req.onerror = () => reject(req.error);
   });
   return opening;
@@ -26,6 +32,6 @@ export const clear = store => run(store, 'readwrite', s => s.clear()).catch(() =
 
 /** Settings: tiny, synchronous, JSON. */
 export const settings = {
-  get(key, fallback = null) { try { const v = localStorage.getItem('likeness.' + key); return v == null ? fallback : JSON.parse(v); } catch { return fallback; } },
-  set(key, value) { try { localStorage.setItem('likeness.' + key, JSON.stringify(value)); } catch { /* full or private */ } return value; },
+  get(key, fallback = null) { try { const v = localStorage.getItem(prefix + key); return v == null ? fallback : JSON.parse(v); } catch { return fallback; } },
+  set(key, value) { try { localStorage.setItem(prefix + key, JSON.stringify(value)); } catch { /* full or private */ } return value; },
 };

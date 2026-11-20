@@ -31,6 +31,7 @@ class Job:
         self.stop = threading.Event()
         self._lock = threading.Lock()
         self.submission: tuple[str, str] | None = None
+        self.owner = ""
 
     def emit(self, kind: str, **data) -> None:
         with self._lock:
@@ -54,7 +55,7 @@ class Jobs:
         self._lock = threading.Lock()
         self._pool = ThreadPoolExecutor(max_workers=max(1, workers), thread_name_prefix="likeness-job")
 
-    def submit(self, work: Callable[[Job], None], submission: tuple[str, str] | None = None) -> Job:
+    def submit(self, work: Callable[[Job], None], submission: tuple[str, str] | None = None, *, owner: str = "") -> Job:
         with self._lock:
             if submission and (existing := self._submissions.get(submission[0])):
                 if existing.submission != submission:
@@ -64,6 +65,7 @@ class Jobs:
                 raise QueueFull()
             job = Job()
             job.submission = submission
+            job.owner = owner
             self.jobs[job.id] = job
             if submission:
                 self._submissions[submission[0]] = job
@@ -91,9 +93,13 @@ class Jobs:
             job.state = "cancelled"
             job.emit("failed", message="Stopped.", cancelled=True)
         except Exception as error:   # the job fails; the studio carries on
+            from .engines import EngineError
+
             job.state = "failed"
-            hint = getattr(error, "hint", "")
-            job.emit("failed", message=str(error) or error.__class__.__name__, hint=hint)
+            if isinstance(error, EngineError):
+                job.emit("failed", message=str(error), hint=error.hint)
+            else:
+                job.emit("failed", message="The studio could not finish this turn.", hint="Try again.")
 
     def _forget_old(self) -> None:
         if len(self.jobs) > self.keep:
