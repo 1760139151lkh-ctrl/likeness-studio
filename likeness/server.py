@@ -1,13 +1,16 @@
-"""The studio's front door: the app's files, one turn API that every engine answers, and a stream of events per job.
+"""哈基秀's front door: the app's files, one turn API that every engine answers, a stream of events per job, and an
+account (with its own private space) for every visitor.
 
-  GET  /studio.json                 which studio this is; the app labels its edition from it
-  POST /api/assets                  a picture or a mask, sent once (multipart: file, kind)
-  GET  /api/assets/{id}             a picture back
+  GET  /studio.json                 which studio this is, and who is asking (their account)
+  POST /api/assets                  a picture or a mask, sent once (multipart: file, kind), into the account's space
+  GET  /api/assets/{id}             a picture back, only to the account that owns it
   POST /api/turns                   a turn: answers {job, eta}
   GET  /api/jobs/{id}/events        what happens, as it happens (server-sent events); GET /api/jobs/{id} for polling
   POST /api/jobs/{id}/cancel        stop it
-  POST /api/rooms, /api/looks, /api/backdrops   words from the studio's model, checked before they reach the app
-  GET  /api/history                 every picture the studio made for this device, newest first (nothing is lost)
+  GET  /api/history                 every picture the studio made for this account, newest first (nothing is lost)
+  GET  /api/me                      the account, and how much it holds
+  POST /api/auth/signup | login | logout | profile     guest → member in place; logging in brings a guest's work along
+  GET  /api/sync?cursor=N, POST /api/sync              the app's records (works, sources, favourites, drafts, prefs)
 """
 
 from __future__ import annotations
@@ -26,17 +29,18 @@ from typing import Literal
 
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.concurrency import run_in_threadpool
+from pydantic import BaseModel, Field
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import __version__, engines, paths, settings
+from .accounts import AccountError, Accounts
 from .engines import EngineError, Work
 from .estimates import Estimates
 from .jobs import Job, Jobs, QueueFull, SubmissionConflict
-from .rooms import normalise_backdrops, normalise_look, normalise_room
 from .store import MAX_UPLOAD, Store
-from .turns import BackdropAsk, Inputs, LookAsk, RoomAsk, Turn
+from .turns import Inputs, Turn
 
 LOOPBACK = {"127.0.0.1", "::1", "localhost"}
 NOT_PAIRED = """<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Likeness</title>
@@ -65,8 +69,29 @@ OWNER_HEADERS = {"Cache-Control": "private, no-store", "Referrer-Policy": "no-re
                  "X-Frame-Options": "DENY", "Permissions-Policy": "geolocation=()",
                  "X-Content-Type-Options": "nosniff"}
 OWNER_COOKIE = "__Host-likeness"
-STATIC_GROUPS = ("css/", "js/", "fonts/", "vendor/", "examples/", "sitters/", "styles/", "bundle/")
-PUBLIC_ASSET_TYPES = {".js", ".mjs", ".css", ".woff2", ".webp", ".task", ".tflite", ".wasm"}
+SESSION_COOKIE = "hjx_sid"
+STATIC_GROUPS = ("css/", "js/", "fonts/", "vendor/", "img/", "bundle/")
+ROOT_FILES = {"icon.svg", "manifest.webmanifest", "sw.js", "icon-192.png", "icon-512.png", "apple-touch-icon.png"}
+PUBLIC_ASSET_TYPES = {".js", ".mjs", ".css", ".woff2", ".webp", ".png", ".task", ".tflite", ".wasm", ".json"}
+
+
+class SignUp(BaseModel):
+    handle: str = Field(max_length=40)
+    password: str = Field(max_length=128)
+    nickname: str = Field("", max_length=40)
+
+
+class LogIn(BaseModel):
+    handle: str = Field(max_length=40)
+    password: str = Field(max_length=128)
+
+
+class Profile(BaseModel):
+    nickname: str = Field(max_length=40)
+
+
+class SyncIn(BaseModel):
+    records: list[dict] = Field(default_factory=list, max_length=200)
 
 
 class StudioFiles(StaticFiles):
@@ -90,12 +115,16 @@ class StudioFiles(StaticFiles):
         return path
 
     async def get_response(self, path, scope):
-        if not path.replace(os.sep, "/").startswith(STATIC_GROUPS) and path not in {"icon.svg", "manifest.webmanifest"}:
+        if not path.replace(os.sep, "/").startswith(STATIC_GROUPS) and path not in ROOT_FILES:
             raise HTTPException(404)
         response = await super().get_response(path, scope)
         # Windows does not always register a media type for WebP.
         if path.endswith(".webp") and response.status_code in (200, 206):
             response.headers["Content-Type"] = "image/webp"
+        if path == "sw.js":   # the service worker is always checked afresh, and may look after the whole site
+            response.headers["Cache-Control"] = "no-cache"
+            response.headers["Service-Worker-Allowed"] = "/"
+            return response
         supplied = scope["path"].lstrip("/").partition("/")[0]
         if supplied == self.builds.get(path.partition(os.sep)[0]) and response.status_code in (200, 304):
             visibility = "public" if scope.get("state", {}).get("public_asset") else "private"
@@ -116,20 +145,14 @@ def public_build(directory: Path) -> str:
 
 def app_shell(builds: dict[str, str], bundled: bool) -> str:
     template = (paths.WEB / "index.html").read_text(encoding="utf-8")
-    if os.environ.get("LIKENESS_HIDE_EXAMPLES") == "1":
-        return template
-    # the first plate a new visitor sees (the first style's portrait, and the photo it was painted from), on its way at once
-    support = "".join(f'<link rel="preload" as="image" href="/{builds[group]}/{group}/{path}" fetchpriority="high">'
-                      for group, path in (("styles", "princess/sofia.webp"), ("examples", "sofia/portrait.webp"))
-                      if (paths.WEB / group / path).is_file())
-    catalog = paths.WEB / "examples" / "manifest.json"
+    support = ""
+    catalog = paths.WEB / "img" / "manifest.json"
     if catalog.is_file():
-        examples = json.loads(catalog.read_text(encoding="utf-8"))
-        data = json.dumps(examples, separators=(",", ":")).replace("<", "\\u003c")
-        support += f'<script id="example-catalog" type="application/json">{data}</script>'
+        data = json.dumps(json.loads(catalog.read_text(encoding="utf-8")), separators=(",", ":"), ensure_ascii=False).replace("<", "\\u003c")
+        support += f'<script id="asset-manifest" type="application/json">{data}</script>'
     versions = json.dumps(builds, separators=(",", ":"))
     support += f'<script id="studio-versions" type="application/json">{versions}</script>'
-    for directory in ("css", "fonts", "js"):
+    for directory in ("css", "fonts", "js", "img"):
         template = template.replace(f'"{directory}/', f'"/{builds[directory]}/{directory}/')
     if bundled:
         template = template.replace(f'"/{builds["js"]}/js/main.js"', f'"/{builds["bundle"]}/bundle/studio.js"')
@@ -173,17 +196,17 @@ def create_app(engine: engines.Engine | None = None, home: Path | None = None, o
         raise ValueError("The owner secret must contain 32 to 90 ASCII bytes.")
     link_key = owner_link_token(owner_secret) if link_only else ""
     session_key = hmac.new(owner_secret, b"likeness-owner-session-v2", hashlib.sha256).digest() if link_only else b""
-    store = Store(home, isolated=link_only)
-    jobs, key = Jobs(int(config["studio"].get("workers", 2))), pairing_key(home)
+    accounts = Accounts(home)
+    jobs, key = Jobs(int(config["studio"].get("workers", 4))), pairing_key(home)
     estimates = Estimates(home / f"estimates-{engine.kind}.json", engine.kind)
     open_door = bool(os.environ.get("LIKENESS_OPEN")) if open_door is None else open_door
-    app = FastAPI(title="Likeness", version=__version__, docs_url="/api/docs", openapi_url="/api/openapi.json", redoc_url=None)
-    app.state.engine, app.state.store, app.state.jobs, app.state.key = engine, store, jobs, key
+    app = FastAPI(title="哈基秀", version=__version__, docs_url="/api/docs", openapi_url="/api/openapi.json", redoc_url=None)
+    app.state.engine, app.state.accounts, app.state.jobs, app.state.key = engine, accounts, jobs, key
     app.add_middleware(GZipMiddleware, minimum_size=1024, compresslevel=3)
     css = public_build(paths.WEB / "css")
     fonts = public_build(paths.WEB / "fonts")
     style_build = "v" + hashlib.sha256((css + fonts).encode()).hexdigest()[:16]
-    builds = {name: public_build(paths.WEB / name) for name in ("js", "vendor", "examples", "sitters", "styles")}
+    builds = {name: public_build(paths.WEB / name) for name in ("js", "vendor", "img")}
     builds.update(css=style_build, fonts=style_build)
     bundled = paths.ROOT / "workstation" / "bundle" / "studio.js"
     manifest = bundled.with_name("source.txt")
@@ -218,8 +241,30 @@ def create_app(engine: engines.Engine | None = None, home: Path | None = None, o
         return response
 
     def studio_store(request: Request) -> Store:
-        device = getattr(request.state, "device", None)
-        return Store(home / "devices" / device, isolated=True) if device else store
+        """The asking account's own pictures: nobody else's are ever found through it."""
+        return Store(accounts.space(request.state.account["id"]), isolated=True)
+
+    def wants_account(request: Request) -> bool:
+        path = request.url.path
+        return path.startswith("/api/") or path in ("/", "/index.html", "/studio.json") or path.startswith("/open/")
+
+    @app.middleware("http")
+    async def account(request: Request, call_next):
+        """Every visitor has an account from the first page: a guest one until they sign up (in place) or log in."""
+        if not wants_account(request):
+            return await call_next(request)
+        token = request.cookies.get(SESSION_COOKIE, "")
+        who = await run_in_threadpool(accounts.session, token) if token else None
+        fresh = None
+        if who is None:
+            who, fresh = await run_in_threadpool(accounts.guest)
+            token = fresh
+        request.state.account, request.state.token = who, token
+        response = await call_next(request)
+        if fresh:
+            response.set_cookie(SESSION_COOKIE, fresh, max_age=2 * 31536000, httponly=True, samesite="lax",
+                                secure=request.url.scheme == "https", path="/")
+        return response
 
     @app.middleware("http")
     async def paired(request: Request, call_next):
@@ -289,9 +334,9 @@ def create_app(engine: engines.Engine | None = None, home: Path | None = None, o
         return JSONResponse({"detail": str(error), "hint": error.hint}, status_code=502)
 
     def describe(request: Request) -> dict:
-        device = getattr(request.state, "device", None)
+        who = getattr(request.state, "account", None)
         return {"ok": True, "edition": "live", "version": __version__, "engine": engine.describe(),
-                **({"storage": device} if device else {}),
+                **({"account": Accounts.public(who)} if who else {}),
                 "events": "poll" if owner_secret else "stream",
                 "eta": {pace: estimates.expect("edit", pace) for pace in ("quick", "fine", "deep")},
                 "portraitEta": {pace: estimates.expect("restyle", pace) for pace in ("quick", "fine", "deep")}}
@@ -315,10 +360,6 @@ def create_app(engine: engines.Engine | None = None, home: Path | None = None, o
     @app.head("/", response_class=HTMLResponse, include_in_schema=False)
     def home_page(request: Request):
         return page_response(request)
-    if os.environ.get("LIKENESS_HIDE_EXAMPLES") == "1":
-        @app.get("/examples/manifest.json", include_in_schema=False)
-        def no_examples() -> None:
-            raise HTTPException(404, headers={"X-Likeness-Examples": "drawn"})
 
     @app.post("/api/assets")
     async def upload(request: Request, file: UploadFile = File(...), kind: Literal["image", "mask"] = Form("image")):
@@ -327,7 +368,7 @@ def create_app(engine: engines.Engine | None = None, home: Path | None = None, o
             note = await run_in_threadpool(studio_store(request).add_bytes, data, kind)
         except ValueError as error:
             raise HTTPException(413 if len(data) > MAX_UPLOAD else 415, str(error)) from None
-        return {"id": note["id"], "kind": note["kind"], "w": note["w"], "h": note["h"], "url": store.url(note["id"])}
+        return {"id": note["id"], "kind": note["kind"], "w": note["w"], "h": note["h"], "url": Store.url(note["id"])}
 
     @app.get("/api/assets/{asset_id}")
     def asset(request: Request, asset_id: str):
@@ -351,7 +392,7 @@ def create_app(engine: engines.Engine | None = None, home: Path | None = None, o
     @app.post("/api/turns")
     def turn(body: Turn, request: Request):
         assets = studio_store(request)
-        device = getattr(request.state, "device", "")
+        device = request.state.account["id"]
         inputs = inputs_for(body, assets)
         eta = estimates.expect(body.intent.op, body.pace, body.n)
 
@@ -366,7 +407,7 @@ def create_app(engine: engines.Engine | None = None, home: Path | None = None, o
             job.emit("done", ms=ms)
 
         submission = None
-        if owner_secret and body.id:
+        if body.id:   # the same turn sent twice (a retry after a dropped connection) is the same job, never a second one
             wire = json.dumps(body.model_dump(mode="json"), sort_keys=True, separators=(",", ":")).encode()
             submission = (f"{device}:{body.id}", hashlib.sha256(wire).hexdigest())
         try:
@@ -379,7 +420,7 @@ def create_app(engine: engines.Engine | None = None, home: Path | None = None, o
 
     def find(request: Request, job_id: str) -> Job:
         job = jobs.jobs.get(job_id)
-        if job is None or (link_only and job.owner != request.state.device):
+        if job is None or job.owner != request.state.account["id"]:
             raise HTTPException(404, "The studio has no such job.")
         return job
 
@@ -410,32 +451,52 @@ def create_app(engine: engines.Engine | None = None, home: Path | None = None, o
         find(request, job_id)
         return {"ok": jobs.cancel(job_id)}
 
-    def picture(request: Request, asset_id: str | None) -> Path | None:
-        if not asset_id:
-            return None
-        path = studio_store(request).path(asset_id)
-        if path is None or not path.is_file():
-            raise HTTPException(409, "The picture needs to be sent again.")
-        return path
-
     @app.get("/api/history")
     def history(request: Request, limit: int = 120):
         return {"made": studio_store(request).made(max(1, min(limit, 500)))}
 
-    @app.post("/api/rooms")
-    def room(ask: RoomAsk):
-        return normalise_room(engine.room(ask), ask.text)
+    # ---- the account and its private space ----
+    @app.exception_handler(AccountError)
+    async def account_failed(request: Request, error: AccountError):
+        return JSONResponse({"detail": str(error)}, status_code=error.status)
 
-    @app.post("/api/looks")
-    def look(ask: LookAsk, request: Request):
-        return normalise_look(engine.look(ask, picture(request, ask.asset)), ask.text)
+    def me(request: Request) -> dict:
+        who = request.state.account
+        return {"account": Accounts.public(who), "counts": accounts.counts(who["id"])}
 
-    @app.post("/api/backdrops")
-    def backdrops(ask: BackdropAsk, request: Request):
-        ideas = normalise_backdrops(engine.backdrops(ask, picture(request, ask.asset)))
-        if not ideas:
-            raise EngineError("No ideas came back this time.", "Try again, or say where you would like to be.")
-        return {"backdrops": ideas}
+    app.get("/api/me")(me)
+
+    @app.post("/api/auth/signup")
+    def signup(body: SignUp, request: Request):
+        request.state.account = accounts.signup(request.state.account["id"], body.handle, body.password, body.nickname)
+        return me(request)
+
+    @app.post("/api/auth/login")
+    def login(body: LogIn, request: Request):
+        who = request.client.host if request.client else ""
+        request.state.account, moved = accounts.login(request.state.token, request.state.account, body.handle, body.password, who)
+        return {**me(request), "moved": moved}
+
+    @app.post("/api/auth/logout")
+    def logout(request: Request):
+        accounts.logout(request.state.token)
+        response = JSONResponse({"ok": True})
+        response.delete_cookie(SESSION_COOKIE, path="/")
+        return response
+
+    @app.post("/api/auth/profile")
+    def profile(body: Profile, request: Request):
+        request.state.account = accounts.rename(request.state.account["id"], body.nickname)
+        return me(request)
+
+    @app.get("/api/sync")
+    def pull(request: Request, cursor: int = 0):
+        records, at = accounts.since(request.state.account["id"], max(0, cursor))
+        return {"records": records, "cursor": at, "account": request.state.account["id"]}
+
+    @app.post("/api/sync")
+    def push(body: SyncIn, request: Request):
+        return {"applied": accounts.put(request.state.account["id"], body.records)}
 
     app.mount("/", StudioFiles(builds, bundle), name="web")
     return app

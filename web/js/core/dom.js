@@ -1,171 +1,143 @@
-/** Small DOM vocabulary: an element builder, icons, sheets, toasts and a few numbers. */
-import { drag, reduced } from './motion.js';
+/**
+ * 小工具：建元素、图标、提示条、底部抽屉。所有界面都从这里取，保持一致。
+ */
 
 /**
- * h('button.btn.btn--accent', { onclick }, 'Label'): tag.classes, props, children.
- * @param {string} tag @param {Record<string, any>|null} [props] @param {...any} kids @returns {any}
+ * h('button.btn.btn--main', { onclick, 'aria-label': '…' }, child, child)
+ * @param {string} tag @param {Record<string, any> | null} [props] @param {...any} kids @returns {HTMLElement}
  */
-export function h(tag, props, ...kids) {
+export function h(tag, props = null, ...kids) {
   const [name, ...cls] = tag.split('.');
   const el = document.createElement(name || 'div');
   if (cls.length) el.className = cls.join(' ');
   for (const [k, v] of Object.entries(props || {})) {
     if (v == null || v === false) continue;
-    if (k === 'style') for (const [p, val] of Object.entries(v)) p.startsWith('--') ? el.style.setProperty(p, val) : (el.style[p] = val);
-    else if (k === 'html') el.innerHTML = v;
-    else if (k === 'data') Object.assign(el.dataset, v);
+    if (k === 'html') el.innerHTML = v;
+    else if (k === 'text') el.textContent = v;
+    else if (k === 'data') for (const [dk, dv] of Object.entries(v)) { if (dv != null) el.dataset[dk] = String(dv); }
+    else if (k === 'style' && typeof v === 'object') Object.assign(el.style, v);
     else if (k.startsWith('on') && typeof v === 'function') el.addEventListener(k.slice(2), v);
-    else if (k in el && k !== 'list' && k !== 'form' && typeof v !== 'string') el[k] = v;
-    else el.setAttribute(k, v === true ? '' : v);
+    else if (k === 'class') el.className += ' ' + v;
+    else if (v === true) el.setAttribute(k, '');
+    else el.setAttribute(k, String(v));
   }
-  el.append(...kids.flat(Infinity).filter(x => x != null && x !== false));
+  for (const kid of kids.flat(Infinity)) if (kid != null && kid !== false) el.append(kid instanceof Node ? kid : String(kid));
   return el;
 }
 
+export const $ = (/** @type {string} */ sel, /** @type {ParentNode} */ root = document) => /** @type {HTMLElement | null} */ (root.querySelector(sel));
+export const $$ = (/** @type {string} */ sel, /** @type {ParentNode} */ root = document) => /** @type {HTMLElement[]} */ ([...root.querySelectorAll(sel)]);
+export const uid = (prefix = '') => prefix + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+export const clamp = (/** @type {number} */ v, lo = 0, hi = 1) => Math.max(lo, Math.min(hi, v));
+export const sleep = (/** @type {number} */ ms) => new Promise(r => setTimeout(r, ms));
+export const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/** 资源地址：相对页面，服务器会把 img/、js/ 改写成带版本号的永久缓存地址。 */
+export const asset = (/** @type {string} */ path) => {
+  const v = versions()[path.split('/')[0]];
+  return v ? '/' + v + '/' + path : path;
+};
+let known = /** @type {Record<string, string> | null} */ (null);
+function versions() {
+  if (!known) { try { known = JSON.parse(document.getElementById('studio-versions')?.textContent || '{}') || {}; } catch { known = {}; } }
+  return known;
+}
+
+// ── 图标：24px 线性图标，统一 1.8 线宽 ──
 const P = {
-  plus: '<path d="M12 5v14M5 12h14"/>', close: '<path d="M6 6l12 12M18 6L6 18"/>', back: '<path d="M15 5l-7 7 7 7"/>',
-  send: '<path d="M12 19V5M6 11l6-6 6 6"/>', arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>', check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
-  image: '<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M4 17l5-4.5 3.5 3 3-2.5L20 17"/>',
-  camera: '<path d="M4 8.5h3.2L9 6h6l1.8 2.5H20v10.5H4z"/><circle cx="12" cy="13.2" r="3.3"/>',
-  album: '<rect x="4" y="4" width="7" height="9" rx="1"/><rect x="13" y="4" width="7" height="6" rx="1"/><rect x="4" y="15" width="7" height="5" rx="1"/><rect x="13" y="12" width="7" height="8" rx="1"/>',
-  heart: '<path d="M12 19.5c-5-3.5-8-6.4-8-10 0-2.4 1.9-4.3 4.3-4.3 1.6 0 3 .9 3.7 2.2.7-1.3 2.1-2.2 3.7-2.2 2.4 0 4.3 1.9 4.3 4.3 0 3.6-3 6.5-8 10z"/>',
-  pin: '<path d="M12 21s-6-5.4-6-10.5a6 6 0 0 1 12 0C18 15.6 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.2"/>',
-  brush: '<path d="M14.5 4.5l5 5-8.5 8.5-5-5z"/><path d="M6 13c-2 0-3 1.6-3 3.5V20h3.5c1.9 0 3.5-1 3.5-3"/>',
-  erase: '<path d="M9 19h10M5 15l8.5-8.5 5 5L12 18H8z"/>',
-  wand: '<path d="M5 19L15 9M14 5v2M18 5v2M17 3.5v0M19 8h2M14 10l1 1"/><path d="M17 4l.6 1.4L19 6l-1.4.6L17 8l-.6-1.4L15 6l1.4-.6z"/>',
-  backdrop: '<path d="M3 18l5.5-7 4 5 3-3.5L21 18z"/><circle cx="16.5" cy="7.5" r="2"/><rect x="3" y="4" width="18" height="16" rx="2"/>',
-  vary: '<rect x="7" y="7" width="13" height="13" rx="2"/><path d="M4 16V5a1 1 0 0 1 1-1h11"/>',
-  compare: '<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M12 3v18"/>',
-  use: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>', save: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',
-  more: '<circle cx="5.5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="18.5" cy="12" r="1.2"/>',
-  retry: '<path d="M4 12a8 8 0 1 0 2.6-5.9M4 4v5h5"/>', stop: '<rect x="7" y="7" width="10" height="10" rx="1.5"/>',
-  bolt: '<path d="M13 3L5 13.5h6l-1 7.5 8-10.5h-6z"/>', feather: '<path d="M19.5 4.5C12 4.5 7 9 6 16.5L4 20M6 16.5h6l-2-2h4.5L12 12h5"/>', gem: '<path d="M7 4h10l4 5-9 11L3 9z"/><path d="M3 9h18M12 20L9 9l3-5 3 5z"/>',
-  sound: '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>',
-  mute: '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/>',
-  page: '<path d="M6 3.5h8l4 4v13H6z"/><path d="M14 3.5v4h4M9.5 13h5M12 10.5v5"/>',
-  sparkle: '<path d="M12 3c.5 4.6 2.4 6.5 7 7-4.6.5-6.5 2.4-7 7-.5-4.6-2.4-6.5-7-7 4.6-.5 6.5-2.4 7-7z"/>',
-  at: '<circle cx="12" cy="12" r="3.6"/><path d="M15.6 12v1.4c0 1.5 1 2.4 2.2 2.4s2.2-1 2.2-3.8a8 8 0 1 0-3.3 6.5"/>',
-  sky: '<path d="M7 18h10a3.6 3.6 0 0 0 .4-7.2 5 5 0 0 0-9.6-1A4.3 4.3 0 0 0 7 18z"/>',
-  room: '<path d="M4 20V9.5L12 4l8 5.5V20"/><path d="M9.5 20v-6h5v6"/>',
-  dial: '<circle cx="12" cy="12" r="8"/><path d="M12 12l4-3"/>',
-  undo: '<path d="M9 7L4.5 11.5 9 16M5 11.5h9a5 5 0 0 1 0 10h-2"/>',
-  share: '<path d="M12 15V4M8 7.5L12 3.5l4 4"/><path d="M6 11H5v9h14v-9h-1"/>',
-  film: '<rect x="4" y="4.5" width="16" height="15" rx="2"/><path d="M8 4.5v15M16 4.5v15M4 9.5h4M4 14.5h4M16 9.5h4M16 14.5h4"/>',
-  trash: '<path d="M5 7h14M10 7V4.5h4V7M7 7l1 13h8l1-13"/>',
-  text: '<path d="M5 6h14M12 6v13"/>',
-  palette: '<path d="M12 3.5a8.5 8.5 0 1 0 0 17c1.2 0 1.8-.8 1.8-1.7 0-1.2-1-1.5-1-2.6 0-1 .8-1.7 1.8-1.7H17a3.5 3.5 0 0 0 3.5-3.5c0-4.2-3.8-7.5-8.5-7.5z"/><circle cx="7.8" cy="11" r="1.1"/><circle cx="10.5" cy="7.5" r="1.1"/><circle cx="15" cy="7.8" r="1.1"/>',
-  expand: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
-  orbit: '<ellipse cx="12" cy="13" rx="9" ry="3.6"/><path d="M14.6 7.4l2.6 2.1-3.2.9"/><circle cx="12" cy="8.6" r="2.4"/>',
-  lenses: '<circle cx="6.8" cy="12" r="4.3" fill="currentColor"/><circle cx="17.2" cy="12" r="4.3"/>',
-  weeks: '<path d="M7 3.5h10M7 20.5h10M8 3.5c0 4.6 4 5.6 4 8.5s-4 3.9-4 8.5M16 3.5c0 4.6-4 5.6-4 8.5s4 3.9 4 8.5"/><path d="M10 18.5c.6-1.4 1.3-2 2-2s1.4.6 2 2z" fill="currentColor"/>',
+  back: '<path d="M15 5l-7 7 7 7"/>',
+  close: '<path d="M6 6l12 12M18 6L6 18"/>',
+  flip: '<path d="M4 9a8 8 0 0 1 14.3-3.6L20 7"/><path d="M20 3v4h-4"/><path d="M20 15a8 8 0 0 1-14.3 3.6L4 17"/><path d="M4 21v-4h4"/>',
+  bolt: '<path d="M13 2L5 13h6l-1 9 8-11h-6l1-9z"/>',
+  compare: '<path d="M12 3v18"/><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M7 9l-2 3 2 3M17 9l2 3-2 3"/>',
+  upload: '<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
+  gallery: '<rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/>',
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
+  camera: '<path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/>',
+  sparkle: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/><path d="M19 15l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7.7-2z"/>',
+  heart: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+  heartFill: '<path fill="currentColor" d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+  download: '<path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 19h16"/>',
+  share: '<path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+  send: '<path d="M21 3L10 14"/><path d="M21 3l-7 18-4-7-7-4 18-7z"/>',
+  refresh: '<path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/>',
+  sliders: '<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>',
+  wand: '<path d="M4 20L15 9"/><path d="M14 4v3M12.5 5.5h3M19 9v3M17.5 10.5h3M18 3l.6 1.4L20 5l-1.4.6L18 7l-.6-1.4L16 5l1.4-.6z"/>',
+  trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  chevron: '<path d="M9 5l7 7-7 7"/>',
+  image: '<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 9"/>',
+  stop: '<rect x="7" y="7" width="10" height="10" rx="2"/>',
+  palette: '<path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.5-.9 1.2-1.7-.4-1.1.3-2.3 1.5-2.3H17a4 4 0 0 0 4-4c0-5.5-4-10-9-10z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10" cy="7" r="1.2"/><circle cx="15" cy="7.5" r="1.2"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+  eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  chat: '<path d="M4 5h16v11H9l-5 4V5z"/>',
+  logout: '<path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4"/><path d="M10 8l-4 4 4 4M6 12h10"/>',
+  shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5L16 9.5"/>',
 };
-/** An inline stroke icon. */
-export const icon = (name, cls = '') => `<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[name] || ''}</svg>`;
+/** @param {keyof typeof P} name */
+export const icon = (name, cls = '') => `<svg class="ico ${cls}" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[name] || ''}</svg>`;
 
-export const sleep = ms => new Promise(r => setTimeout(r, ms));
-export const frame = () => new Promise(r => requestAnimationFrame(() => r(undefined)));
-/** Yield to the current frame before preparing a more expensive visual result. */
-export const afterPaint = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(r, 0))));
-export const stage = () => /** @type {HTMLElement} */ (document.getElementById('stage'));
-export const screens = () => /** @type {HTMLElement} */ (document.getElementById('screens'));
-const versions = JSON.parse(document.getElementById('studio-versions')?.textContent || '{}');
-/** A site asset keyed by the files in its group, or an ordinary relative URL on the static edition. @param {string} path */
-export const assetUrl = path => {
-  const version = versions[path.split('/')[0]];
-  return new URL(version ? '/' + version + '/' + path : path, document.baseURI);
-};
-export const clamp = (v, lo = 0, hi = 1) => Math.max(lo, Math.min(hi, v));
-export const lerp = (a, b, t) => a + (b - a) * t;
-export const uid = (p = '') => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-export const pick = (list, seed = Math.random()) => list[Math.floor(seed * list.length) % list.length];
-/** Seeded randomness, for drawings that must come out the same twice. @param {number|string} [seed] */
-export function rng(seed = 1) { let s = (typeof seed === 'string' ? [...seed].reduce((a, c) => Math.imul(a ^ c.charCodeAt(0), 16777619), 2166136261) : seed) >>> 0 || 1; return () => ((s = Math.imul(s ^ (s >>> 15), 2246822507 | s) + 0x6d2b79f5 >>> 0) % 1e9) / 1e9; }
-/** "about 40 s", "about 2 min" */
-export function eta(ms) {
-  if (ms == null || !isFinite(ms)) return '';
-  const s = Math.max(1, Math.round(ms / 1000));
-  if (s < 10) return 'a few seconds';
-  if (s < 55) return `about ${Math.round(s / 5) * 5} s`;
-  const m = Math.round(s / 30) / 2;
-  return `about ${m % 1 ? m.toFixed(1) : m} min`;
+/** 图标 + 短字的按钮。 */
+export function iconBtn(/** @type {keyof typeof P} */ name, /** @type {string} */ label, /** @type {(e: Event) => void} */ run, cls = '', showLabel = false) {
+  return h('button.ibtn' + (cls ? '.' + cls : ''), { type: 'button', 'aria-label': label, title: label, onclick: run },
+    h('span.ibtn__ico', { html: icon(name) }), showLabel ? h('span.ibtn__label', null, label) : null);
 }
-export const seconds = ms => (ms / 1000).toFixed(ms < 10000 ? 1 : 0) + ' s';
 
+// ── 提示条 ──
 let toastTimer = 0;
-/** A short line of confirmation near the top of the stage. */
-let ruler = /** @type {CanvasRenderingContext2D | null} */ (null);
 /**
- * Of some ways to say a thing, longest first, the first that fits a text field as its placeholder (else the last):
- * a hint cut off halfway looks broken, a shorter one does not.
- * @param {HTMLInputElement} input @param {string[]} words @returns {string}
+ * 屏幕上方的一条提示。可带一个动作（例如「去看看」「撤销」）。
+ * @param {string} text @param {{ ms?: number, action?: { label: string, run: () => void }, tone?: 'ok' | 'warn' }} [o]
  */
-export function fitting(input, words) {
-  const st = getComputedStyle(input), room = input.clientWidth - parseFloat(st.paddingLeft) - parseFloat(st.paddingRight), last = words[words.length - 1] || '';
-  ruler ||= document.createElement('canvas').getContext('2d');
-  if (!ruler || !(room > 0)) return last;
-  ruler.font = 'italic ' + st.fontWeight + ' ' + st.fontSize + ' ' + st.fontFamily;
-  const r = ruler;
-  return words.find(w => r.measureText(w).width <= room) ?? last;
-}
-
-/** A short note at the top of the stage; with an action, a button to act on it (e.g. undo) while it shows. @param {string} text @param {number} [ms] @param {{ label: string, run: () => void } | null} [action] */
-export function toast(text, ms = 2200, action = null) {
-  let el = stage().querySelector('.toast');
-  if (!el) stage().append(el = h('div.toast', { role: 'status' }));
-  el.replaceChildren(text, ...(action ? [h('button.toast__act', { onclick: () => { el.classList.remove('is-in'); action.run(); } }, action.label)] : []));
-  el.classList.toggle('toast--act', !!action);
+export function toast(text, o = {}) {
+  const root = stageEl();
+  root.querySelector('.toast')?.remove();
+  const el = h('div.toast', { role: 'status', 'aria-live': 'polite', data: { tone: o.tone || '' } },
+    h('span.toast__text', null, text),
+    o.action ? h('button.toast__act', { type: 'button', onclick: () => { el.remove(); o.action?.run(); } }, o.action.label) : null);
+  root.append(el);
   requestAnimationFrame(() => el.classList.add('is-in'));
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('is-in'), ms);
+  toastTimer = window.setTimeout(() => { el.classList.remove('is-in'); setTimeout(() => el.remove(), 300); }, o.ms || 2400);
 }
 
-/**
- * Raises a sheet from the bottom edge; it can be flung back down. Resolves with whatever close() was given.
- * @param {(close: (value?: any) => void, panel: HTMLElement) => Node[]} build @param {{ cls?: string, label?: string }} [opts]
- */
-export function sheet(build, { cls = '', label = '' } = {}) {
+export const stageEl = () => /** @type {HTMLElement} */ (document.getElementById('stage'));
+
+/** 选文件（照片）。 @param {{ capture?: boolean }} [o] @returns {Promise<File | null>} */
+export function chooseFile(o = {}) {
   return new Promise(resolve => {
-    const scrim = h('div.scrim'), body = h('div.sheet__body'), grip = h('div.sheet__grip');
-    const panel = h('div.sheet' + (cls ? '.' + cls : ''), { role: 'dialog', 'aria-modal': 'true', 'aria-label': label }, grip, body);
+    const input = /** @type {HTMLInputElement} */ (h('input', { type: 'file', accept: 'image/*', hidden: true, ...(o.capture ? { capture: 'user' } : {}) }));
     let done = false;
-    // Escape puts the sheet on top away (only that one), and the keys go back where they were
-    const was = /** @type {HTMLElement | null} */ (document.activeElement);
-    const onKey = (/** @type {KeyboardEvent} */ e) => {
-      if (e.key !== 'Escape' || done) return;
-      const all = stage().querySelectorAll('.sheet'); if (all[all.length - 1] !== panel) return;
-      e.preventDefault(); e.stopPropagation(); close(); was?.focus?.({ preventScroll: true });
-    };
-    window.addEventListener('keydown', onKey, true);
-    const close = value => {
-      if (done) return; done = true;
-      window.removeEventListener('keydown', onKey, true);
-      scrim.inert = panel.inert = true;
-      scrim.classList.remove('is-in'); panel.classList.remove('is-in'); panel.style.transform = '';
-      resolve(value);
-      setTimeout(() => { scrim.remove(); panel.remove(); }, reduced ? 0 : 200);
-    };
-    body.append(...build(close, panel));
-    scrim.addEventListener('click', () => close());
-    drag(grip, {
-      start: () => { panel.classList.add('is-dragging'); },
-      move: d => { panel.style.transform = `translateY(${Math.max(0, d.dy)}px)`; },
-      end: d => { panel.classList.remove('is-dragging'); if (d.dy > 90 || d.vy > 600) close(); else panel.style.transform = ''; },
-    });
-    scrim.classList.add('is-in');
-    panel.classList.add('is-in');
-    stage().append(scrim, panel);
-  });
-}
-
-/** Reads a file chooser and resolves the chosen files (images only). */
-/** @param {{ multiple?: boolean, capture?: boolean | 'user' | 'environment' }} [o] */
-export function chooseFiles({ multiple = true, capture = /** @type {boolean | 'user' | 'environment'} */ (false) } = {}) {
-  return new Promise(resolve => {
-    const input = h('input', { type: 'file', accept: 'image/*', multiple, hidden: true });
-    if (capture) input.setAttribute('capture', capture === true ? 'environment' : String(capture));
-    input.addEventListener('change', () => { resolve([...(input.files || [])]); input.remove(); });
-    input.addEventListener('cancel', () => { resolve([]); input.remove(); });
+    input.addEventListener('change', () => { done = true; resolve(input.files?.[0] || null); input.remove(); });
+    window.addEventListener('focus', () => setTimeout(() => { if (!done) { resolve(null); input.remove(); } }, 1200), { once: true });
     document.body.append(input);
     input.click();
   });
+}
+
+/** 时间说人话：8 秒 / 1 分 10 秒。 */
+export function said(/** @type {number} */ ms) {
+  const s = Math.max(1, Math.round(ms / 1000));
+  return s < 60 ? s + ' 秒' : Math.floor(s / 60) + ' 分' + (s % 60 ? ' ' + (s % 60) + ' 秒' : '钟');
+}
+/** 今天 / 昨天 / 11月18日 */
+export function dayOf(/** @type {number} */ t) {
+  const d = new Date(t), today = new Date(); today.setHours(0, 0, 0, 0);
+  const diff = Math.round((today.getTime() - new Date(d).setHours(0, 0, 0, 0)) / 864e5);
+  return diff <= 0 ? '今天' : diff === 1 ? '昨天' : (d.getMonth() + 1) + '月' + d.getDate() + '日';
+}
+
+/** 长按（含鼠标按住）：按下时 on(true)，松开 on(false)。 */
+export function holdable(/** @type {HTMLElement} */ el, /** @type {(on: boolean) => void} */ on, delay = 120) {
+  let t = 0, held = false;
+  const start = (/** @type {PointerEvent} */ e) => { if (e.button > 0) return; t = window.setTimeout(() => { held = true; on(true); }, delay); };
+  const end = () => { clearTimeout(t); if (held) { held = false; on(false); } };
+  el.addEventListener('pointerdown', start);
+  for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) el.addEventListener(ev, end);
+  el.addEventListener('contextmenu', e => e.preventDefault());
+  el.addEventListener('keydown', e => { if (e.key === ' ' && !e.repeat) { e.preventDefault(); on(true); } });
+  el.addEventListener('keyup', e => { if (e.key === ' ') on(false); });
 }

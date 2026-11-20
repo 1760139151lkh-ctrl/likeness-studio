@@ -31,8 +31,8 @@ from . import EngineError, Work, shaped
 
 PACES = {"quick": "Quick", "fine": "Fine", "deep": "Deep"}
 DEFAULT_PACES = {
-    "quick": {"model": "gpt-image-2.6-flare", "quality": "low", "partials": 1, "timeout": 120},
-    "fine": {"model": "gpt-image-2.6-flare", "quality": "medium", "partials": 2, "timeout": 180},
+    "quick": {"model": "gpt-image-2.6-flare", "quality": "low", "partials": 1, "timeout": 90},
+    "fine": {"model": "gpt-image-2.6-flare", "quality": "medium", "partials": 2, "timeout": 120},
     "deep": {"model": "gpt-image-2.6-sunburst", "quality": "high", "partials": 2, "timeout": 300},
 }
 EDIT_OPS = {"edit", "restyle", "reference", "blend", "region", "backdrop", "remove", "vary", "angles"}
@@ -58,6 +58,16 @@ def _multipart(fields: list[tuple[str, str]], files: list[tuple[str, str, bytes,
         out.write(b"\r\n")
     out.write(f"--{boundary}--\r\n".encode())
     return out.getvalue(), f"multipart/form-data; boundary={boundary}"
+
+
+def _jpeg(path: Path) -> bytes:
+    """A picture as the API takes it with the fewest bytes: the stored JPEG as it is, anything else re-encoded."""
+    if path.suffix == ".jpg":
+        return path.read_bytes()
+    with Image.open(path) as image:
+        buf = io.BytesIO()
+        image.convert("RGB").save(buf, "JPEG", quality=92)
+        return buf.getvalue()
 
 
 def _png(path: Path, size: tuple[int, int] | None = None) -> bytes:
@@ -108,7 +118,7 @@ class OpenAIImages:
         return {**DEFAULT_PACES.get(name, DEFAULT_PACES["fine"]), **(self.config.get("pace", {}).get(name) or {})}
 
     def describe(self) -> dict:
-        return {"id": self.id, "kind": self.kind, "label": "GPT Image, direct",
+        return {"id": self.id, "kind": self.kind, "label": "GPT Image",
                 "paces": {name: {k: self.pace(name).get(k, "") for k in ("model", "quality")} for name in PACES}}
 
     def provenance(self, turn: Turn) -> dict:
@@ -154,16 +164,19 @@ class OpenAIImages:
         pace = self.pace(turn.pace)
         size = SIZES.get(turn.aspect or "", "") or str(self.config.get("size") or "1024x1536")
         common = [("model", str(pace["model"])), ("prompt", prompt), ("size", size), ("quality", str(pace["quality"])),
-                  ("output_format", "jpeg"), ("output_compression", "92"), ("stream", "true"), ("partial_images", str(int(pace.get("partials", 0))))]
+                  ("output_format", "jpeg"), ("output_compression", "90"), ("stream", "true"), ("partial_images", str(int(pace.get("partials", 0))))]
         subject = inputs.subject or next(iter(inputs.pictures), None)
         if turn.intent.op in EDIT_OPS and subject:
             first = inputs.pictures[subject]
             with Image.open(first) as im:
                 base_size = im.size
-            files = [("image[]", f"{subject}.png", _png(first), "image/png")]
-            files += [("image[]", f"{h}.png", _png(p), "image/png") for h, p in inputs.pictures.items() if h != subject][:7]
             mask = self._mask(inputs, base_size)
-            if mask is not None:
+            if mask is None:   # no mask: JPEG goes up in a fraction of the time a PNG does
+                files = [("image[]", f"{subject}.jpg", _jpeg(first), "image/jpeg")]
+                files += [("image[]", f"{h}.jpg", _jpeg(p), "image/jpeg") for h, p in inputs.pictures.items() if h != subject][:7]
+            else:
+                files = [("image[]", f"{subject}.png", _png(first), "image/png")]
+                files += [("image[]", f"{h}.png", _png(p), "image/png") for h, p in inputs.pictures.items() if h != subject][:7]
                 files.append(("mask", "mask.png", mask, "image/png"))
             body, kind = _multipart(common, files)
             path = "/images/edits"
@@ -205,7 +218,7 @@ class OpenAIImages:
             with ThreadPoolExecutor(max_workers=min(4, turn.n)) as pool:
                 for future in [pool.submit(self._one, turn, inputs, work, i, prompt) for i in range(turn.n)]:
                     future.result()
-        voice = turn.room.voice if turn.room and turn.room.voice else ["Here it is."]
+        voice = turn.room.voice if turn.room and turn.room.voice else ["出片啦"]
         work.reply(voice[secrets.randbelow(len(voice))])
 
     # ---- words only ----

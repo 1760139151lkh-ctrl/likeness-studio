@@ -1,135 +1,126 @@
 /**
- * Where you are, and the way back. Every screen and every step inside one is an entry in the browser's history, so the
- * phone's back gesture, the browser's back button and the app's own ← all do the same thing; an address (#/mine,
- * #/create/princess) opens the screen it names. Screens are stacked: the one below stays as it was (its scroll, its
- * carousel), so going back is instant.
+ * 导航：每个页面都有地址（#/studio、#/work/xxx…），刷新后回到原地；手机返回手势、浏览器后退、页面左上角的返回
+ * 按钮走的是同一条路。抽屉和弹层也占一格历史，所以「返回」总是先关掉最上面那一层，绝不会把人带出应用。
  *
- * A screen is a function of its params that returns { el, step?(name), shown?(), left?() }.
+ * 根页面只有两个：实时变身（live）与上传精修（studio），它们之间是切换，不是前进。
  */
-import { screens } from './dom.js';
-import { reduced } from './motion.js';
+import { stageEl, reduced } from './dom.js';
 import { emit } from './bus.js';
 
-/** @typedef {{ el: HTMLElement, step?: (name: string) => void, shown?: () => void, left?: () => void, keep?: boolean }} Screen */
-/** @typedef {{ i: number, name: string, params: Record<string, any>, step: string, screen: Screen | null }} Entry */
+/** @typedef {{ el: HTMLElement, shown?: (params: Record<string, string>) => void, hidden?: () => void, keep?: boolean }} Screen */
+/** @type {Map<string, (params: Record<string, string>) => Screen>} */
+const factories = new Map();
+/** @type {Map<string, Screen>} */
+const kept = new Map();
+/** @type {{ name: string, params: Record<string, string>, screen: Screen } | null} */
+let current = null;
+/** @type {{ id: number, close: () => void }[]} */
+const overlays = [];
+let depth = 0;   // how many entries this session has pushed (so back never leaves the app)
+let overlaySeq = 0;
 
-/** @type {Record<string, (params: Record<string, any>) => Screen>} */
-const routes = {};
-/** @type {Entry[]} */
-const stack = [];
-let seq = 0;
-/** The screens that have no screen of their own: the desk under everything (nothing on top of it is the desk). */
-const BARE = new Set(['desk']);
+export const ROOTS = ['live', 'studio'];
 
-/** @param {string} name @param {(params: Record<string, any>) => Screen} make */
-export function define(name, make) { routes[name] = make; }
+export function define(/** @type {string} */ name, /** @type {(params: Record<string, string>) => Screen} */ make) { factories.set(name, make); }
+export const here = () => current?.name || '';
+export const params = () => current?.params || {};
 
-export const current = () => stack[stack.length - 1] || null;
-export const here = () => current()?.name || '';
+/** #/work/abc → { name: 'work', params: { id: 'abc' } } */
+function parse(hash = location.hash) {
+  const [name, id] = hash.replace(/^#\/?/, '').split('/');
+  const known = factories.has(name) ? name : '';
+  return { name: known, params: id ? { id: decodeURIComponent(id) } : {} };
+}
+const hashOf = (/** @type {string} */ name, /** @type {Record<string, string>} */ p = {}) => '#/' + name + (p.id ? '/' + encodeURIComponent(p.id) : '');
 
-/** The address for an entry: #/name/param. @param {string} name @param {Record<string, any>} params */
-const address = (name, params) => '#/' + [name === 'home' ? '' : name, params.id || ''].filter(Boolean).join('/');
-const state = (/** @type {Entry} */ e) => ({ likeness: true, i: e.i, name: e.name, params: e.params, step: e.step });
+/** 去某个页面。replace：替换当前这一格（例如两个根页面之间切换）。 */
+export function go(/** @type {string} */ name, /** @type {Record<string, string>} */ p = {}, o = { replace: false }) {
+  // an open sheet's history entry becomes the new page's, so one back gesture returns to where the sheet was opened
+  const fromOverlay = overlays.length > 0;
+  closeOverlays();
+  const swap = o.replace || (ROOTS.includes(name) && ROOTS.includes(here()));
+  if (fromOverlay && !swap) { depth++; history.replaceState({ app: true, depth }, '', hashOf(name, p)); }
+  else if (swap) history.replaceState({ app: true, depth }, '', hashOf(name, p));
+  else { depth++; history.pushState({ app: true, depth }, '', hashOf(name, p)); }
+  show(name, p);
+}
+
+/** 返回上一页；如果这是进入应用的第一页，就回到根页面，而不是离开应用。 */
+export function back(/** @type {string} */ fallback = '') {
+  if (overlays.length) { history.back(); return; }
+  if (depth > 0) { history.back(); return; }
+  const root = fallback || lastRoot();
+  history.replaceState({ app: true, depth: 0 }, '', hashOf(root));
+  show(root, {});
+}
+let rootPref = 'live';
+export const lastRoot = () => rootPref;
+export function setRootPref(/** @type {string} */ r) { if (ROOTS.includes(r)) rootPref = r; }
+
+function show(/** @type {string} */ name, /** @type {Record<string, string>} */ p) {
+  const make = factories.get(name);
+  if (!make) return;
+  const prev = current;
+  if (prev && prev.name === name && JSON.stringify(prev.params) === JSON.stringify(p)) { prev.screen.shown?.(p); return; }
+  let screen = kept.get(name);
+  if (!screen) {
+    screen = make(p);
+    if (screen.keep) kept.set(name, screen);
+    stageEl().querySelector('.screens')?.append(screen.el);
+  }
+  if (ROOTS.includes(name)) rootPref = name;
+  current = { name, params: p, screen };
+  screen.el.hidden = false;
+  screen.el.removeAttribute('inert');
+  const forward = !prev || rank(name) >= rank(prev.name);
+  if (!reduced) screen.el.animate(forward
+    ? [{ opacity: 0, transform: 'translateY(14px) scale(.985)' }, { opacity: 1, transform: 'none' }]
+    : [{ opacity: 0, transform: 'scale(1.015)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: 'cubic-bezier(.2,.8,.2,1)' });
+  screen.shown?.(p);
+  if (prev && prev.screen !== screen) {
+    prev.screen.hidden?.();
+    if (prev.screen.keep) { prev.screen.el.hidden = true; prev.screen.el.setAttribute('inert', ''); }
+    else prev.screen.el.remove();
+  }
+  document.documentElement.dataset.screen = name;
+  emit('screen', name);
+}
+const rank = (/** @type {string} */ n) => ({ live: 0, studio: 0, gallery: 1, me: 1, result: 2, work: 2 })[n] ?? 1;
 
 /**
- * Opens a screen on top of this one (or, with replace, in its place).
- * @param {string} name @param {Record<string, any>} [params] @param {{ replace?: boolean }} [o]
+ * 一个盖在页面上的层（抽屉、弹窗）：占一格历史，所以返回手势会先把它关掉。
+ * 返回 dismiss()：用户点「关闭」时调用它。
+ * @param {() => void} close 真正把层收起来的函数（只会被调用一次）
  */
-export function go(name, params = {}, { replace = false } = {}) {
-  const top = current();
-  if (top && top.name === name && JSON.stringify(top.params) === JSON.stringify(params) && !top.step) return;
-  /** @type {Entry} */ const e = { i: ++seq, name, params, step: '', screen: null };
-  if (replace && top) { stack.pop(); close(top, 'replace'); }
-  // a tab (home, mine, the desk) is a fresh start: what was stacked under it is put away
-  const tab = name === 'home' || name === 'mine' || name === 'desk';
-  if (tab) while (stack.length) close(/** @type {Entry} */ (stack.pop()), 'replace');
-  stack.push(e);
-  (replace ? history.replaceState : history.pushState).call(history, state(e), '', address(name, params));
-  show(e, 'forward', !tab && !replace);
+export function overlay(close) {
+  const id = ++overlaySeq;
+  overlays.push({ id, close });
+  history.pushState({ app: true, depth, overlay: id }, '');
+  return () => { if (overlays.some(o => o.id === id)) history.back(); };
 }
+function closeOverlays() { while (overlays.length) overlays.pop()?.close(); }
 
-/** A step inside the screen on top (the create flow's photo, tune, paint): its own entry in the history. @param {string} step */
-export function step(step) {
-  const top = current(); if (!top || top.step === step) return;
-  top.step = step;
-  history.pushState(state(top), '', address(top.name, top.params));
-}
-
-/** The step on top, said again without a new entry (a finished painting's step becomes its result). @param {string} step */
-export function restep(step) {
-  const top = current(); if (!top) return;
-  top.step = step;
-  history.replaceState(state(top), '', address(top.name, top.params));
-}
-
-/** Back one: a step, or a screen; from the first screen, home. */
-export function back() {
-  if (history.state?.likeness && stack.length > 1 || current()?.step) history.back();
-  else go('home', {}, { replace: true });
-}
-
-/** Mounts an entry's screen, or brings it back. @param {Entry} e @param {'forward' | 'back'} way @param {boolean} [animate] */
-function show(e, way, animate = true) {
-  const make = routes[e.name] || routes.home;
-  if (!e.screen) {
-    e.screen = make(e.params);
-    const el = e.screen.el;
-    if (el) {
-      el.classList.add('nav-screen');
-      screens().append(el);
-      if (animate && !reduced) el.animate(way === 'forward'
-        ? [{ opacity: 0, transform: 'translateX(6cqw)' }, { opacity: 1, transform: 'none' }]
-        : [{ opacity: 0, transform: 'translateX(-4cqw)' }, { opacity: 1, transform: 'none' }], { duration: 300, easing: 'cubic-bezier(.2,.8,.2,1)' });
-    }
-  } else if (e.screen.el) { e.screen.el.hidden = false; e.screen.el.inert = false; }
-  for (const below of stack) if (below !== e && below.screen?.el) { below.screen.el.inert = true; hideLater(below.screen.el); }
-  document.documentElement.dataset.screen = e.name;
-  if (e.step) e.screen.step?.(e.step);
-  e.screen.shown?.();
-  emit('nav', e.name);
-}
-/** A screen under another is hidden once the one above has come in (so it is never seen to vanish). @param {HTMLElement} el */
-function hideLater(el) { setTimeout(() => { if (el.inert) el.hidden = true; }, reduced ? 0 : 320); }
-
-/** Takes a screen away. @param {Entry} e @param {string} why */
-function close(e, why) {
-  const s = e.screen; e.screen = null; if (!s) return;
-  s.left?.();
-  const el = s.el; if (!el) return;
-  if (reduced || why === 'replace' || el.hidden) { el.remove(); return; }
-  el.inert = true;
-  el.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateX(8cqw)' }], { duration: 220, easing: 'cubic-bezier(.4,0,1,1)' }).finished.then(() => el.remove(), () => el.remove());
-}
-
-/** The phone's back (or forward) moved through the history: follow it. */
-addEventListener('popstate', ev => {
-  const s = ev.state;
-  if (!s?.likeness) { go('home', {}, { replace: true }); return; }
-  const at = stack.findIndex(e => e.i === s.i);
-  if (at >= 0) {
-    while (stack.length - 1 > at) close(/** @type {Entry} */ (stack.pop()), 'back');
-    const e = stack[at];
-    const stepChanged = e.step !== s.step;
-    e.step = s.step || '';
-    if (!e.screen || e.screen.el?.hidden || e.screen.el?.inert) show(e, 'back');
-    else if (stepChanged) e.screen.step?.(e.step);
+window.addEventListener('popstate', () => {
+  if (overlays.length) {
+    const top = overlays.pop();
+    top?.close();
     return;
   }
-  // an entry this page no longer holds (after a reload, or forward again): opened fresh
-  /** @type {Entry} */ const e = { i: s.i, name: s.name, params: s.params || {}, step: s.step || '', screen: null };
-  seq = Math.max(seq, s.i);
-  const tab = e.name === 'home' || e.name === 'mine' || e.name === 'desk';
-  if (tab) while (stack.length) close(/** @type {Entry} */ (stack.pop()), 'replace');
-  stack.push(e); show(e, 'forward', !tab);
+  depth = Math.max(0, (history.state?.depth ?? depth - 1));
+  const { name, params: p } = parse();
+  show(name || rootPref, p);
 });
 
-/** The screen the address asks for when the page opens (#/mine, #/create/princess), or home. */
-export function start(fallback = 'home') {
-  const [name = '', id = ''] = location.hash.replace(/^#\/?/, '').split('/');
-  const known = name && routes[name] ? name : fallback;
-  /** @type {Entry} */ const e = { i: ++seq, name: known, params: id ? { id } : {}, step: '', screen: null };
-  stack.push(e);
-  history.replaceState(state(e), '', address(e.name, e.params));
-  show(e, 'forward', false);
+/** 第一次打开：按地址进入，地址不认识就去根页面。 */
+export function start(/** @type {string} */ fallback) {
+  const { name, params: p } = parse();
+  const first = name || fallback;
+  history.replaceState({ app: true, depth: 0 }, '', hashOf(first, p));
+  // 直接打开的是详情页：在它下面垫一个根页面，这样「返回」有地方可回
+  if (!ROOTS.includes(first)) {
+    history.replaceState({ app: true, depth: 0 }, '', hashOf(rootPref));
+    history.pushState({ app: true, depth: 1 }, '', hashOf(first, p));
+    depth = 1;
+  }
+  show(first, p);
 }
-export const isBare = (/** @type {string} */ name) => BARE.has(name);

@@ -25,3 +25,19 @@ def load(home: Path | None = None) -> dict:
     config["studio"].setdefault("workers", 2)
     config.setdefault("codex", {})
     return config
+
+
+def load_env_local(root: Path | None = None) -> None:
+    """KEY=value lines from .env.local (git-ignored) into the environment, without overriding what is already set.
+    This is where a local OPENAI_API_KEY lives; it is never logged or written anywhere else."""
+    import os
+
+    path = (root or paths.ROOT) / ".env.local"
+    if not path.is_file():
+        return
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        k, v = line.split("=", 1)
+        os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))

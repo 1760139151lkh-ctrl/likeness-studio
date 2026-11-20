@@ -127,11 +127,20 @@ def test_refusals_are_said_plainly(live, api):
         OpenAIImages({}).look(type("Ask", (), {"text": "x"})(), None)
 
 
-def test_words_only_asks_use_a_strict_schema(live, api):
-    look = live.post("/api/looks", json={"text": "velvet evening"}).json()
+def test_words_only_asks_use_a_strict_schema(api):
+    look = OpenAIImages({}).look(type("Ask", (), {"text": "velvet evening"})(), None)
     assert look["name"]
     sent = json.loads(api.seen[-1]["body"])
     assert sent["response_format"]["json_schema"]["strict"] is True
+
+
+def test_a_photo_goes_up_to_the_api_as_jpeg_not_a_re_encoded_png(live, api):
+    photo = upload(live, png((300, 400), (200, 170, 140)))
+    turn = {"id": "p5", "text": "Repaint.", "pace": "quick", "aspect": "portrait", "preset": "princess",
+            "handles": {"A": photo}, "intent": {"op": "restyle", "subject": photo}}
+    follow(live, live.post("/api/turns", json=turn).json()["job"])
+    body = api.seen[-1]["body"]
+    assert b'filename="A.jpg"' in body and b"Content-Type: image/jpeg" in body and b"image/png" not in body
 
 
 def test_the_engine_will_not_start_without_a_key(monkeypatch):
@@ -149,5 +158,7 @@ def test_the_studio_keeps_a_history_of_what_it_made(client):
 
 
 def test_the_styles_art_is_served_and_cached(client):
-    res = client.get("/styles/princess/sofia.webp")
+    res = client.get("/img/styles/princess/mei.webp")
     assert res.status_code == 200 and res.headers["content-type"] == "image/webp"
+    shell = client.get("/").text
+    assert 'id="asset-manifest"' in shell and 'lang="zh-SG"' in shell

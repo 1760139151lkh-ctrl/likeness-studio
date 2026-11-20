@@ -2,7 +2,7 @@
 
 Two machines build Likeness, and they never talk to each other. The code is written on one; the other is the workstation, where Codex CLI runs and makes the pictures. **GitHub is the only channel between them.** Work for the workstation travels as a numbered packet in this folder.
 
-**Start at `START.md`.** It is the whole hand-off as one prompt: installing on the workstation, then packet 0003, then packet 0004, then every feature checked with real pictures, and the phone last.
+**Start at `START.md`.** Note: the app was rebuilt as 哈基秀 (see `docs/REBUILD.md`); the Lookbook packet 0004 is gone, and the site's art is now made by `tools/make_assets.py`.
 
 ```
 relay/NNNN-slug/
@@ -27,7 +27,6 @@ relay/NNNN-slug/
 | Packet | What it is for |
 |---|---|
 | `0003-codex-studio` | Wire the Codex engine to the workstation, prove every flow end to end with real pictures, calibrate time estimates, polish what real use reveals, and connect the phone last. A one-shot hand-off. |
-| `0004-lookbook` | Make the Lookbook's people with GPT Image: eight portraits of people who do not exist, three looks each and every angle of one, judged picture by picture, then committed. Runs after 0003. |
 
 ## The runner
 

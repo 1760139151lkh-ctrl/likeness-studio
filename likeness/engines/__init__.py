@@ -104,13 +104,22 @@ class Engine(Protocol):
 
 
 def create(name: str = "auto", config: dict | None = None, home: Path | None = None) -> Engine:
-    """auto: Codex when its command answers on this machine, otherwise the simulator."""
+    """auto: GPT Image through the API when a key is configured (OPENAI_API_KEY, .env.local or [openai].key_file),
+    else Codex when its command answers on this machine, otherwise the simulator."""
     from .. import settings
 
     config = settings.load(home) if config is None else config
     name = (name or config.get("studio", {}).get("engine") or "auto").lower()
     if name == "auto":
+        import os
+
         from .codex import version
+
+        key_file = config.get("openai", {}).get("key_file")
+        if os.environ.get("OPENAI_API_KEY", "").strip() or (key_file and Path(str(key_file)).expanduser().is_file()):
+            from .openai_images import OpenAIImages
+
+            return OpenAIImages(config.get("openai", {}))
 
         name = "codex" if version(list(config.get("codex", {}).get("command") or ["codex"])) else "simulator"
     if name in ("simulator", "mock"):

@@ -1,55 +1,45 @@
-/** Small steps the browser tests share. */
+/** Shared steps for the browser tests. */
 import { expect } from '@playwright/test';
 
-/** Opens the desk, past the Lookbook. */
-export async function open(page, path = '/?desk') {
-  await page.goto(path);
-  await expect(page.locator('.desk__bar .edition')).toBeVisible();
+/** Opens the app with a fresh profile; `intro` keeps the first-run onboarding. */
+export async function open(page, { intro = false } = {}) {
+  const errors = [];
+  page.on('pageerror', e => errors.push(e.message));
+  await page.goto(intro ? '/' : '/?skipintro');
+  await expect(page.locator('html')).toHaveAttribute('data-screen', /.+/);
+  return errors;
 }
 
-/** Says something to the studio and sends it. */
-export async function say(page, text) {
-  await page.locator('.composer textarea, textarea').first().fill(text);
-  await page.locator('button.send').click();
+/** Nothing on screen spills out, wraps a short label, or scrolls the page sideways. */
+export async function tidy(page) {
+  const issues = await page.evaluate(() => {
+    const stage = document.getElementById('stage').getBoundingClientRect(), out = [];
+    for (const el of document.querySelectorAll('.pill, .seg__opt, .chip2, .act__label, .tool__label, .card__name, .bar__title, .cta__label, .next__btn span, .btn, .modes__opt')) {
+      const r = el.getBoundingClientRect();
+      if (!r.width || el.closest('[hidden]')) continue;
+      const tops = new Set();
+      const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      for (let n = walk.nextNode(); n; n = walk.nextNode()) { if (!n.textContent.trim()) continue; const range = document.createRange(); range.selectNodeContents(n); for (const x of range.getClientRects()) if (x.width > 1) tops.add(Math.round(x.top / 4)); }
+      if (tops.size > 1) out.push('wraps: ' + el.textContent.trim());
+      if (!el.closest('.cards, .pills, .carousel__track, .res__styles, .versions, .panel__body, .gal__scroll, .me__scroll, .work__scroll') && (r.right > stage.right + 1 || r.left < stage.left - 1)) out.push('outside: ' + el.textContent.trim());
+    }
+    if (document.scrollingElement.scrollWidth > document.scrollingElement.clientWidth + 1) out.push('page scrolls sideways');
+    return out;
+  });
+  expect(issues).toEqual([]);
 }
 
-/** Puts the two sample pictures on the desk. */
-export async function samples(page) {
-  await page.getByRole('button', { name: 'or play with two sample pictures' }).click();
-  await expect(page.locator('figure.print')).toHaveCount(2);
+/** Starts the camera: the button is only there while permission has not been given yet. */
+export async function camera(page) {
+  const ask = page.getByRole('button', { name: '打开摄像头' });
+  await page.waitForFunction(() => document.querySelector('.live')?.dataset.cam && document.querySelector('.live')?.dataset.cam !== 'starting', null, { timeout: 15000 }).catch(() => {});
+  if (await ask.isVisible()) await ask.click();
 }
 
-/** Pictures the studio made, by the label they carry. */
-export const made = (page, label) => page.locator('figure.print .print__stamp', { hasText: label });
-
-/** Opens a picture, pins a part of it, says what it should become, and sends. */
-export async function pinAndSend(page, note) {
-  await page.locator('figure.print').first().click();
-  await page.locator('.focus button.tool').first().click();
-  const box = await page.locator('.focus__pic').boundingBox();
-  await page.mouse.click(box.x + box.width * .3, box.y + box.height * .32);
-  await page.locator('.bubble input').fill(note);
-  await page.keyboard.press('Enter');
-  await page.locator('button.focus__send').click();
-}
-
-/**
- * From the Lookbook, a photo brought in: the mirror opens on it. Where the browser has a camera (the suite's has a
- * fake one), the live mirror opens first and the photo is chosen from there, as a person would.
- */
-export async function mirrorOn(page, sitter) {
-  const chooser = page.waitForEvent('filechooser');
-  await page.locator('.lb-ask__photo').click();
-  const live = page.locator('section.lv');
-  if (await Promise.race([chooser.then(() => false), live.waitFor({ timeout: 15_000 }).then(() => true, () => false)])) await live.locator('.lv-gallery').click();
-  await (await chooser).setFiles(sitter);
-  await expect(page.locator('section.mr')).toBeVisible();
-}
-
-/** The studio's example people, stood in for by the drawn sitters (the real ones are rendered on the workstation). */
-export async function stubExamples(page, kind = 'render') {
-  const people = [['lena', 'bangs', 'curtain', 'mei'], ['kofi', 'beard', 'trimmed', 'tomas'], ['ines', 'colour', 'copper', 'ruth'], ['mei', 'brows', 'feathered', 'lena']]
-    .map(([id, part, style, after]) => ({ id, name: id[0].toUpperCase() + id.slice(1), portrait: 'p/' + id + '.jpg', looks: [{ part, style, image: 'p/' + after + '.jpg', angles: ['p/tomas.jpg', 'p/ruth.jpg', 'p/ines.jpg'] }] }));
-  await page.route('**/examples/manifest.json', r => r.fulfill({ json: { by: 'test', kind, people } }));
-  await page.route('**/examples/p/*.jpg', r => r.fulfill({ path: 'tests/fixtures/sitters/' + r.request().url().split('/').pop() }));
+/** Puts one of the invented sample people into 上传精修. */
+export async function useSample(page, nth = 0) {
+  await page.goto('/?skipintro#/studio');
+  await page.getByRole('button', { name: '用示例玩', exact: true }).click();
+  await page.locator('.sample').nth(nth).click();
+  await expect(page.locator('.studio')).toHaveAttribute('data-has', 'photo');
 }

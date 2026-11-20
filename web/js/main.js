@@ -1,77 +1,64 @@
 /**
- * Likeness: find out which studio is speaking, dress the app in the style in front, raise the sky, and open the
- * styles. The desk (the conversation with the studio) is always there underneath, as the Studio tab; the Lookbook
- * (hair and make-up tried on a face) is a place of its own.
+ * 哈基秀：启动顺序
+ *   1. 同时：问工作室是谁（和你的账号）、读资产清单、打开本地存储
+ *   2. 读回你的私人空间（作品、草稿、偏好），套上上次的风格主题
+ *   3. 按地址打开页面（刷新后回到原地）；第一次来先看 3 秒引导
+ *   4. 接上页面关闭时还没生成完的作品
  */
-import { connect, studio } from './studio/studio.js';
-import { boot, settings, app } from './state.js';
-import { paint } from './room/theme.js';
-import { sky } from './room/sky.js';
-import { applySky, roomById, changeRoom, setSky } from './room/atmosphere.js';
-import { on } from './core/bus.js';
-import { refreshOutside } from './room/outside.js';
-import { sound } from './core/sound.js';
-import { screens, h, icon } from './core/dom.js';
-import { deskScreen } from './ui/desk.js';
-import { showBook } from './looks/book.js';
+import { connect, studio } from './core/api.js';
+import { loadManifest } from './core/assets.js';
+import { ready } from './core/db.js';
+import { boot, pref, setPref, addSource, sources } from './core/data.js';
+import { define, start, go, setRootPref } from './core/nav.js';
+import { emit } from './core/bus.js';
+import { applyTheme } from './core/theme.js';
+import { resumeAll, create } from './core/generate.js';
+import { personArt } from './core/assets.js';
+import { presetById, defaultsOf } from './presets.js';
+import { liveScreen } from './screens/live.js';
+import { studioScreen } from './screens/studio.js';
+import { resultScreen } from './screens/result.js';
+import { galleryScreen } from './screens/gallery.js';
+import { workScreen } from './screens/work.js';
+import { meScreen } from './screens/me.js';
+import { onboard } from './screens/onboard.js';
 import { watchKeyboard } from './core/keyboard.js';
-import { welcome } from './ui/welcome.js';
-import { define, start, back, go, here } from './core/nav.js';
-import { homeScreen, intro } from './portrait/home.js';
-import { createScreen, resumePortraits } from './portrait/create.js';
-import { mineScreen } from './portrait/gallery.js';
-import { portraits } from './portrait/keep.js';
-import { STYLES, styleById } from './portrait/styles.js';
 
-await Promise.all([connect(), boot()]);
+await Promise.all([connect(), loadManifest(), ready()]);
+await boot();
 const stage = /** @type {HTMLElement} */ (document.getElementById('stage'));
 watchKeyboard(stage);
-// the room: the one you were in, or the style in front's (the Little Princess, the first time)
-const room = roomById(settings.get('room', styleById(settings.get('style', ''))?.room || STYLES[0].room));
-sky.mount(stage);
-paint(room); sky.setRoom(room); applySky();
-sound.set(settings.get('sound', false), room.sound);
-on('room', r => { sky.setRoom(r); applySky(); });
-const lookOutside = () => refreshOutside().then(o => { if (o) applySky(); }).catch(() => {});
-lookOutside(); setInterval(lookOutside, 15 * 60 * 1000);
-document.addEventListener('visibilitychange', () => { if (!document.hidden) lookOutside(); });
+applyTheme(pref('preset', 'princess'));
 
-// the desk, under everything, with a way back from it
-const desk = deskScreen();
-screens().append(desk);
-desk.querySelector('.desk__bar')?.prepend(h('button.icon-btn.desk__home', { type: 'button', 'aria-label': 'Back to the styles', title: 'Back', html: icon('back'), onclick: () => back() }));
+define('live', liveScreen);
+define('studio', studioScreen);
+define('result', resultScreen);
+define('gallery', galleryScreen);
+define('work', workScreen);
+define('me', meScreen);
+setRootPref(pref('root', 'live'));
+addEventListener('hashchange', () => { const r = location.hash.replace(/^#\/?/, '').split('/')[0]; if (r === 'live' || r === 'studio') setPref('root', r); });
 
-define('home', homeScreen);
-define('create', createScreen);
-define('mine', mineScreen);
-define('desk', () => ({ el: null, shown: () => desk.querySelector('textarea')?.blur() }));
-define('looks', () => {
-  showBook();
-  const book = /** @type {HTMLElement | null} */ (stage.querySelector('section.book'));
-  if (book && !book.querySelector('.lb-home')) book.querySelector('.lb-bar')?.prepend(h('button.lb-home', { type: 'button', 'aria-label': 'Back to the styles', title: 'Back', html: icon('back'), onclick: () => back() }));
-  // the Lookbook's own way to the desk is the desk tab
-  const watch = book && new MutationObserver(() => { if (book.classList.contains('is-away') && here() === 'looks') go('desk'); });
-  watch?.observe(book, { attributes: true, attributeFilter: ['class'] });
-  return { el: null, left: () => { watch?.disconnect(); if (book && !book.classList.contains('is-away')) { book.classList.add('is-away'); book.setAttribute('inert', ''); } } };
-});
-
-/** A handle for tests and for poking around in the console. */
-Object.assign(window, { likeness: { app, studio, sky, room: id => changeRoom(roomById(id)), setSky, go } });
-
-/** Touching the empty room stirs the weather. */
-stage.addEventListener('pointerdown', e => {
-  const t = /** @type {HTMLElement} */ (e.target);
-  if (!t.closest('button, a, input, textarea, .print, .say, .job, .sheet, .box, .focus, .picker, .book, .mr, .cr, .mine, .tabs, .ph-track, .intro')) sky.poke(e.clientX, e.clientY);
-});
-
-// where to begin: the address's screen; the old addresses (?desk, ?looks, ?welcome) still work
-const asked = new URLSearchParams(location.search);
-if (asked.has('desk') || asked.has('skipwelcome')) start('desk');
-else if (asked.has('looks') || asked.has('welcome')) {
-  start('looks');
-  if (asked.has('welcome')) welcome({ force: true });
-} else {
-  start('home');
-  if (asked.has('intro') || !navigator.webdriver) intro({ force: asked.has('intro') });
+const first = !pref('onboarded', false) && !new URLSearchParams(location.search).has('skipintro');
+start(first ? 'live' : pref('root', 'live'));
+if (first) {
+  onboard({
+    onShoot: () => { setPref('camAsked', true); go('live', {}, { replace: true }); emit('cam:start'); },
+    onSample: async () => {
+      // 一键试玩范例：用示例人物 Mei + 当前风格直接出一张
+      const id = pref('preset', 'princess');
+      const have = sources().find(s => s.sample === 'mei');
+      const src = have || await addSource(await fetch(personArt('mei')).then(r => r.blob()), { sample: 'mei' });
+      const p = /** @type {any} */ (presetById(id));
+      const w = await create({ source: src.id, preset: id, params: defaultsOf(p), format: 'portrait', mode: 'live', why: '示例试玩 · ' + p.name });
+      go('result', { id: w.id });
+    },
+    onSkip: () => {},
+  });
 }
-portraits().then(resumePortraits).catch(() => {});
+resumeAll().catch(() => {});
+
+/** 静态资源缓存（第二次打开秒开）。 */
+if ('serviceWorker' in navigator && location.protocol !== 'file:' && !navigator.webdriver) navigator.serviceWorker.register('sw.js').catch(() => {});
+
+Object.assign(window, { hajixiu: { studio, go } });

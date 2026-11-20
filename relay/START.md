@@ -1,3 +1,5 @@
+> **2026-11-20 · 已重构为「哈基秀」**：本文描述的 Lookbook、镜子、Desk 与 Rooms 已移除。当前产品、运行方式与验收见根目录 `README.md` 与 `docs/REBUILD.md`；以下内容仅作历史记录。
+
 # Start here · the hand-off
 
 **Everything Likeness needs from this computer, as one job: install it, wire it to Codex and GPT Image, make the Lookbook's people and put them in the app, prove every feature with real pictures, and the phone last.**

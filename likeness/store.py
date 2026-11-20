@@ -44,13 +44,12 @@ class Store:
         if kind == "mask":
             image = image.convert("LA").getchannel("A") if image.mode in ("LA", "RGBA", "PA") else image.convert("L")
             name, fmt = f"{asset_id}.png", "PNG"
-        elif kind == "partial":
+        else:
+            # pictures travel as JPEG: a fraction of a PNG's bytes, so uploads, renders and the phone's downloads are quick
             image = image.convert("RGB")
             name, fmt = f"{asset_id}.jpg", "JPEG"
-        else:
-            image = image.convert("RGB")
-            name, fmt = f"{asset_id}.png", "PNG"
-        image.save(self.dir / name, fmt, **({"quality": 82} if fmt == "JPEG" else {"optimize": False}))
+        quality = {"partial": 80, "made": 92, "image": 92}.get(kind, 90)
+        image.save(self.dir / name, fmt, **({"quality": quality, "optimize": kind == "made"} if fmt == "JPEG" else {"optimize": False}))
         note = {"id": asset_id, "file": name, "kind": kind, "w": image.width, "h": image.height, "created": time.time(), **extra}
         self._note(asset_id).write_text(json.dumps(note), encoding="utf-8")
         return note

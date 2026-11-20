@@ -1,11 +1,15 @@
 {
-  "name": "Likeness",
-  "short_name": "Likeness",
-  "description": "A personal image studio you talk to.",
+  "name": "哈基秀 · 一张自拍，秒变艺术头像",
+  "short_name": "哈基秀",
+  "description": "实时变身 + 上传精修：17 种风格，一键做出惊艳全场的艺术头像。",
+  "lang": "zh-SG",
   "start_url": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#f3eee4",
-  "theme_color": "#f3eee4",
-  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+  "background_color": "#0d0a1a",
+  "theme_color": "#0d0a1a",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
 }

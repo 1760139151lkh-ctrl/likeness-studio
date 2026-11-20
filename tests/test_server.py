@@ -1,10 +1,7 @@
 """The studio over HTTP, on the simulator: what the app sends, what comes back, and what never gets in."""
 
-import re
-
 from conftest import follow, picture, png, upload
 
-from likeness.rooms import COLOUR_KEYS, contrast
 
 
 def test_the_studio_says_what_it_is(client):
@@ -81,17 +78,6 @@ def test_the_event_stream_carries_the_whole_turn(client):
         body = "".join(stream.iter_text())
     names = [line[7:] for line in body.splitlines() if line.startswith("event: ")]
     assert names.count("result") == 2 and names[-1] == "done"
-
-
-def test_rooms_looks_and_backdrops_come_back_ready_to_wear(client):
-    room = client.post("/api/rooms", json={"text": "a midnight jazz bar in the rain"}).json()
-    assert room["dark"] and room["sky"]["weather"] in ("notes", "rain") and room["sound"] == "musicbox"
-    assert all(re.fullmatch(r"#[0-9a-f]{6}", room["colors"][k]) for k in COLOUR_KEYS)
-    assert contrast(room["colors"]["ink"], room["colors"]["surface"]) >= 4.5
-    look = client.post("/api/looks", json={"text": "rose gold film"}).json()
-    assert len(look["ramp"]) >= 3 and look["prompt"]
-    ideas = client.post("/api/backdrops", json={"text": "", "near": 0.9, "dream": 0.9}).json()["backdrops"]
-    assert len(ideas) == 6 and all(i["name"] and i["words"] for i in ideas)
 
 
 def test_strangers_are_turned_away_until_they_pair(studio, tmp_path):

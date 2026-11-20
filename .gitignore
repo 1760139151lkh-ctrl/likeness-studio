@@ -16,3 +16,7 @@ workstation/
 # Local run artifacts.
 relay/*/out/
 relay/*/REPORT.md
+
+# Local secrets (OpenAI key etc.): never committed.
+.env.local
+.env.*.local

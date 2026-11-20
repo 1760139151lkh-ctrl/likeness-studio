@@ -10,7 +10,8 @@
     "sitters": "node tools/sitters.mjs",
     "tour": "node tools/tour.mjs",
     "check": "tsc -p web/jsconfig.json",
-    "test": "playwright test"
+    "test": "playwright test",
+    "accept": "LIKENESS_ACCEPT=1 playwright test --project=accept --project=accept-iphone"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1",

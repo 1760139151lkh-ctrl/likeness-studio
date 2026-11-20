@@ -1,119 +1,90 @@
-# Likeness
+# 哈基秀 · 一张自拍，秒变艺术头像
 
-[Open the connected workstation](https://arlington-brakes-gradually-nelson.trycloudflare.com/open) · [Connection and download](HOST-INTEGRATION.md)
+面向新加坡、马来西亚及亚太区 TikTok 年轻创作者的艺术头像 App。两个平级核心入口：
 
-**An artistic portrait studio: choose a world, add one photo, and be painted in it.**
+- **实时变身**：打开就是 9:16 取景器，对着镜头立刻看到风格加持（本机 WebGL 风格化 + 人脸追踪 AR 贴纸），按下快门约 10 秒直出高精艺术头像；不用重拍就能一键换风格。
+- **上传精修**：一次上传，无限换装与精雕。风格强度 / 保留像貌 / 细节丰富度 / 美颜微调，配饰 / 光效 / 背景氛围 / 画框装饰，前后对比，每个版本都有完整的创作轨迹。
 
-Likeness opens on its **styles**, each one a portrait in its own frame, swiped like a gallery wall: *Little Princess* (ribbons, roses, a pearl tiara, under a pink arch), *Storybook* watercolour, *Anime*, *Old Master* oils in gilt, *Neon City*, *Pop Art*, *Woodblock* and *Clay*, then a style of your own (in words, or from a picture of one). Each plate shows the photograph it was painted from, so what the app does is plain at a glance; hold a plate to see that photograph whole. The whole app wears the style in front: its colours, type, ornaments and weather change through the style's own wipe (a heart, a curtain, a wave) as you swipe.
+21 个风格、6 个分类（热门 · 搞怪 · 角色变身 · 梦幻主题 · 二次元 · 氛围出片），其中二次元 6 个世界（动漫主角 · 3D动画脸 · 魔法少女 · 热血少年 · 治愈手绘 · 虚拟主播）。**一风格一世界**：选中哪个风格，整个 App 就换上它的配色、画框、字体气质、装饰语言和实时 AR 信物；停在一个新世界上会有动画转场眼一样的标题卡，出片那一刻是一道光扫过的「蜕变」揭晓。
 
-One button paints you in it, in three clear steps, each with a way back (the phone's back gesture works too):
+旧版诊断、重构方案、资产清单见 [`docs/REBUILD.md`](docs/REBUILD.md)。
 
-1. **Your photo:** a selfie, a photo, one you used before, or one of the studio's invented people.
-2. **Style it** (or skip straight to painting): palette, mood, details (a tiara, ribbon bows, pearls…), backdrop, format (portrait, a square avatar, a wallpaper), how closely it keeps your face, and anything else in your own words. Every tap shows at once on a sketch of you in that palette, and every choice can be undone and redone.
-3. **Painting:** a sketch of you in the style at once (made on the phone, and labelled as one), the studio's stages in the style's own voice, an honest time left, the picture as it develops, and Stop.
+## 快速开始
 
-The result can be painted again, tweaked, tried in **another style** from the same photo, saved, shared, or taken into the conversation with the studio (*make the bow red*). Everything is kept the moment it is asked for: **Mine** holds every portrait (those still painting, too) and every conversation; a portrait left painting when the page closed is found again; a live studio keeps its own copies; and **your space** (your name, storage the browser is asked not to clear, a backup to carry to another phone) is the groundwork for accounts.
+```sh
+npm ci                     # 前端测试与打包工具
+uv sync                    # Python 3.12 + 依赖（https://docs.astral.sh/uv/）
 
-Also inside: the **Studio** tab, a studio you talk to (pictures with handles like @A, looks, pins, backdrops, rooms and today's sky), and the **Lookbook** (`?looks`): hair and make-up tried on a face, fitted by eye, and seen weeks on.
+# 1) 真实出片：把 OpenAI Key 放进 .env.local（已在 .gitignore 里，永远不会被提交）
+echo 'OPENAI_API_KEY=sk-...' > .env.local
+uv run likeness serve      # 检测到 Key 自动用 GPT Image；打开 http://127.0.0.1:8787/
 
-It is a phone-shaped web app and a small studio server. GPT Image makes the pictures on your own machine, through Codex CLI or straight through the OpenAI API.
-
-## Three editions, never confused
-
-| Edition | What makes the pictures | Label on every picture |
-|---|---|---|
-| **Showcase** | the device itself: looks are sketched over the face, never rendered (static files, no server) | Sketch |
-| **Live · Simulator** | `likeness serve --engine simulator`: Pillow stand-ins, also stamped on the picture | Simulated |
-| **Live · Workstation** | `likeness serve` with Codex CLI and GPT Image, or `--engine openai` for GPT Image through the API directly (about ten seconds a portrait, streamed) | Render |
-
-The header identifies the edition. Example portraits carry their source in the catalog and show it in the mirror. The mirror also shows when a face turns on the device. Every angle uses the connected studio.
-
-## Run it
-
-The showcase needs only Node:
-
-```
-npm run serve                            # http://127.0.0.1:4173   (?desk opens straight on the desk)
-```
-
-The live studio needs Python 3.12 and [uv](https://docs.astral.sh/uv/):
-
-```
-uv sync
-uv run likeness serve                    # Codex when the codex command answers here, otherwise the simulator
+# 2) 不花钱跑通全流程：模拟引擎（成片会盖「模拟出片」章）
 uv run likeness serve --engine simulator
-uv run likeness serve --engine openai    # GPT Image straight through the API: set OPENAI_API_KEY first
-uv run likeness probe codex [--smoke]    # is Codex here, signed in, and speaking every flag the studio uses?
-uv run likeness examples                 # make the Lookbook's people through the engine (relay packet 0004)
-npm run tour -- --url http://127.0.0.1:8787   # the whole product used end to end at a phone's size, filmed into storyboards
+
+# 3) 纯静态演示版（没有服务器）：示例人物出预先生成的样张，自己的照片出本机滤镜预览
+npm run serve              # http://127.0.0.1:4173/
 ```
 
-`serve` prints a link for this machine and a pairing QR code for a phone on the same network. Scan it once and the phone stays paired.
+手机访问：`uv run likeness serve --host 0.0.0.0` 会打印同一 Wi-Fi 下的配对二维码。手机浏览器只在 HTTPS 下开放摄像头，用 `--cert/--key` 提供证书（例如 mkcert）。上线前 `npm run build` 生成打包后的脚本，服务器会自动使用。
 
-On the workstation, Codex sets all of this up: `relay/START.md` is the hand-off, from installing to the phone.
+## 画质与速度（GPT Image，实测）
 
-## The Lookbook and the mirror
+| 画质 | 模型 | 典型耗时 |
+|---|---|---|
+| 极速 | `gpt-image-2.6-flare` low | 7–8 秒 |
+| 高清（默认） | `gpt-image-2.6-flare` medium | 约 10 秒 |
+| 超清 | `gpt-image-2.6-sunburst` high | 约 30 秒 |
 
-- **The first time.** A sitting, not a slideshow (`web/js/ui/welcome.js`). One of the studio's people fills the screen, as they are and then wearing a look in a sweep of light; under them, the three looks they were made in. Touch one and it sweeps in (GPT Image, made on the studio's computer); drag across the picture and the light follows the finger, the look on one side and the face as it was on the other (arrow keys move it too: the picture is a slider); *Someone else* moves on. Then **Try it on me** takes that look to your own face (the camera, or a photo), or **Look around** opens the Lookbook with that face in front. A line under the buttons says what the edition does with your looks (sketched here, simulated, or rendered). Where the studio's people are not here, the welcome says the same in a line and three steps. Held still for anyone who asks for less motion. Skipped or finished, it is remembered; the name at the top of the Lookbook brings it back. Automated browsers see it only with `?welcome`.
-- **The ring.** Eight people who do not exist, rendered by GPT Image on the workstation (`relay/0004-lookbook`), three looks each. Drag it, or let it turn. Touch a part and the ring deals only that part's looks. Their faces are read on the device as the ring comes in, so each card closes on the head and leans in on the part it changes, the look sweeping in close; words typed are drawn on the real face as said, and the card says *Sketch* until they are gone. Until the people are made, the ring holds the drawn sitters (invented people, drawn, in `web/sitters/`), each wearing a look the device sketches on with the mirror's own strokes and colours, labelled as drawings. The one in front leans in on the part it changes and draws the look on stroke by stroke; while you stay with it, it tries that part's other styles on. Their faces and hair are read once by `npm run sitters` (`tools/sitters.mjs`: the segmenter's hair, grown through the drawing's own colours into a bob or a bun it missed, kept off the skin, the face and a beard, and cut free of shelves and hedges of the same colour), so the first screen needs no model and every sitter can take a colour. Touch a sitter and it opens in the mirror wearing the look; *On me* puts it on your own face.
-- **Mix a look.** Pick a style and you are mixing: pick from as many parts as you like (bangs, brows, lips, colour…) and every face in the ring wears all of it at once, named for all of it (*Curtain bangs · Red lips*). A line over the parts says what to do next. Each pick is a token in the ask bar; touch it to take it back. The styles come up in the same place, at the same height, whichever part is open. Touch a face and the mirror opens wearing the whole look; **Try on** asks for all of it.
-- **Painted from the person's own hair.** On a photograph (the studio's people, or you) a look is painted from the picture itself (`web/js/looks/paint.js`). A fringe is the person's own hair brought forward: each point of it takes the hair that lies past the hairline the way the fringe falls, mirrored through the hairline, so its curl, its grey, its light and its grain are theirs (`combed`). Straight hair is drawn out along its fall into strands; curls stay curls; a parting goes under it; skin is never taken for hair; its ends are its own, thinning out strand by strand. It is no longer than the hair it comes from (a short crop makes a short fringe; hair past the ears can fall to the cheekbones), a curtain parts in the middle and sweeps out over the brows to the cheekbones, its inner edge the way its own strands fall, so they leave it one by one rather than being cut along a line; a side fringe sweeps from its parting across to the far temple along its own fall. Where no hair can be found in a picture there is nothing to comb a fringe from, so it stays a pencil line rather than being invented. Brows are filled hair by hair in their own colour (a finer shape blends the old one into the skin round it); liner is ink and a smoky eye is shadow; a beard grows hair by hair on the skin's own light, darkening it toward the hair's colour, thicker in places and thinner in others as a beard is, and thinner up the cheeks. A hair colour dyes strand by strand, keeping the hair's own light and shade (`dyeHair` in `web/js/looks/tint.js`); a colour lifts dark hair only part of the way, where a bleach (platinum, silver) takes it all the way; a painted fringe is dyed as the hair it came from. Only a cut is still a fine line, because only a render can take hair away. It is all drawn on the device, so every picture it is on still says *Sketch*. In the mirror the pencil comes back while a handle is held, so a shape can be dragged, and the paint follows when it is let go; a face turned on the device wears the same paint.
-- **Rooms, everywhere.** The room dresses the Lookbook and the mirror as well as the desk: the Salon by default (low lamps, warm brass, dark), Little Princess, Night Arcade and the rest. The swatch beside the edition opens them.
-- **Words that shape.** What you type is read the way a stylist hears it (`web/js/looks/words.js`): *curtain bangs, a lot longer, parted left* names the look and moves the same handles a finger drags, so it is drawn as it is written. On the Lookbook the ring turns to a face wearing what you name and the strokes glide into the shape you describe, the words under it saying what they did (*to the jaw · parted left*); left alone, the line says something by itself and the ring acts it out, one face after another. Over the studio's own people it names the looks they wear (*Curtain bangs*, *Copper hair*, *Pixie cut*) and the ring turns to each: a render is the real thing, and nothing is sketched over one unless you ask for something it does not show. In the mirror the words pick the look, shape it and take the mirror close to each part they mention; delete them and what they asked for goes. Press go with no photo and the camera opens with the look already on.
-- **The live mirror.** The camera (in the ask bar, *On me* on a drawn style, or *On me* in the mirror) opens the front camera as a mirror (`web/js/looks/live.js`). MediaPipe follows the face in video mode. Where the device has a core to spare it reads in a worker beside the page, so the mirror is drawn at the camera's own pace and the face is carried on between readings; otherwise it reads on the page between frames (on the CPU where the graphics are drawn in software, which is faster there). The picked looks are on it as you move, painted as on a photograph: a fringe combed from your own hair, brows, liner, a beard, painted again as often as the device keeps up with (no more than about a third of its time; `data-paint` on the live view says how long a painting takes) and carried with the face by the corners of the eyes between paintings, the hair found a few times a second carried the same way; only a cut is the markup's line. The lips are tinted, and a colour is dyed strand by strand into the hair the segmenter finds (never on the brows, or on a beard: a chin far darker than the cheeks keeps a new colour off the lower face all round, sideburns too, while hair that falls beside a beardless face keeps it). Touch a part and the picture comes apart into every style of it at once, each tile close on that part of your live face; touch one and the others fall away as it closes back round you wearing it. Swipe across the face for the next style. The frame says *Live sketch · on this device*. The shutter keeps that moment as a photo, the way you saw yourself, and hands it to the mirror with the face it had just read, so the look is on it at once. With no camera, or no permission, a photo instead.
-- **Every side of you.** The button beside the shutter (it says what it does the first time you turn your head) puts a level under your face: a dot that goes where your nose does, and a mark for straight on and for each side. Turn slowly and each is caught as you pass it, with the look drawn on it and the hair read again in that very frame, so its new colour is where the hair is. With all three, the mirror opens on the front and turns through your real angles once, then lets you drag round them. Between two sides the head turns on the device: each side is turned towards the next on its own face mesh (`web/js/looks/turn.js`) until they meet half-way, so it is one head turning rather than one picture fading into another. The studio's angles turn the same way wherever their faces can be read. The pictures are three moments of your own camera; only the frames between them are made on the device.
-- **The ring becomes you.** Once a photo of you is kept (the shutter, every side of you, or a photo chosen), the ring deals its looks again, on you: each card a sketch on your photo (stamped *Sketch*), the line acting its sayings out on your face, and a card touched opens your photo in the mirror wearing that look. *Them · You* in the bar goes back and forth; on a later visit you are offered there, not shown. Your face is read and your hair found on the device (the beard and the brows left out), and none of it leaves the device.
-- **Show it.** On your own photo, *Show* makes the mirror something to show the person who will cut it: the tools fall away, the picture comes forward (turning slowly through every side of you, or swaying a little on the device and saying so), and the look is set under it in its words. *Save the card* draws it all as one picture, 1080 by 1350, on the device and hands it to the phone's share sheet or downloads it. The foot identifies sketched details where present.
-- **The face, read on the device.** MediaPipe's face landmarker finds 478 points (`web/js/studio/face.js`). From them come the parts and their masks: where bangs fall, the brows, the eyes, the lips, a beard. A small hair segmenter finds the hair for a colour. Nothing is sent anywhere until you try something on.
-- **Markup, then renders.** A style is drawn over your face from your own landmarks (`web/js/looks/markup.js`): bangs fall from your hairline, brows follow your brow bone, a wing leaves the corner of your eye, a colour is washed into your hair the way a dye takes: most of the way to the colour's own lightness (platinum lifts black hair, copper deepens grey), then its hue, keeping the hair's own light and shade (`web/js/looks/tint.js`). A live studio then makes four takes in the app's own words for that style (`web/js/looks/vocab.js`), inside the mask, keeping everything else.
-- **Shaped by hand.** A chosen part brings the mirror close (the picture and its markup, not the notes in the margin), and each style puts handles on its own markup (`controlsOf` in `web/js/looks/markup.js`): a brow's arch, fullness and tails; a fringe's length and parting; a cut's length and volume; a wing; a beard's length; a colour's shade. Dragged, the sketch reshapes live and says what it has become, in words taken from the face itself: a fringe *ending right at the brows*, a cut *resting on the shoulders*. Those words go to the studio after the style's own (`wordsFor`), so four takes come back shaped as drawn. Arrow keys move a focused handle; a double tap puts it back.
-- **Fit it: one, or two?** Nobody knows what they want in words or numbers; they know it when they see two. *Fit it* on the frame (beside *Grow out*) fits the look to the face the way an optometrist finds a prescription (`web/js/looks/trial.js`). The dock becomes a pair of lenses; the frame comes close to the part and shows two versions of it, one and then the other (*One… …or two?*), until one is chosen. Coarse first (the style as it is, or the one a stylist would suggest beside it: a wispy fringe for a blunt one, honey for platinum), then finer (a length, a parting, a shade, both ways from where it is, then a half step), a minute or so for a whole look. *Either* is an answer too: then the one that keeps longer before it wants seeing to, or as it was. A question whose two look the same on this picture (a fringe on hair too short to show it) is never asked. Each answer is said back on the frame and goes into the look's words, so Try on asks for the look as fitted. A touch on the face turns the two by hand, holding shows the face as it was, and 1, 2, E and the arrows do it from the keys.
-- **Weeks on.** A look that grows (a fringe, a colour, a cut, brows, a beard) can be seen in the weeks after the salon. *Grow out* on the frame makes way for a ruler in the dock, from today to three months on: a tick a week, taller each month, and a mark where the look will want seeing to (a blunt fringe's trim at three weeks, platinum's roots at four). The weeks walk on by themselves to the first of them, then they are the finger's (or the arrow keys'). The painted look goes with them (`web/js/looks/time.js`): a fringe falls lower and loses its line, a colour's own roots come in along the hairline and up the parting in the hair's own colour (softly, for a balayage), a cut grows out, shaped brows grow back, a beard fills in, each week fading into the next. A caption says what is due (*The fringe in the eyes · roots showing*) and the frame is dated the day it would be, in a camera's orange. **Try on** asks for the look that far on: the studio is told what the weeks have done (`grownWords`), a fringe's mask goes down as far as it has grown, and the takes say how far on they are. **Show** lists what each part will want (*Trim every 3 weeks*), and so does the card.
-- **A face that turns, on the device.** The picture on show is laid over a fine grid (`web/js/looks/turn.js`) shaped like a head: the face's own depth from its 478 points inside its outline, blended into a head fitted to it that falls away smoothly at the jaw and carries on round behind at the sides, so the jaw stays round and the far ear tucks away as it turns; across the eyes and the bridge of the nose nearly level, so glasses turn whole; drawn with a depth test, so what turns away goes behind what comes round. The hair turns with the head, weighted by the hair segmenter, so the wall behind it stays straight; the frame's edge is pinned. Where WebGL is drawn in software (no graphics chip) the grid is lighter and its edges unsmoothed, so it keeps its pace. WebGL turns it a little either way, with a soft limit, the margin notes' lines follow their parts, and the stamp reads *Turned on this device* until it is back at rest. Without WebGL it simply does not turn.
-- **Drawn on, or borrowed.** The + in the mirror's ask bar: *Draw on it* (circle it, cross it out, sketch the shape, in three inks, with undo) and *A reference* (a photo whose cut, colour or outfit is borrowed, pinned to the frame's corner). Both sit beside the picks as tokens and go to the studio with the words: the marks widen the part's mask and go as a marked copy of the picture (`role: marks`), the reference as `role: look`; `likeness/brief.py` tells GPT Image what each is, and never to draw the marks in or take the reference's face.
-- **Several at once, and nothing lost.** With a studio, **Try on** stays live while takes are made: ask for another look and the two are made side by side. The pill in the bar counts what is being made and burns toward the estimate; touched, *In the studio* (`web/js/ui/activity.js`) lists everything asked lately, in its own words, with how far it has got, and opens any of it again in the mirror, still developing or done. Everything is kept on the device as it arrives; a page closed mid-turn picks the turn up when it is opened again.
-- **On a phone.** The keyboard lays over the app instead of pushing it up (`interactive-widget=overlays-content`), and the line being typed rises above it (`web/js/core/keyboard.js`).
-- **Takes and angles.** Takes arrive one by one, each with the studio's estimate burning round it. Scrub, keep, hold to compare. *Every angle* asks for three more pictures of the one on show (`op: angles`): three-quarter from the right, profile, three-quarter from the left. They are turned through with a finger.
-- **Stacking.** A change asked while a take is on show is made from that take, so bangs, then brows, then colour build on each other.
+在 `studio.toml` 的 `[openai.pace.*]` 调整；`private/studio.toml` 可以只覆盖本机的设置。
 
-## The desk
-
-Behind the Lookbook is the desk, where Likeness began: a studio you talk to. It is reached by asking, from the Lookbook's own line: words that are no look (*a lighthouse inside a teacup, at dusk*, *take me to the seaside*) turn the line's arrow into *Paint it*, and sent, they rise into the desk, which paints them (or, for *take me to …*, moves the whole place and leaves the Lookbook where it was). One line takes anything; the grid button still goes straight there.
-
-- **Conversation, not menus.** Pictures get handles (A, B, …). `@` calls a picture, `#` a look, and the app reads what you mean as you type: change, restyle, reference, blend, pin, backdrop, variations, every angle.
-- **Pins.** Tap part of a picture (an on-device segmenter selects it) and say what it should become.
-- **Backdrops and trips.** *@A on a beach in Lisbon*, *put me on the moon*, *take @A to Paris, Kyoto and Mars*. The device paints the place, finds the person, and lights them by it.
-- **Alive.** A picture the device painted moves while you look at it, and opens into depth. The sun can be held and dragged across the sky.
-- **Rooms and today's sky.** The whole app dressed as a room you choose or invent from a sentence, with weather that resets each morning.
-- **Honest waiting.** A draft at once, stages in the room's voice, previews, and a fuse burning toward an estimate learned on your machine. Stop works mid-turn.
-
-## How a turn travels
+## 代码结构
 
 ```
-app ── POST /api/assets ──────────────▶ studio     each picture once (masks too)
-    ── POST /api/turns ───────────────▶            {text, handles, intent, pins, look, backdrop, room, pace, n} → {job, eta}
-    ◀── GET /api/jobs/{id}/events ────             stage · note · plan · partial · result · reply · done | failed
-    ── POST /api/jobs/{id}/cancel ────▶
-    ── POST /api/rooms | looks | backdrops ─▶      words from the model, checked before they reach the app
+web/
+  index.html  sw.js  manifest.webmanifest
+  css/app.css                 全部样式：可插值主题变量、组件、页面、每个风格的画框/字体/装饰
+  js/presets.js               21 个风格的唯一数据源：主题、实时滤镜参数、贴纸、Prompt、细节选项、默认值
+  js/copy.js                  全部界面文案（zh-SG）
+  js/core/                    导航(nav) · 本地存储(db) · 私有空间与同步(data) · 服务器(api) · 生成流程(generate) · 主题(theme) · 图片(image)
+  js/live/                    摄像头 · WebGL 实时风格化(renderer) · 人脸追踪(tracker) · AR 贴纸与画框(overlay)
+  js/screens/                 实时变身 · 结果页 · 上传精修 · 作品库 · 作品详情 · 我的 · 首次引导
+  js/ui/                      共用零件 · 抽屉 · 样张抽屉（拍同款）· 沉浸动效（世界转场 / 蜕变揭晓 / 主题粒子 / 震动）
+  img/                        生成的全站资产（样张、示例人物、氛围背景、贴纸）+ manifest.json + provenance.json
+  vendor/mediapipe/           MediaPipe 人脸关键点（本机运行，画面不出设备）
+likeness/                     FastAPI 服务器：账号与私有空间(accounts) · 生成任务(jobs) · 引擎(engines/openai_images|simulator|codex)
+tools/make_assets.py          用 GPT Image 批量生成全站资产（Prompt 与 App 发出的完全一致）
+tools/process_assets.py       裁切压缩成网页尺寸，写清单与来源
+tests/                        pytest（服务器、账号隔离、同步、引擎）+ tests/browser（Playwright 端到端）
 ```
 
-A look tried on in the mirror is an `op: region` turn with `n: 4` and one pin, whose mask is the part's; a cut has no mask and is an `op: edit`. Every angle is `op: angles` with `n: 3`. The Codex engine runs one `codex exec --json` per turn in a job folder of its own under `private/jobs/`: the pictures and masks in `in/`, a brief (`likeness/brief.py`) that asks for a `PLAN` line, the pictures in `out/` and a `DONE` line, and Codex's event stream becomes the progress you see.
-
-## The repository
+## 接口一览
 
 ```
-web/                 the app: index.html, css/, js/ (core, looks, room, studio, ui), examples/, fonts/, vendor/ (MediaPipe)
-likeness/            the studio: server.py, engines/ (simulator, codex), brief.py, examples.py, turns.py, rooms.py, jobs.py, store.py
-studio.toml          the studio's defaults; private/studio.toml holds this machine's own answers
-tests/               pytest (server, simulator, Codex engine against tests/fake_codex.py, examples, rooms, relay) and browser/ (Playwright)
-relay/               the hand-off to the workstation: START.md, then the packets
-tools/serve.mjs      the static server for the showcase
+GET  /studio.json                    引擎、预计耗时、当前账号（首页已内联，零额外请求）
+POST /api/assets                     传图到当前账号的私有空间
+POST /api/turns                      发起生成 {id, text, pace, aspect, preset, handles, intent} → {job, eta}；同 id 重发 = 同一任务
+GET  /api/jobs/{id}/events           SSE：stage · plan · partial · result · reply · done | failed（GET /api/jobs/{id} 轮询）
+POST /api/jobs/{id}/cancel
+GET  /api/me · POST /api/auth/signup | login | logout | profile
+GET  /api/sync?cursor=N · POST /api/sync      作品/原图/收藏/草稿/偏好，按服务器游标增量同步
 ```
 
-Checks: `npm run check` (types), `uv run pytest`, and `npm test` (Chrome at a 9:16 viewport, showcase and live simulator).
+## 测试与验收
 
-Run `npm run build` before starting a Studio intended for access over a network. The server uses the bundled scripts when their sources are current and can also serve the original browser modules directly.
+```sh
+uv run pytest              # 55 项：生成协议、OpenAI 引擎（本地假 API）、账号隔离、注册原地升级、登录归属、同步游标、限流
+npm run check              # 前端类型检查
+npm test                   # Playwright：静态演示版 + 模拟引擎服务器，使用 tests/fixtures/camera/selfie.mjpeg 作为假摄像头
+```
 
-## Privacy
+## 隐私
 
-Conversation and album history is kept in the current browser profile. For a Studio opened with an owner access link, the server uses an independent workspace for each paired browser. A browser can retrieve only its own uploads and results, even when it uses the same link as another device. Phone history survives a refresh in the same profile. Uploads and jobs explicitly sent for rendering stay in the workstation's Git-ignored `private/` area. The camera preview and face tracking run on the device. The public assets contain the fictional Lookbook portraits and the drawn test fixtures.
+- 实时镜头画面与人脸追踪全部在手机本地完成，不上传。
+- 只有按下快门 / 点「一键变身」的那张照片会传到**你自己的私有空间**用于生成；每个账号（包括访客）的上传、成片和记录互相隔离。
+- 账号库、私有空间、生成原图都在 git 忽略的 `private/` 里。OpenAI Key 只从环境变量或 `.env.local` 读取，不写日志、不进任务、不返回前端。
+- 示例人物全部由生成模型创作，不是真人。
+
+## 关于角色风格
+
+「光之巨人」「蓝胖子」「奶龙恶搞」是向奥特曼、哆啦A梦、奶龙致敬的同人风格：Prompt 直接按原作的标志性造型生成（银红战衣 + 彩色计时器 + 头冠鳍；蓝白头套 + 红鼻子 + 胡须 + 铃铛 + 四次元口袋 + 竹蜻蜓；奶龙的圆滚滚小黄龙），实时镜头里也有对应的信物贴纸。本项目为个人娱乐用途。

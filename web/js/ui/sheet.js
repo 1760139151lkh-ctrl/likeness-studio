@@ -1,0 +1,44 @@
+/**
+ * 底部抽屉：标题 + 右上角固定的「关闭」；点遮罩、按 Esc、手机返回手势都能关。
+ */
+import { h, iconBtn, stageEl, reduced } from '../core/dom.js';
+import { overlay } from '../core/nav.js';
+
+/**
+ * @param {(close: () => void) => any[]} build
+ * @param {{ title: string, cls?: string, onClose?: () => void, tall?: boolean }} o
+ */
+export function sheet(build, o) {
+  let gone = false;
+  const remove = () => {
+    if (gone) return; gone = true;
+    panel.classList.remove('is-in'); scrim.classList.remove('is-in');
+    setTimeout(() => { panel.remove(); scrim.remove(); }, reduced ? 0 : 260);
+    o.onClose?.();
+  };
+  const dismiss = overlay(remove);
+  const scrim = h('div.scrim', { onclick: () => dismiss() });
+  const panel = h('section.sheet' + (o.cls ? '.' + o.cls : '') + (o.tall ? '.sheet--tall' : ''), { role: 'dialog', 'aria-modal': 'true', 'aria-label': o.title },
+    h('div.sheet__grip', { 'aria-hidden': 'true' }),
+    h('header.sheet__head', null, h('h2.sheet__title', null, o.title), iconBtn('close', '关闭', () => dismiss(), 'sheet__close')),
+    h('div.sheet__body', null, ...build(() => dismiss())));
+  stageEl().append(scrim, panel);
+  requestAnimationFrame(() => { scrim.classList.add('is-in'); panel.classList.add('is-in'); });
+  panel.addEventListener('keydown', e => { if (e.key === 'Escape') dismiss(); });
+  setTimeout(() => /** @type {HTMLElement | null} */ (panel.querySelector('.sheet__close'))?.focus({ preventScroll: true }), 60);
+  return { close: () => dismiss(), panel };
+}
+
+/** 一个确认弹窗：两个按钮，说清楚会发生什么。 @returns {Promise<boolean>} */
+export function confirmBox(/** @type {string} */ title, /** @type {string} */ text, ok = '确定', cancel = '算了') {
+  return new Promise(resolve => {
+    let answered = false;
+    const { close } = sheet(c => [
+      h('p.sheet__text', null, text),
+      h('div.sheet__acts', null,
+        h('button.btn.btn--ghost', { type: 'button', onclick: () => { answered = true; resolve(false); c(); } }, cancel),
+        h('button.btn.btn--main', { type: 'button', onclick: () => { answered = true; resolve(true); c(); } }, ok)),
+    ], { title, cls: 'sheet--confirm', onClose: () => { if (!answered) resolve(false); } });
+    void close;
+  });
+}
