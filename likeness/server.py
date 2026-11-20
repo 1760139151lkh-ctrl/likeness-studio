@@ -40,7 +40,8 @@ from .engines import EngineError, Work
 from .estimates import Estimates
 from .jobs import Job, Jobs, QueueFull, SubmissionConflict
 from .store import MAX_UPLOAD, Store
-from .turns import Inputs, Turn
+from .turns import Inputs, StyleAsk, Turn
+from .rooms import normalise_style
 
 LOOPBACK = {"127.0.0.1", "::1", "localhost"}
 NOT_PAIRED = """<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Likeness</title>
@@ -374,13 +375,13 @@ def create_app(engine: engines.Engine | None = None, home: Path | None = None, o
     def asset(request: Request, asset_id: str):
         path = studio_store(request).path(asset_id)
         if path is None or not path.exists():
-            raise HTTPException(404, "The studio has no such picture.")
+            raise HTTPException(404, "找不到这张图")
         return FileResponse(path, media_type="image/jpeg" if path.suffix == ".jpg" else "image/png", headers={"cache-control": "private, max-age=31536000, immutable"})
 
     def inputs_for(turn: Turn, assets: Store) -> Inputs:
         pictures = {a: assets.path(a) for a in turn.asset_ids()}
         if any(path is None or not path.is_file() for path in pictures.values()):
-            raise HTTPException(409, "Some pictures need to be sent again.")
+            raise HTTPException(409, "照片需要重新上传一下")
         return Inputs(
             pictures={h: pictures[a] for h, a in turn.handles.items()},
             subject=turn.handle_of(turn.intent.subject) if turn.intent.subject else None,
@@ -401,7 +402,7 @@ def create_app(engine: engines.Engine | None = None, home: Path | None = None, o
             progress = Work(job, assets, engine.provenance(body))
             engine.turn(body, inputs, progress)
             if not progress.results:
-                raise EngineError("The studio finished without a picture.", "Try again, perhaps in fewer words.")
+                raise EngineError("这次没有出图", "再试一次，或者换个说法")
             ms = int((time.monotonic() - started) * 1000)
             estimates.record(body.intent.op, body.pace, body.n, ms)
             job.emit("done", ms=ms)
@@ -414,14 +415,14 @@ def create_app(engine: engines.Engine | None = None, home: Path | None = None, o
             job = jobs.submit(work, submission, owner=device)
             return {"job": job.id, "eta": eta}
         except SubmissionConflict:
-            raise HTTPException(422, "This turn ID was already used for a different request.") from None
+            raise HTTPException(422, "这个请求号已经用过了，刷新一下再试") from None
         except QueueFull:
-            raise HTTPException(429, "The studio is busy. Try again when a turn finishes.", headers={"Retry-After": "10"}) from None
+            raise HTTPException(429, "排队的人有点多，等前面的出片再试", headers={"Retry-After": "10"}) from None
 
     def find(request: Request, job_id: str) -> Job:
         job = jobs.jobs.get(job_id)
         if job is None or job.owner != request.state.account["id"]:
-            raise HTTPException(404, "The studio has no such job.")
+            raise HTTPException(404, "找不到这个任务，可能服务器刚重启过")
         return job
 
     @app.get("/api/jobs/{job_id}")
@@ -450,6 +451,19 @@ def create_app(engine: engines.Engine | None = None, home: Path | None = None, o
     def cancel(request: Request, job_id: str):
         find(request, job_id)
         return {"ok": jobs.cancel(job_id)}
+
+    @app.post("/api/styles")
+    def invent_style(ask: StyleAsk, request: Request):
+        """自创风格: a whole new style (name, theme, live filter, prompt, details) from words or a picture."""
+        if not ask.text.strip() and not ask.asset:
+            raise HTTPException(400, "说一句你想要的风格，或者传一张参考图")
+        picture = studio_store(request).path(ask.asset) if ask.asset else None
+        if ask.asset and picture is None:
+            raise HTTPException(409, "参考图需要重新上传一下")
+        maker = getattr(engine, "style", None)
+        if maker is None:
+            raise HTTPException(501, "这个工作室还不会自创风格")
+        return {"style": normalise_style(maker(ask, picture), ask.text.strip())}
 
     @app.get("/api/history")
     def history(request: Request, limit: int = 120):

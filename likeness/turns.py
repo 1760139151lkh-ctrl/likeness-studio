@@ -10,9 +10,9 @@ from pydantic import BaseModel, Field, StringConstraints
 
 Op = Literal["create", "edit", "restyle", "reference", "blend", "region", "backdrop", "remove", "vary", "angles"]
 Pace = Literal["quick", "fine", "deep"]
-Aspect = Literal["portrait", "square", "tall"]
+Aspect = Literal["portrait", "square", "tall", "landscape"]
 # what an image model is asked for, by format (a tall wallpaper is painted portrait and composed for the phone)
-SIZES = {"portrait": "1024x1536", "square": "1024x1024", "tall": "1024x1536"}
+SIZES = {"portrait": "1024x1536", "square": "1024x1024", "tall": "1024x1536", "landscape": "1536x1024"}
 Handle = Annotated[str, StringConstraints(pattern=r"^[A-Z]{1,8}$")]
 
 
@@ -88,6 +88,12 @@ class RoomAsk(BaseModel):
 
 
 class LookAsk(BaseModel):
+    text: str = Field("", max_length=300)
+    asset: str | None = Field(None, max_length=40)
+
+
+class StyleAsk(BaseModel):
+    """自创风格: a style invented from words, a picture of a look, or both."""
     text: str = Field("", max_length=300)
     asset: str | None = Field(None, max_length=40)
 

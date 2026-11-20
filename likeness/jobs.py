@@ -83,7 +83,7 @@ class Jobs:
     def _run(self, job: Job, work: Callable[[Job], None]) -> None:
         if job.stop.is_set():
             job.state = "cancelled"
-            job.emit("failed", message="Stopped before it started.", cancelled=True)
+            job.emit("failed", message="还没开始就取消了", cancelled=True)
             return
         job.state = "running"
         try:
@@ -91,7 +91,7 @@ class Jobs:
             job.state = "done"
         except Cancelled:
             job.state = "cancelled"
-            job.emit("failed", message="Stopped.", cancelled=True)
+            job.emit("failed", message="已取消", cancelled=True)
         except Exception as error:   # the job fails; the studio carries on
             from .engines import EngineError
 
@@ -99,7 +99,7 @@ class Jobs:
             if isinstance(error, EngineError):
                 job.emit("failed", message=str(error), hint=error.hint)
             else:
-                job.emit("failed", message="The studio could not finish this turn.", hint="Try again.")
+                job.emit("failed", message="这次没成功", hint="再试一次")
 
     def _forget_old(self) -> None:
         if len(self.jobs) > self.keep:

@@ -29,12 +29,12 @@ class Store:
     def add_bytes(self, data: bytes, kind: str = "image") -> dict:
         """An upload: opened, turned upright, normalised (masks to greyscale PNG, pictures to RGB), saved."""
         if len(data) > MAX_UPLOAD:
-            raise ValueError("That picture is larger than the studio accepts (24 MB).")
+            raise ValueError("这张图太大啦（超过 24 MB），换一张小一点的吧")
         try:
             image = Image.open(io.BytesIO(data))
             image.load()
         except Exception as error:
-            raise ValueError("That file could not be opened as a picture.") from error
+            raise ValueError("这个文件打不开，换一张照片试试") from error
         return self.add_image(ImageOps.exif_transpose(image), kind)
 
     def add_image(self, image: Image.Image, kind: str = "made", **extra) -> dict:

@@ -25,9 +25,10 @@ from pathlib import Path
 from PIL import Image, ImageChops
 
 from .. import brief
-from ..rooms import BACKDROPS_SCHEMA, LOOK_SCHEMA, ROOM_SCHEMA
-from ..turns import SIZES, BackdropAsk, Inputs, LookAsk, RoomAsk, Turn
+from ..rooms import BACKDROPS_SCHEMA, LOOK_SCHEMA, ROOM_SCHEMA, STYLE_SCHEMA
+from ..turns import SIZES, BackdropAsk, Inputs, LookAsk, RoomAsk, StyleAsk, Turn
 from . import EngineError, Work, shaped
+from .codex import _composite_region
 
 PACES = {"quick": "Quick", "fine": "Fine", "deep": "Deep"}
 DEFAULT_PACES = {
@@ -36,6 +37,13 @@ DEFAULT_PACES = {
     "deep": {"model": "gpt-image-2.6-sunburst", "quality": "high", "partials": 2, "timeout": 300},
 }
 EDIT_OPS = {"edit", "restyle", "reference", "blend", "region", "backdrop", "remove", "vary", "angles"}
+# one picture per call: each angle is asked for on its own, in this order
+ANGLES = [
+    "a three-quarter view, the head turned so the nose points toward the right edge of the picture",
+    "a full side profile facing the right edge of the picture",
+    "a three-quarter view, the head turned so the nose points toward the left edge of the picture",
+    "a slightly high angle, looking up at the camera with the chin a little lowered",
+]
 
 
 def _key(config: dict) -> str:
@@ -94,12 +102,12 @@ def _said(error: urllib.error.HTTPError) -> EngineError:
         detail = {}
     message, code = str(detail.get("message") or ""), str(detail.get("code") or detail.get("type") or "")
     if error.code == 401:
-        return EngineError("The studio's OpenAI key was not accepted.", "Check OPENAI_API_KEY on the studio's computer.")
+        return EngineError("生图服务的 Key 不可用", "检查一下服务器上的 OPENAI_API_KEY")
     if error.code == 429:
-        return EngineError("OpenAI is busy or the key's limit is reached.", "Wait a moment and try again.")
+        return EngineError("生图服务太忙或额度用完了", "等一会儿再试")
     if "moderation" in code or "safety" in code or "safety" in message.lower():
-        return EngineError("The picture was refused by the model's safety checks.", "Try different words, or another photo.")
-    return EngineError("GPT Image could not make this picture." + (f" ({message[:160]})" if message else ""), "Try again, perhaps in fewer words.")
+        return EngineError("这张被生图模型的安全审核拦下了", "换个说法或换张照片试试")
+    return EngineError("这张没生成出来" + (f"（{message[:120]}）" if message else ""), "再试一次，或者换个说法")
 
 
 class OpenAIImages:
@@ -133,9 +141,9 @@ class OpenAIImages:
         except urllib.error.HTTPError as error:
             raise _said(error) from None
         except (urllib.error.URLError, socket.timeout, TimeoutError) as error:
-            raise EngineError("The studio could not reach OpenAI.", "Check the studio computer's internet connection.") from error
+            raise EngineError("连不上生图服务", "检查一下服务器的网络") from error
 
-    def _stream(self, response, work: Work, index: int, prompt: str, aspect: str | None) -> bool:
+    def _stream(self, response, work: Work, index: int, prompt: str, aspect: str | None, keep=lambda picture: picture) -> bool:
         """Reads the server-sent events of one picture: partial pictures as they come, then the picture itself."""
         data: list[str] = []
         made = False
@@ -154,15 +162,18 @@ class OpenAIImages:
                 work.partial(index, shaped(_picture(event["b64_json"]), aspect))
             elif kind.endswith("completed") and event.get("b64_json"):
                 work.stage("finish")
-                work.result(index, shaped(_picture(event["b64_json"]), aspect), prompt)
+                work.result(index, keep(shaped(_picture(event["b64_json"]), aspect)), prompt)
                 made = True
             elif event.get("error"):
-                raise EngineError("GPT Image stopped partway: " + str(event["error"].get("message", ""))[:160], "Try again.")
+                raise EngineError("生成到一半停了：" + str(event["error"].get("message", ""))[:120], "再试一次")
         return made
 
     def _one(self, turn: Turn, inputs: Inputs, work: Work, index: int, prompt: str) -> None:
         pace = self.pace(turn.pace)
         size = SIZES.get(turn.aspect or "", "") or str(self.config.get("size") or "1024x1536")
+        if turn.intent.op in EDIT_OPS and inputs.pictures and not turn.aspect:
+            with Image.open(inputs.pictures[inputs.subject or next(iter(inputs.pictures))]) as im:   # edit a photo in its own shape
+                size = "1536x1024" if im.width > im.height * 1.15 else "1024x1024" if im.width > im.height * .85 else "1024x1536"
         common = [("model", str(pace["model"])), ("prompt", prompt), ("size", size), ("quality", str(pace["quality"])),
                   ("output_format", "jpeg"), ("output_compression", "90"), ("stream", "true"), ("partial_images", str(int(pace.get("partials", 0))))]
         subject = inputs.subject or next(iter(inputs.pictures), None)
@@ -184,17 +195,31 @@ class OpenAIImages:
             body = json.dumps({k: (v if k not in ("stream", "partial_images", "output_compression") else (v == "true" if k == "stream" else int(v))) for k, v in common}).encode()
             kind, path = "application/json", "/images/generations"
         work.stage("plan")
+        keep = self._keeper(turn, inputs)
         with self._open(path, body, kind, float(pace.get("timeout", 180))) as response:
             if "text/event-stream" in (response.headers.get("Content-Type") or ""):
-                if self._stream(response, work, index, prompt, turn.aspect):
+                if self._stream(response, work, index, prompt, turn.aspect, keep):
                     return
-                raise EngineError("GPT Image finished without a picture.", "Try again.")
+                raise EngineError("这次没有出图", "再试一次")
             answer = json.loads(response.read().decode("utf-8"))
-            work.result(index, shaped(_picture(answer["data"][0]["b64_json"]), turn.aspect), prompt)
+            work.result(index, keep(shaped(_picture(answer["data"][0]["b64_json"]), turn.aspect)), prompt)
+
+    def _keeper(self, turn: Turn, inputs: Inputs):
+        """A region edit changes only the marked regions: the new picture is laid into the original through the
+        (feathered) union of the masks, so everything outside them stays exactly as it was, pixel for pixel."""
+        subject = inputs.subject or next(iter(inputs.pictures), None)
+        if turn.intent.op != "region" or not subject:
+            return lambda picture: picture
+        with Image.open(inputs.pictures[subject]) as im:
+            original = im.convert("RGB")
+        region = self._region(inputs, original.size)
+        if region is None or not region.getbbox():
+            return lambda picture: picture
+        return lambda picture: _composite_region(picture, original, region)
 
     @staticmethod
-    def _mask(inputs: Inputs, size: tuple[int, int]) -> bytes | None:
-        """The marked regions, as the API wants them: transparent where the picture may change."""
+    def _region(inputs: Inputs, size: tuple[int, int]) -> Image.Image | None:
+        """The marked regions as one greyscale mask at the picture's size: white where it may change."""
         masks = [m for _, _, m in inputs.pins if m] + ([inputs.subject_mask] if inputs.subject_mask else [])
         if not inputs.pins or not masks:
             return None
@@ -202,6 +227,14 @@ class OpenAIImages:
         for path in masks[: len(inputs.pins)]:
             with Image.open(path) as m:
                 region = ImageChops.lighter(region, m.convert("L").resize(size))
+        return region
+
+    @classmethod
+    def _mask(cls, inputs: Inputs, size: tuple[int, int]) -> bytes | None:
+        """The marked regions, as the API wants them: transparent where the picture may change."""
+        region = cls._region(inputs, size)
+        if region is None:
+            return None
         out = Image.new("RGBA", size, (0, 0, 0, 255))
         out.putalpha(ImageChops.invert(region))
         buf = io.BytesIO()
@@ -212,11 +245,14 @@ class OpenAIImages:
         work.stage("read")
         prompt = brief.direct_brief(turn, inputs)
         work.plan("GPT Image, " + PACES.get(turn.pace, turn.pace).lower() + (f", {turn.n} pictures" if turn.n > 1 else ""), prompt)
+        prompts = [prompt] * turn.n
+        if turn.intent.op == "angles":
+            prompts = [brief.angle_brief(turn, inputs, ANGLES[i % len(ANGLES)]) for i in range(turn.n)]
         if turn.n == 1:
-            self._one(turn, inputs, work, 0, prompt)
+            self._one(turn, inputs, work, 0, prompts[0])
         else:
             with ThreadPoolExecutor(max_workers=min(4, turn.n)) as pool:
-                for future in [pool.submit(self._one, turn, inputs, work, i, prompt) for i in range(turn.n)]:
+                for future in [pool.submit(self._one, turn, inputs, work, i, prompts[i]) for i in range(turn.n)]:
                     future.result()
         voice = turn.room.voice if turn.room and turn.room.voice else ["出片啦"]
         work.reply(voice[secrets.randbelow(len(voice))])
@@ -233,13 +269,16 @@ class OpenAIImages:
         try:
             return json.loads(answer["choices"][0]["message"]["content"])
         except (KeyError, IndexError, TypeError, ValueError) as error:
-            raise EngineError("The answer came back in a shape the studio could not read.", "Try again.") from error
+            raise EngineError("没读懂模型的回答", "再试一次") from error
 
     def room(self, ask: RoomAsk) -> dict:
         return self._words(brief.room_brief(ask.text, ask.palette), ROOM_SCHEMA)
 
     def look(self, ask: LookAsk, picture: Path | None) -> dict:
         return self._words(brief.look_brief(ask.text, picture is not None), LOOK_SCHEMA, picture)
+
+    def style(self, ask: StyleAsk, picture: Path | None) -> dict:
+        return self._words(brief.style_brief(ask.text, picture is not None), STYLE_SCHEMA, picture)
 
     def backdrops(self, ask: BackdropAsk, picture: Path | None) -> list[dict]:
         return self._words(brief.backdrops_brief(ask.text, ask.near, ask.dream, ask.room, picture is not None), BACKDROPS_SCHEMA, picture).get("backdrops") or []

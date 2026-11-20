@@ -2,22 +2,15 @@
  * 沉浸感的小动效，全部尊重「减少动态效果」设置：
  *   warp    换风格时，一个带风格信物的标题卡从快门处晕开（像动画里的转场眼）
  *   reveal  出片时一道光从左扫到右，扫过的地方从预览蜕变成成片
- *   burst   出片瞬间，这个世界自己的小物件四散飞出（公主是爱心蝴蝶结、巨人是闪电、蓝胖子是竹蜻蜓…）
+ *   burst   出片瞬间，这个世界自己的小物件四散飞出（公主是蝴蝶结和爱心、特摄是能量闪电、丹青是宫灯…）
  *   buzz    手机上轻轻震一下
  */
 import { h, reduced } from '../core/dom.js';
 import { sticker } from '../core/assets.js';
 import { presetById } from '../presets.js';
 
-/** 每个世界的「信物」：标题卡上的那个小图，和出片时飞出来的东西。 */
-const EMBLEM = {
-  princess: ['bow', 'heart'], gothic: ['gothic-crown', 'sparkle'], giant: ['ultra-crest', 'bolt'], robocat: ['take-copter', 'sparkle'],
-  dragon: ['nailong-hood', 'heart'], bighead: ['heart', 'sparkle'], faceart: ['bolt', 'sparkle'], clay: ['candy', 'candy'], pet: ['paw', 'heart'],
-  pilot: ['bolt', 'sparkle'], figure: ['sparkle', 'heart'], arcade: ['bolt', 'sparkle'], anime: ['sparkle', 'sparkle'], toon3d: ['sparkle', 'heart'],
-  magical: ['magic-tiara', 'sparkle'], shonen: ['ninja-band', 'bolt'], ghibli: ['leaf-umbrella', 'sparkle'], vtuber: ['cat-headset', 'heart'],
-  ccd: ['sparkle', 'sparkle'], film: ['sparkle', 'sparkle'], neon: ['neon-heart', 'neon-heart'],
-};
-const emblem = (/** @type {string} */ id, i = 0) => sticker((EMBLEM[id] || ['sparkle', 'sparkle'])[i]) || sticker('sparkle');
+/** 每个世界的「信物」（presets.js 的 emblem）：标题卡上的那个小图，和出片时飞出来的东西。 */
+const emblem = (/** @type {string} */ id, i = 0) => sticker(presetById(id)?.emblem?.[i] || 'sparkle') || sticker('sparkle');
 
 let warpEl = /** @type {HTMLElement | null} */ (null);
 /** 世界切换标题卡。 @param {HTMLElement} host @param {string} id */

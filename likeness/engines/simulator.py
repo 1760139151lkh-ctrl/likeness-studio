@@ -433,6 +433,22 @@ class Simulator:
             raw["ramp"] = ["#%02x%02x%02x" % c for c in _palette(_open(picture, 256))]
         return raw
 
+    def style(self, ask, picture: Path | None) -> dict:
+        """A stand-in style: colours from the words (or the picture), Chinese names, honest about being simulated."""
+        text = ask.text.strip()
+        hue = _hue_in(text)
+        if hue is None and picture is not None:
+            r, g, b = (c / 255 for c in _palette(_open(picture, 256))[0])
+            hue = round(colorsys.rgb_to_hls(r, g, b)[0] * 360)
+        hue = _seed(text) % 360 if hue is None else hue
+        dark = bool(re.search(r"暗|夜|黑|哥特|赛博|dark|night|noir", text, re.I))
+        c = colours_for(hue, .55, dark)
+        return {"name": (text[:5] or "图中风格"), "line": f"模拟：从「{text[:10] or '一张图'}」变出来的风格", "hook": "模拟风格",
+                "prompt": f"Repaint this person in this style: {text or 'the colours and light of the reference picture'}. Still clearly them.",
+                "dark": dark, "colors": {"bg": c["ground"], "bg2": c["ground2"], "surface": c["surface"], "ink": c["ink"], "soft": c["soft"], "accent": c["accent"], "accent2": c["accent2"]},
+                "look": {"sat": 1.15, "contrast": 1.05, "warmth": .1, "posterize": .25, "edge": .2, "bloom": .25, "grain": .1, "vignette": .25, "smooth": .6},
+                "frame": "poster", "deco": "sparkle", "display": "round", "details": []}
+
     def backdrops(self, ask: BackdropAsk, picture: Path | None) -> list[dict]:
         rnd = random.Random()
         ranked = sorted(PLACES, key=lambda p: (p[2] - ask.near) ** 2 + (p[3] - ask.dream) ** 2 + rnd.uniform(0, .05))

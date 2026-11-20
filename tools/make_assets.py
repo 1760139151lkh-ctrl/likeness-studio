@@ -80,22 +80,34 @@ BACKGROUNDS = {
     "faceart": "A manga-style backdrop: white paper with dramatic black speed lines radiating from the centre, dotted screentone gradients and a few hot-pink impact bursts.",
     "clay": "A handmade clay diorama backdrop: soft pastel plasticine shapes, rounded candy blobs, tiny clay clouds and stars, faint fingerprints, warm miniature lighting with gentle depth of field.",
     "pet": "A cosy, adorable backdrop: soft blush-pink and apricot gradients, fluffy cloud shapes, tiny paw prints, little hearts and sparkles, warm and gentle.",
-    "giant": "An epic Ultraman tokusatsu backdrop: a city at dusk under a deep blue sky, a giant kaiju silhouette far away in the haze, silver and red light streaks, a brilliant blue beam of light and lens flares, cinematic Showa-era film still.",
-    "robocat": "A bright Doraemon-anime backdrop in retro 1980s cel animation style: a sky-blue sky with round puffy white clouds over a grassy field, the pink Anywhere Door standing open, a little yellow Take-copter flying, cheerful flat colours.",
+    "hero": "An epic retro tokusatsu sci-fi backdrop: a city skyline at dusk under a deep blue sky, distant smoke and searchlights, silver and red light streaks, a brilliant cyan beam of light and lens flares, a cinematic 1970s special-effects film still.",
+    "robot": "A bright retro 1980s TV-cartoon backdrop in flat cel animation style: a sky-blue sky with round puffy white clouds over a green grassy hill, little floating gears and stars, cheerful flat colours, thick soft outlines.",
     "pilot": "A sci-fi mecha cockpit backdrop: dark teal-black interior, glowing cyan holographic HUD rings, grids and reticles, a few warm orange indicator lights, shallow depth of field.",
     "figure": "A premium designer-toy studio backdrop: a soft lavender seamless sweep, glossy pastel pedestals, little floating sparkles, softbox reflections, clean product-photography mood.",
     "arcade": "A 1990s arcade backdrop in detailed 16-bit pixel art: a purple-to-magenta sunset gradient, a distant pixel city, glowing yellow and pink energy sparks, CRT scanline glow.",
+    "wuxia": "A cinematic wuxia backdrop: a towering misty bamboo forest at dawn, shafts of soft light, drifting bamboo leaves, distant ink-wash mountain cliffs, jade green and stone grey, painterly and serene.",
     "princess": "A fairy-tale princess backdrop: soft blush-pink and champagne-gold bokeh, floating translucent hearts, satin ribbons, rose petals and pearls, an elegant arched window of warm light.",
     "gothic": "A dark gothic backdrop: deep plum and black velvet shadows, a glowing gothic stained-glass rose window, antique silver filigree, candle glow, drifting dark rose petals.",
+    "inkfairy": "A classical Chinese painting backdrop: ink-wash mountains and rolling auspicious clouds on warm rice paper, a few red palace lanterns glowing softly, drifting peach blossoms, gold-leaf flecks and vermilion accents, poetic and airy.",
+    "tarot": "A mystical tarot backdrop: a midnight-blue and violet night sky full of stars and moon phases, ornate gold art-nouveau curls and filigree around the edges, soft glowing dust, luxurious and enchanting.",
     "anime": "An anime film background painting: a towering summer sky with luminous cumulus clouds, lens flare, a few drifting cherry-blossom petals, breathtaking and airy.",
     "toon3d": "A 3D animated-film backdrop: a warm whimsical storybook town at golden hour, soft round shapes, glowing orbs of light and gentle bokeh, high-end studio render.",
+    "magical": "A 90s magical-girl anime backdrop: a starry pastel night sky with a huge glowing crescent moon, swirling ribbons of light, falling stars, tiny hearts and sparkles, pink and lavender gradients, cel-shaded 2D anime.",
+    "shonen": "A shonen battle-anime backdrop: a dark ruined battlefield at a blood-red sunset, erupting golden energy aura and flames, dramatic speed lines radiating outwards, flying debris, bold cel-shaded 2D anime key frame.",
+    "handdrawn": "A hand-painted animated-film backdrop: a lush green summer countryside with rice fields, a little country bus stop, towering fluffy cumulus clouds in a bright blue sky, soft gouache and watercolour, warm nostalgic light.",
+    "vtuber": "A VTuber livestream backdrop: a cosy pastel streamer room with glowing LED strips, a soft ring light, floating hearts and stars, cyber-pop neon cyan and pink, clean anime illustration style.",
+    "shoujo": "A shoujo-manga backdrop: a dreamy pastel pink and lilac haze, cascading roses and lilies, floating bubbles and star sparkles, soft screentone gradients, romantic and sparkling.",
+    "retro": "A 1990s TV-anime backdrop: a city skyline glowing at sunset, purple and orange sky, telephone wires and a quiet train platform, hand-painted cel background with faded VHS colours and soft grain.",
     "ccd": "An early-2000s CCD camera night backdrop: a dark city street at night shot with harsh flash, blooming cold highlights, fine digital noise, blurred orange and blue street lights.",
     "film": "A fresh film-photography backdrop: soft sunlight through green leaves on a quiet lane, creamy lifted shadows, fine 35mm grain, dreamy shallow depth of field, airy and calm.",
     "neon": "A cyberpunk backdrop: a rain-soaked night city with glowing magenta and cyan neon signs dissolved into bokeh, rain streaks, wet reflections, cinematic.",
-    "magical": "A 90s magical-girl anime backdrop: a starry pastel night sky with a huge glowing crescent moon, swirling ribbons of light, falling stars, tiny hearts and sparkles, pink and lavender gradients, cel-shaded 2D anime.",
-    "shonen": "A shonen battle-anime backdrop: a dark ruined battlefield at a blood-red sunset, erupting golden energy aura and flames, dramatic speed lines radiating outwards, flying debris, bold cel-shaded 2D anime key frame.",
-    "ghibli": "A hand-painted Studio Ghibli style backdrop: a lush green summer countryside with rice fields, a little country bus stop, towering fluffy cumulus clouds in a bright blue sky, soft gouache and watercolour, warm nostalgic light.",
-    "vtuber": "A VTuber livestream backdrop: a cosy pastel streamer room with glowing LED strips, a soft ring light, floating hearts and stars, cyber-pop neon cyan and pink, clean anime illustration style.",
+    "hkfilm": "A 1990s Hong Kong film backdrop: a dense night street of glowing red and green neon signs dissolved into soft bokeh, warm tungsten street light, wet pavement, rich film grain and halation, moody and nostalgic. No readable text.",
+    "oil": "An Old Master painting backdrop: a deep dark warm umber background with soft glazed oil-paint texture, a hint of a heavy velvet curtain, subtle craquelure, candlelit museum atmosphere.",
+    "storybook": "A children's picture-book backdrop: soft watercolour washes on textured cotton paper, a whimsical forest of round trees, little hand-drawn stars and clouds, warm pastel palette.",
+    "pop": "A playful retro graphic backdrop: flat bright yellow, hot pink and cobalt blue colour blocks, large round halftone dots, thick black outlines and a starburst shape, cheerful 1960s print style.",
+    "woodblock": "An ukiyo-e woodblock-print backdrop: stylised curling indigo waves, ochre clouds and a large vermilion sun disc on textured washi paper, carved outlines, visible wood grain.",
+    "calendar": "A 1930s Nanyang calendar-poster backdrop: a soft airbrushed pastel garden with frangipani and palm fronds, a colonial balcony with art-deco railings, warm nostalgic light, aged paper texture.",
+    "peranakan": "A Peranakan heritage backdrop: rows of pastel ceramic tiles with intricate floral motifs, a colourful shophouse facade with wooden shutters and potted orchids, bright tropical daylight, joyful and detailed.",
     "brand": "A vibrant creative-app backdrop: flowing gradients of hot pink, violet and electric cyan, soft glowing light trails and a few sparkles, glossy and energetic.",
 }
 
@@ -105,15 +117,18 @@ HEADWEAR = ("Only the accessory itself, as a standalone object: no head, no hair
 STICKERS = {
     "tiara": f"A delicate pearl and rose-gold princess tiara with small diamond sparkles and a heart-shaped centre pearl. {HEADWEAR}",
     "gothic-crown": f"An ornate antique-silver gothic filigree crown with a short black lace veil and tiny dark-purple gems. {HEADWEAR}",
-    "nailong-hood": f"A cute plush headband in the style of Nailong, the chubby milky-yellow baby dragon: two tiny orange nub horns and soft round yellow ears on a squishy yellow band. {HEADWEAR}",
+    "dragon-hood": f"A cute plush baby-dragon hood headband, an original design: a squishy custard-yellow band with two tiny rounded orange horns and two soft round ears, glossy soft toy look. {HEADWEAR}",
     "cat-ears": f"A pair of fluffy cream-and-pink kitten ears on a thin headband, soft fur, pink inner ears. {HEADWEAR}",
     "dog-ears": f"A pair of floppy golden puppy ears on a thin headband, soft fur. {HEADWEAR}",
     "beanie": f"A chunky hand-knitted beanie made of soft coral and mint plasticine clay, with a pom-pom, visible fingerprints, stop-motion style. {HEADWEAR}",
-    "ultra-crest": f"The silver Ultraman crest fin: the iconic smooth silver central fin of Ultraman's head with its red side stripes, as a headpiece worn above the forehead. {HEADWEAR}",
-    "take-copter": f"Doraemon's yellow Take-copter (bamboo-copter): a small yellow propeller on a short stalk with a round base, seen from the front, flat retro anime cel style. {HEADWEAR}",
-    "magic-tiara": f"A 90s magical-girl tiara: a golden tiara with a glowing pink crescent moon jewel in the centre, tiny stars and two small ribbon bows. {HEADWEAR}",
-    "ninja-band": f"A ninja forehead-protector headband: a dark blue cloth band with a polished engraved metal plate in the centre (a simple swirl leaf symbol), tails fluttering. {HEADWEAR}",
-    "leaf-umbrella": f"A huge glossy green taro leaf held over the head like an umbrella, its stem pointing down, hand-painted anime style. {HEADWEAR}",
+    "hero-visor": f"A sleek futuristic hero headpiece, an original design: a silver and red streamlined band with a glowing cyan lens strip across the front, worn above the forehead like a crown. {HEADWEAR}",
+    "robot-antenna": f"A cute cartoon robot antenna headband: a glossy sky-blue band with two little bolts and one springy antenna topped with a glowing yellow ball, flat cel cartoon style. {HEADWEAR}",
+    "magic-tiara": f"A 90s magical-girl tiara: a golden tiara with a glowing pink star jewel in the centre, tiny stars and two small ribbon bows. {HEADWEAR}",
+    "fight-band": f"A red cloth martial-arts headband tied around the head with two long fluttering tails, plain cloth with no symbol. {HEADWEAR}",
+    "straw-hat": f"A summery straw sun hat with a wide brim and a red ribbon band, hand-painted anime style. {HEADWEAR}",
+    "douli": f"A woven bamboo conical hat with a short sheer white veil around the brim, wuxia style. {HEADWEAR}",
+    "buyao": f"An exquisite classical Chinese gold hair ornament: a phoenix-and-flower hairpin crown with dangling pearl and jade tassels, gongbi painting style. {HEADWEAR}",
+    "flower-clip": f"A cluster of pastel pink roses, tiny white flowers and a satin ribbon on a hair clip, shoujo-manga style. {HEADWEAR}",
     "cat-headset": f"A cute pastel gaming headset with glowing pink cat ears on top and a small boom microphone, anime style. {HEADWEAR}",
     "bow": "A glossy blush-pink satin ribbon bow with long tails and a tiny pearl in the knot.",
     "heart": "A glossy, puffy pink heart gem with soft highlights and a tiny sparkle.",
@@ -122,7 +137,32 @@ STICKERS = {
     "paw": "A cute fluffy pink cat paw print shaped cushion.",
     "sparkle": "A four-pointed anime sparkle star in white and light blue with a soft glow.",
     "neon-heart": "A glowing magenta and cyan neon-tube heart sign.",
+    "lantern": "A glowing red Chinese palace lantern with gold trim and a red silk tassel, gongbi painting style.",
+    "tarot-card": "A single ornate tarot card standing upright, its back decorated with gold stars and a crescent moon on midnight blue, art-nouveau border, nothing legible.",
+    "cassette": "A cute retro cassette tape with a pastel label (blank, nothing written) and a little sparkle, 90s anime style.",
+    "film-reel": "A small vintage film reel with a curl of film strip, warm metallic finish.",
+    "paintbrush": "A classic artist's paintbrush with a dab of gold paint and a small wooden palette.",
+    "flower": "A single pastel watercolour flower with soft petals, hand-painted storybook style.",
+    "wave": "A small stylised ukiyo-e wave crest in indigo and white, woodblock-print style.",
+    "tile": "A single square pastel Peranakan ceramic tile with an intricate pink and teal floral motif.",
+    "bamboo": "A sprig of green bamboo leaves painted with ink-wash brush strokes.",
 }
+# 换背景的场景缩略图（精修台「换背景」里的选项），没有人物
+SCENES = {
+    "beach": "A golden sunset over a tropical beach with gentle waves and palm silhouettes.",
+    "sakura": "An avenue of blooming cherry trees with petals drifting in soft spring light.",
+    "neonstreet": "A rainy night street glowing with magenta and cyan neon signs dissolved into bokeh, no readable text.",
+    "galaxy": "A breathtaking starry night sky with the Milky Way over a quiet hill.",
+    "moon": "The grey surface of the moon with the blue Earth rising over the horizon.",
+    "snow": "Snowy mountains under a clear blue sky, soft powder snow in the air.",
+    "flowers": "An endless field of pastel flowers under a dreamy pink sky.",
+    "cafe": "A cosy café corner with warm lamps, plants and a big window.",
+    "nightmarket": "A lively Asian night market with glowing lanterns and food stalls softly blurred, no readable text.",
+    "skyline": "A modern waterfront city skyline at blue hour with glowing towers reflected in the bay.",
+    "funfair": "A colourful funfair at dusk with a glowing ferris wheel and carousel lights.",
+    "studio": "A clean soft-gradient photo studio backdrop in warm pastel tones, softbox light.",
+}
+SCENE_STYLE = "Photographic, beautiful light, no people, no faces, no text, square composition."
 ICON = ("A glossy, modern app icon: a playful magic sparkle star with a tiny camera shutter ring around it, over a vibrant "
         "gradient of hot pink, violet and electric cyan, rounded-square icon shape filling the frame, soft 3D depth, no text.")
 
@@ -176,7 +216,7 @@ def retry(fn, label: str):
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--only", default="people,styles,bg,stickers,icon")
+    ap.add_argument("--only", default="people,styles,bg,stickers,scenes,icon")
     ap.add_argument("--pick", default="", help="only these preset ids / sticker names")
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--lanes", type=int, default=6)
@@ -188,7 +228,7 @@ def main() -> None:
     c = Client(key())
     data = presets()
     suffix = f".{a.variant}" if a.variant else ""
-    for sub in ("people", "styles", "bg", "stickers", "brand"):
+    for sub in ("people", "styles", "bg", "stickers", "scenes", "brand"):
         (RAW / sub).mkdir(parents=True, exist_ok=True)
     meta_path = RAW / "provenance.json"
     meta = json.loads(meta_path.read_text()) if meta_path.is_file() else {}
@@ -247,6 +287,16 @@ def main() -> None:
         remember(f"stickers/{name}", prompt=prompt)
         log("sticker", name, f"{time.time() - t:.0f}s")
 
+    def scene_job(sid: str, desc: str):
+        out = RAW / "scenes" / f"{sid}{suffix}.webp"
+        if not todo(out):
+            return
+        prompt = f"{desc} {SCENE_STYLE}"
+        t = time.time()
+        out.write_bytes(retry(lambda: c.generate(prompt, "1024x1024", quality="medium"), "scene " + sid))
+        remember(f"scenes/{sid}", prompt=prompt)
+        log("scene", sid, f"{time.time() - t:.0f}s")
+
     def icon_job():
         out = RAW / "brand" / f"icon{suffix}.webp"
         if not todo(out):
@@ -262,6 +312,8 @@ def main() -> None:
         jobs += [(bg_job, sid, desc) for sid, desc in BACKGROUNDS.items() if not pick or sid in pick]
     if "stickers" in only:
         jobs += [(sticker_job, n, desc) for n, desc in STICKERS.items() if not pick or n in pick]
+    if "scenes" in only:
+        jobs += [(scene_job, sid, desc) for sid, desc in SCENES.items() if not pick or sid in pick]
     if "icon" in only:
         jobs.append((icon_job,))
     if "styles" in only:

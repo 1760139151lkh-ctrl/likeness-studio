@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import time
 from pathlib import Path
 
@@ -55,7 +56,10 @@ def portrait_set(src: Path, dest: Path) -> dict:
 def main() -> None:
     started = time.time()
     provenance = json.loads((RAW / "provenance.json").read_text()) if (RAW / "provenance.json").is_file() else {}
-    manifest: dict = {"by": "GPT Image (gpt-image-2.6-sunburst)", "made": time.strftime("%Y-%m-%d"), "people": [], "styles": {}, "bg": [], "stickers": {}}
+    manifest: dict = {"by": "GPT Image (gpt-image-2.6-sunburst)", "made": time.strftime("%Y-%m-%d"), "people": [], "styles": {}, "bg": [], "stickers": {}, "scenes": []}
+    # start clean: a picture taken out of private/assets-raw (a retired style, a replaced sticker) leaves the site too
+    for sub in ("people", "styles", "bg", "stickers", "scenes"):
+        shutil.rmtree(IMG / sub, ignore_errors=True)
 
     for src in sorted((RAW / "people").glob("*.webp")):
         if "." in src.stem:
@@ -93,6 +97,14 @@ def main() -> None:
         save(im, IMG / "stickers" / f"{src.stem}.webp", 86, exact=True)
         manifest["stickers"][src.stem] = {"w": im.width, "h": im.height}
 
+    # 换背景的场景缩略图（精修台里点一下就换）
+    for src in sorted((RAW / "scenes").glob("*.webp")):
+        if "." in src.stem:
+            continue
+        with Image.open(src) as raw:
+            save(fit(raw.convert("RGB"), 256, 256), IMG / "scenes" / f"{src.stem}.webp", 76)
+        manifest["scenes"].append(src.stem)
+
     icon = RAW / "brand" / "icon.webp"
     if icon.is_file():
         with Image.open(icon) as raw:
@@ -103,6 +115,9 @@ def main() -> None:
 
     (IMG / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
     # what made each picture (model, date, the exact prompt): kept beside them, not inlined into the page
+    live = {f"people/{p}" for p in manifest["people"]} | {f"styles/{k}/{p}" for k, v in manifest["styles"].items() for p in v} | {f"bg/{b}" for b in manifest["bg"]} \
+        | {f"stickers/{k}" for k in manifest["stickers"]} | {f"scenes/{k}" for k in manifest["scenes"]} | {"brand/icon"}
+    provenance = {k: v for k, v in provenance.items() if k in live}
     (IMG / "provenance.json").write_text(json.dumps(provenance, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     total = sum(f.stat().st_size for f in IMG.rglob("*") if f.is_file())
     print(f"web/img: {total / 2**20:.1f} MB in {time.time() - started:.0f}s")

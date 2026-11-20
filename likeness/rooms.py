@@ -148,3 +148,78 @@ ROOM_SCHEMA = _obj({
 })
 LOOK_SCHEMA = _obj({"name": S, "line": S, "prompt": S, "ramp": {"type": "array", "items": S}, "keep": {"type": "number"}, "grain": {"type": "number"}, "bloom": {"type": "number"}, "vignette": {"type": "number"}})
 BACKDROPS_SCHEMA = _obj({"backdrops": {"type": "array", "items": _obj({"name": S, "words": S})}})
+
+
+# ---- 哈基秀: a style invented from words or a picture (自创风格) ----
+STYLE_FRAMES = ["poster", "arch", "sticker", "candy", "print", "paper", "neon", "magic", "gothic", "comic", "energy", "brackets", "box", "circle", "tv", "stream", "scroll", "gilt", "deco", "tiles", "tarot", "blossom", "vhs", "cinema", "pop"]
+STYLE_DECOS = ["sparkle", "hearts", "bubbles", "halftone", "candy", "stars", "clouds", "leaves", "neon", "orbs", "grid", "dots", "thorns", "flames", "mist", "xiangyun", "doodle", "bendays", "waves", "deco", "tiles", "blossom", "vhs", "canvas"]
+STYLE_DISPLAYS = ["round", "serif", "tech", "comic", "mono", "gothic", "pixel", "brush", "sans"]
+STYLE_GROUPS = ["acc", "light", "scene", "frame"]
+N = {"type": "number"}
+B = {"type": "boolean"}
+STYLE_SCHEMA = _obj({
+    "name": S, "line": S, "hook": S, "prompt": S, "dark": B,
+    "colors": _obj({k: S for k in ("bg", "bg2", "surface", "ink", "soft", "accent", "accent2")}),
+    "look": _obj({k: N for k in ("sat", "contrast", "warmth", "posterize", "edge", "bloom", "grain", "vignette", "smooth")}),
+    "frame": {"type": "string", "enum": STYLE_FRAMES}, "deco": {"type": "string", "enum": STYLE_DECOS}, "display": {"type": "string", "enum": STYLE_DISPLAYS},
+    "details": {"type": "array", "items": _obj({"group": {"type": "string", "enum": STYLE_GROUPS}, "label": S, "words": S})},
+})
+
+
+def _hex(value, default: str) -> str:
+    return value if isinstance(value, str) and HEX.match(value) else default
+
+
+def normalise_style(raw: dict, text: str = "") -> dict:
+    """Whatever a model invents becomes a complete, safe 哈基秀 preset: colours that read, numbers in range,
+    two details in each group, an id of its own. A strange answer can never break the app."""
+    raw = raw if isinstance(raw, dict) else {}
+    seed = text or json_safe(raw.get("name"))
+    hue = int(hashlib.sha1(seed.encode()).hexdigest()[:6], 16) % 360
+    dark = bool(raw.get("dark"))
+    base = colours_for(hue, .55, dark)
+    c = _dict(raw.get("colors"))
+    colors = {"bg": _hex(c.get("bg"), base["ground"]), "bg2": _hex(c.get("bg2"), base["ground2"]), "surface": _hex(c.get("surface"), base["surface"]),
+              "ink": _hex(c.get("ink"), base["ink"]), "soft": _hex(c.get("soft"), base["soft"]), "accent": _hex(c.get("accent"), base["accent"]), "accent2": _hex(c.get("accent2"), base["accent2"])}
+    if contrast(colors["ink"], colors["surface"]) < 4.5:   # text must read on its cards
+        colors["ink"] = "#f6f3ff" if _lum(colors["surface"]) < .3 else "#1d1a24"
+    if contrast(colors["soft"], colors["surface"]) < 2.6:
+        colors["soft"] = colors["ink"]
+    dark = _lum(colors["surface"]) < .3
+    look = _dict(raw.get("look"))
+    num = lambda k, d, lo=0.0, hi=1.0: round(_num(look.get(k), d, lo, hi), 3)
+    clean = lambda v, n: " ".join(str(v or "").split())[:n]
+    groups: dict[str, list[dict]] = {g: [] for g in STYLE_GROUPS}
+    for item in _list(raw.get("details")):
+        if isinstance(item, dict) and item.get("group") in groups and item.get("label") and item.get("words"):
+            groups[item["group"]].append({"label": clean(item["label"], 8), "words": clean(item["words"], 200)})
+    fallback = {"acc": [("小配饰", "a small matching accessory"), ("发饰", "a pretty hair ornament")],
+                "light": [("柔光", "soft flattering light"), ("闪光点", "little light sparkles")],
+                "scene": [("纯色底", "a clean solid-colour background"), ("梦幻背景", "a dreamy matching background")],
+                "frame": [("画框", "a matching decorative frame"), ("贴纸白边", "a thick white die-cut sticker outline")]}
+    details = []
+    for g in STYLE_GROUPS:
+        items = (groups[g] + [{"label": a, "words": b} for a, b in fallback[g]])[:2]
+        for i, it in enumerate(items):
+            details.append({"id": f"{g}{i + 1}", "label": it["label"], "group": g, "words": it["words"], **({"solo": g} if g in ("scene", "frame") else {})})
+    prompt = clean(raw.get("prompt"), 700) or f"Repaint this person in this style: {text}. Still clearly them."
+    name = clean(raw.get("name"), 8) or (clean(text, 6) or "我的风格")
+    radius = {"arch": "999px 999px 24px 24px", "circle": "50%", "pixel": "0px"}.get(raw.get("frame"), "20px")
+    return {
+        "id": "my-" + secrets.token_hex(4), "custom": True, "cat": "mine", "hot": 0,
+        "name": name, "line": clean(raw.get("line"), 30) or f"由「{clean(text, 12) or '一张图'}」变出来的风格", "hook": clean(raw.get("hook"), 12) or "我的专属风格",
+        "prompt": prompt,
+        "theme": {"dark": dark, **colors, "onAccent": "#ffffff" if _lum(colors["accent"]) < .5 else "#1a1408",
+                  "glow": colors["accent"] + "73", "line": ("#ffffff" if dark else "#000000") + "22", "radius": radius,
+                  "display": _pick(raw.get("display"), STYLE_DISPLAYS, "round"), "deco": _pick(raw.get("deco"), STYLE_DECOS, "sparkle"), "frame": _pick(raw.get("frame"), STYLE_FRAMES, "poster")},
+        "live": {"grade": [1, 1, 1], "sat": num("sat", 1.1, .5, 1.6), "contrast": num("contrast", 1.05, .5, 1.6), "lift": 0, "warmth": num("warmth", 0, -1, 1),
+                 "grain": num("grain", .1), "vignette": num("vignette", .25), "bloom": num("bloom", .2), "posterize": num("posterize", .2), "edge": num("edge", .15),
+                 "halftone": 0, "pixel": 0, "bulge": 0, "eyes": 0, "smooth": num("smooth", .5), "rim": [0, 0, 0, 0, 0, 0], "scan": 0, "overlay": "sparkle"},
+        "details": details,
+        "defaults": {"strength": 80, "likeness": 75, "richness": 60, "beauty": 35, "words": "", "details": [details[2]["id"], details[4]["id"]]},
+        "hero": "mei", "also": [], "emblem": ["sparkle", "heart"], "from": clean(text, 120),
+    }
+
+
+def json_safe(value) -> str:
+    return str(value or "style")

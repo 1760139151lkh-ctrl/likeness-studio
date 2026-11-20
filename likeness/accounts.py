@@ -27,7 +27,7 @@ import time
 from pathlib import Path
 
 HANDLE = re.compile(r"^[a-z0-9_.]{3,20}$")
-COLLECTIONS = {"works", "sources", "favs", "drafts", "prefs"}
+COLLECTIONS = {"works", "sources", "favs", "drafts", "prefs", "threads", "styles"}
 MAX_RECORD = 96 * 1024
 MAX_BATCH = 200
 

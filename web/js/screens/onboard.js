@@ -10,7 +10,7 @@ import { presetById } from '../presets.js';
 import { applyTheme } from '../core/theme.js';
 import { T } from '../copy.js';
 
-const TOUR = ['princess', 'giant', 'magical', 'robocat', 'shonen', 'ghibli', 'neon', 'dragon', 'vtuber', 'anime', 'figure', 'ccd', 'gothic', 'clay'];
+const TOUR = ['princess', 'inkfairy', 'hero', 'shoujo', 'neon', 'dragon', 'peranakan', 'magical', 'hkfilm', 'robot', 'anime', 'tarot', 'figure', 'handdrawn', 'gothic', 'clay', 'wuxia', 'ccd'];
 
 /** @param {{ onShoot: () => void, onSample: () => void, onSkip: () => void }} o */
 export function onboard(o) {

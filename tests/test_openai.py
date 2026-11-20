@@ -121,9 +121,9 @@ def test_refusals_are_said_plainly(live, api):
     api.refuse = "safety"
     events = follow(live, live.post("/api/turns", json={"id": "p4", "text": "x", "intent": {"op": "create"}}).json()["job"])
     failed = next(e for e in events if e["type"] == "failed")
-    assert "safety" in failed["message"] and failed["hint"]
+    assert "安全审核" in failed["message"] and failed["hint"]
     api.refuse = "key"
-    with pytest.raises(EngineError, match="key was not accepted"):
+    with pytest.raises(EngineError, match="Key 不可用"):
         OpenAIImages({}).look(type("Ask", (), {"text": "x"})(), None)
 
 
@@ -162,3 +162,47 @@ def test_the_styles_art_is_served_and_cached(client):
     assert res.status_code == 200 and res.headers["content-type"] == "image/webp"
     shell = client.get("/").text
     assert 'id="asset-manifest"' in shell and 'lang="zh-SG"' in shell
+
+
+def test_a_region_edit_keeps_every_pixel_outside_the_marked_region(live, api):
+    """部位精修 / 圈选: the model may repaint the whole frame, but only the marked region is laid into the original."""
+    subject = upload(live, png((240, 360), (30, 160, 60)))
+    mask = upload(live, png((240, 360), (0, 0, 0), box=(80, 120, 160, 200)), "mask")
+    turn = {"id": "r1", "text": "red lips", "aspect": "portrait", "handles": {"A": subject}, "intent": {"op": "region", "subject": subject},
+            "pins": [{"n": 1, "note": "a classic red lip", "mask": mask}]}
+    events = follow(live, live.post("/api/turns", json=turn).json()["job"])
+    out = picture(live, next(e for e in events if e["type"] == "result")["url"]).convert("RGB")
+    w, h = out.size
+    far = out.getpixel((int(w * .05), int(h * .05)))
+    inside = out.getpixel((int(w * .5), int(h * .44)))
+    assert abs(far[0] - 30) < 14 and abs(far[1] - 160) < 14, far          # untouched: still the original green
+    assert inside[0] > 150 and inside[1] < 150, inside                    # changed: the model's pink
+
+
+def test_every_angle_is_asked_for_on_its_own(live, api):
+    photo = upload(live, png((300, 450), (200, 170, 140)))
+    turn = {"id": "a1", "text": "", "n": 3, "aspect": "portrait", "handles": {"A": photo}, "intent": {"op": "angles", "subject": photo}}
+    events = follow(live, live.post("/api/turns", json=turn).json()["job"])
+    assert sum(e["type"] == "result" for e in events) == 3
+    prompts = [s["body"] for s in api.seen[-3:]]
+    assert any(b"three-quarter view, the head turned so the nose points toward the right" in p for p in prompts)
+    assert any(b"full side profile" in p for p in prompts)
+    assert any(b"toward the left edge" in p for p in prompts)
+
+
+def test_a_landscape_photo_is_edited_in_its_own_shape(live, api):
+    photo = upload(live, png((600, 400), (120, 130, 140)))
+    turn = {"id": "l1", "text": "make it sunset", "handles": {"A": photo}, "intent": {"op": "edit", "subject": photo}}
+    follow(live, live.post("/api/turns", json=turn).json()["job"])
+    assert b'name="size"\r\n\r\n1536x1024' in api.seen[-1]["body"]
+
+
+def test_a_style_invented_from_words_is_complete_and_safe(live, api):
+    res = live.post("/api/styles", json={"text": "星空糖果风"})
+    assert res.status_code == 200
+    st = res.json()["style"]
+    assert st["custom"] and st["id"].startswith("my-") and st["cat"] == "mine"
+    assert len(st["details"]) == 8 and {d["group"] for d in st["details"]} == {"acc", "light", "scene", "frame"}
+    assert all(st["theme"][k].startswith("#") for k in ("bg", "bg2", "surface", "ink", "soft", "accent", "accent2"))
+    assert st["prompt"] and st["defaults"]["details"]
+    assert live.post("/api/styles", json={"text": ""}).status_code == 400

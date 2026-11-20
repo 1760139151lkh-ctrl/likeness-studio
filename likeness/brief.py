@@ -60,6 +60,15 @@ def direct_brief(turn: Turn, inputs: Inputs) -> str:
     return " ".join(line for line in lines if line)[:3900]
 
 
+def angle_brief(turn: Turn, inputs: Inputs, angle: str) -> str:
+    """One of several angles, asked for on its own (the openai engine makes each angle in its own call)."""
+    lines = [f"Show the person in the subject picture from another angle: {angle}.",
+             "Keep them exactly: the same face, hair, make-up, clothes, light, style and backdrop. Only the camera moves."]
+    if turn.text.strip():
+        lines.append(turn.text.strip())
+    return " ".join(lines)[:3900]
+
+
 def turn_brief(turn: Turn, inputs: Inputs, files: dict[str, str], *, size: str, quality: str, image_hint: str) -> str:
     """The brief for one turn. files maps each picture's handle (and mask names) to its path inside the job folder."""
     lines = ["You are the studio hand of Likeness, a personal image studio. Work only inside the current folder.", ""]
@@ -125,3 +134,20 @@ def backdrops_brief(text: str, near: float, dream: float, room: str, has_picture
             + f"and {'real and photographic' if dream < .4 else 'dreamlike and impossible' if dream > .6 else 'between real and dreamt'}.\n"
             + (f"The person is working in a room called «{room}»; let that colour the ideas a little.\n" if room else "")
             + "Each backdrop: name (at most five words) and words (one vivid line an image model can paint).\nAnswer with JSON only, matching the schema.")
+
+
+def style_brief(text: str, has_picture: bool) -> str:
+    """A whole new style for 哈基秀, invented from a person's words or from a picture of a look they like."""
+    source = ("the attached picture's look (its medium, palette, light and mood, never its people)" if has_picture and not text
+              else f"«{text}»" + (" (the attached picture shows the look they mean)" if has_picture else ""))
+    return (f"Invent a new art-avatar style for 哈基秀, a playful app that turns a selfie into an artistic portrait, from {source}.\n"
+            "Write name, line, hook and detail labels in Simplified Chinese as young people in Singapore and Malaysia chat: short, vivid, natural. "
+            "name: 2 to 5 characters. line: one sentence, at most 22 characters. hook: at most 9 characters.\n"
+            "prompt: in English, the instruction an image model follows to repaint a person's photo in this style: medium, palette, light, texture, "
+            "mood and setting, ending with 'Still clearly them.' Never name living artists, studios, brands or existing characters.\n"
+            "colors: the app's theme for this style as #rrggbb: bg and bg2 (the background gradient), surface (cards), ink (text, readable on surface), "
+            "soft (quiet text), accent and accent2 (highlights). dark: whether the theme is dark.\n"
+            "look: a live camera filter that hints at the style, each 0 to 1 except sat and contrast (0.5 to 1.6, 1 is neutral).\n"
+            "details: exactly eight options, two in each group (acc: an accessory, light: a lighting effect, scene: a background, frame: a border), "
+            "each with a Chinese label of 2 to 5 characters and English words for the image model.\n"
+            "Answer with JSON only, matching the schema.")

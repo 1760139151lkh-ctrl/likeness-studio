@@ -1,5 +1,5 @@
 /**
- * 镜头上的 AR 层：跟着脸走的贴纸（皇冠、猫耳、小龙头套、毛线帽、英雄头冠…）、每个风格自己的画框/HUD/粒子。
+ * 镜头上的 AR 层：跟着脸走的贴纸（皇冠、猫耳、小龙头套、斗笠、步摇…）、每个风格自己的画框/HUD/粒子。
  * 贴纸是生成的透明图（img/stickers/），画框和粒子是矢量即时绘制，所以清晰、轻量。
  */
 import { sticker } from '../core/assets.js';
@@ -7,10 +7,10 @@ import { presetById } from '../presets.js';
 
 /** 头部贴纸怎么戴：宽度（相对脸宽）、底边离发际线抬高多少（相对脸长）。 */
 const WEAR = {
-  tiara: { w: .95, lift: .1 }, 'gothic-crown': { w: 1.05, lift: .08 }, 'nailong-hood': { w: 1.5, lift: .02 }, 'cat-ears': { w: 1.45, lift: .04 },
-  'dog-ears': { w: 1.6, lift: -.06 }, beanie: { w: 1.38, lift: -.1 }, 'ultra-crest': { w: .62, lift: .02 },
-  'take-copter': { w: .5, lift: .14 }, 'magic-tiara': { w: .95, lift: .08 }, 'ninja-band': { w: 1.12, lift: -.2 },
-  'leaf-umbrella': { w: 1.55, lift: .02 }, 'cat-headset': { w: 1.7, lift: -.58 },
+  tiara: { w: .95, lift: .1 }, 'gothic-crown': { w: 1.05, lift: .08 }, 'dragon-hood': { w: 1.45, lift: -.04 }, 'cat-ears': { w: 1.45, lift: .04 },
+  'dog-ears': { w: 1.6, lift: -.06 }, beanie: { w: 1.38, lift: -.1 }, 'hero-visor': { w: 1.1, lift: -.06 }, 'robot-antenna': { w: 1.1, lift: -.04 },
+  'magic-tiara': { w: .95, lift: .08 }, 'fight-band': { w: 1.15, lift: -.2 }, 'straw-hat': { w: 1.75, lift: -.14 }, 'cat-headset': { w: 1.7, lift: -.58 },
+  douli: { w: 2, lift: -.16 }, buyao: { w: 1.05, lift: .02 }, 'flower-clip': { w: .85, lift: .02 },
 };
 const images = new Map();
 function img(/** @type {string} */ name) {
@@ -43,7 +43,6 @@ export function createOverlay(/** @type {HTMLCanvasElement} */ canvas) {
     particles(ov, t, W, H, k);
     if (face && p.live.sticker) wear(p.live.sticker, face);
     if (face && ov === 'paws') whiskers(face, k);
-    if (face && ov === 'dora') dora(face, k);
     frame(ov, face, t, W, H, k);
     x.restore();
   }
@@ -57,25 +56,7 @@ export function createOverlay(/** @type {HTMLCanvasElement} */ canvas) {
     const ax = f.top.x + up.x * f.height * how.lift, ay = f.top.y + up.y * f.height * how.lift;
     x.save();
     x.translate(ax, ay); x.rotate(f.roll);
-    if (name === 'take-copter') {   // 竹蜻蜓：叶片左右翻转，像在转
-      const spin = .25 + .75 * Math.abs(Math.cos(performance.now() / 70));
-      x.drawImage(im, 0, 0, im.naturalWidth, im.naturalHeight * .45, -w / 2 * spin, -h, w * spin, h * .45);
-      x.drawImage(im, 0, im.naturalHeight * .45, im.naturalWidth, im.naturalHeight * .55, -w / 2, -h * .55, w, h * .55);
-    } else x.drawImage(im, -w / 2, -h, w, h);
-    x.restore();
-  }
-  /** 蓝胖子：红鼻子 + 六根胡须。 */
-  function dora(/** @type {any} */ f, /** @type {number} */ k) {
-    x.save();
-    x.translate(f.nose.x, f.nose.y); x.rotate(f.roll);
-    const r = f.width * .075;
-    const g = x.createRadialGradient(-r * .3, -r * .3, r * .1, 0, 0, r); g.addColorStop(0, '#ff8a80'); g.addColorStop(1, '#d32f2f');
-    x.fillStyle = g; x.strokeStyle = '#3b1a1a'; x.lineWidth = 1.6 * k; x.beginPath(); x.arc(0, -f.height * .01, r, 0, 7); x.fill(); x.stroke();
-    x.fillStyle = 'rgba(255,255,255,.85)'; x.beginPath(); x.arc(-r * .35, -f.height * .01 - r * .35, r * .22, 0, 7); x.fill();
-    x.strokeStyle = 'rgba(30,20,20,.75)'; x.lineWidth = 2 * k; x.lineCap = 'round';
-    for (const side of [-1, 1]) for (let i = -1; i <= 1; i++) {
-      x.beginPath(); x.moveTo(side * f.width * .16, f.height * .08 + i * f.height * .04); x.lineTo(side * f.width * .44, f.height * .06 + i * f.height * .07); x.stroke();
-    }
+    x.drawImage(im, -w / 2, -h, w, h);
     x.restore();
   }
   function whiskers(/** @type {any} */ f, /** @type {number} */ k) {
@@ -93,6 +74,14 @@ export function createOverlay(/** @type {HTMLCanvasElement} */ canvas) {
   /** 画在脸后面一层的效果（漫画放射线、爆炸背光）。 */
   function behind(/** @type {string} */ ov, /** @type {any} */ f, /** @type {number} */ t, /** @type {number} */ W, /** @type {number} */ H, /** @type {number} */ k) {
     if (ov === 'aura') { aura(f, t, W, H, k); return; }
+    if (ov === 'wave' || ov === 'deco') {   // 浮世木刻：头后的朱红日轮；南洋月份牌：装饰艺术的放射光
+      const cx = f ? f.center.x : W / 2, cy = f ? f.center.y - f.height * .1 : H * .4, r = f ? f.height * .95 : H * .28;
+      x.save();
+      if (ov === 'wave') { x.fillStyle = 'rgba(200,70,44,.32)'; x.beginPath(); x.arc(cx, cy, r, 0, 7); x.fill(); }
+      else { x.strokeStyle = 'rgba(232,196,120,.35)'; x.lineWidth = 2 * k; for (let i = 0; i < 24; i++) { const a = Math.PI + (i / 23) * Math.PI; x.beginPath(); x.moveTo(cx + Math.cos(a) * r * .9, cy + Math.sin(a) * r * .9); x.lineTo(cx + Math.cos(a) * r * 2.2, cy + Math.sin(a) * r * 2.2); x.stroke(); } }
+      x.restore();
+      return;
+    }
     if (ov !== 'speed' && ov !== 'burst') return;
     const cx = f ? f.center.x : W / 2, cy = f ? f.center.y : H * .42, r0 = f ? f.height * .78 : H * .26;
     x.save();
@@ -136,16 +125,17 @@ export function createOverlay(/** @type {HTMLCanvasElement} */ canvas) {
   }
 
   function spawn(/** @type {string} */ kind, /** @type {number} */ W, /** @type {number} */ H) {
-    const up = ['hearts', 'bubbles', 'candy', 'paws', 'orbs', 'sparkle', 'stars', 'embers'].includes(kind);
+    const up = ['hearts', 'bubbles', 'candy', 'paws', 'orbs', 'sparkle', 'stars', 'embers', 'dust', 'glints', 'doodles'].includes(kind);
     bits.push({ kind, x: Math.random() * W, y: up ? H + 20 : -20, vx: (Math.random() - .5) * .4, vy: up ? -(.4 + Math.random() * .9) : (kind === 'rain' ? 9 + Math.random() * 6 : .6 + Math.random()),
       s: kind === 'rain' ? 1 : .6 + Math.random() * .8, r: Math.random() * 6, vr: (Math.random() - .5) * .02, life: 1, hue: Math.random() });
   }
   function particles(/** @type {string} */ ov, /** @type {number} */ t, /** @type {number} */ W, /** @type {number} */ H, /** @type {number} */ k) {
-    const kind = { hearts: 'hearts', bubbles: 'bubbles', candy: 'candy', paws: 'paws', orbs: 'orbs', sparkle: 'sparkle', rain: 'rain', gothic: 'petals', energy: 'sparkle', magic: 'stars', breeze: 'leaves', stream: 'hearts', dora: 'bubbles', aura: 'embers' }[ov];
+    const kind = { hearts: 'hearts', bubbles: 'bubbles', candy: 'candy', paws: 'paws', orbs: 'orbs', sparkle: 'sparkle', rain: 'rain', gothic: 'petals', energy: 'sparkle', magic: 'stars', breeze: 'leaves', stream: 'hearts', aura: 'embers',
+      robot: 'bubbles', bamboo: 'bamboo', ink: 'peach', flowers: 'peach', tarot: 'stars', hk: 'dust', deco: 'glints', doodle: 'doodles', wave: 'snow' }[ov];
     if (!kind) { bits = []; return; }
-    const want = kind === 'rain' ? 70 : kind === 'orbs' ? 10 : 14;
+    const want = kind === 'rain' ? 70 : kind === 'orbs' ? 10 : kind === 'snow' || kind === 'dust' ? 36 : 14;
     bits = bits.filter(b => b.kind === kind);
-    if (bits.length < want && Math.random() < (kind === 'rain' ? .9 : .12)) spawn(kind, W, H);
+    if (bits.length < want && Math.random() < (kind === 'rain' ? .9 : kind === 'snow' || kind === 'dust' ? .3 : .12)) spawn(kind, W, H);
     for (const b of bits) {
       b.x += b.vx * k; b.y += b.vy * k; b.r += b.vr;
       if (b.y < -60 || b.y > H + 60) b.life = 0;
@@ -159,6 +149,12 @@ export function createOverlay(/** @type {HTMLCanvasElement} */ canvas) {
       else if (kind === 'petals') { x.fillStyle = 'rgba(70,10,40,.7)'; x.beginPath(); x.ellipse(0, 0, s * .32, s * .18, 0, 0, 7); x.fill(); }
       else if (kind === 'stars') { star(s * .5, (b.hue || 0) > .5 ? '#fff6a8' : '#ffc2ef'); }
       else if (kind === 'leaves') { x.fillStyle = (b.hue || 0) > .6 ? 'rgba(120,180,90,.85)' : (b.hue || 0) > .3 ? 'rgba(230,200,120,.85)' : 'rgba(255,255,255,.8)'; if ((b.hue || 0) > .3) { x.beginPath(); x.ellipse(0, 0, s * .34, s * .14, 0, 0, 7); x.fill(); } else { x.beginPath(); x.arc(0, 0, s * .12, 0, 7); x.fill(); for (let i = 0; i < 6; i++) { x.rotate(1.047); x.fillRect(0, -.5 * k, s * .3, k); } } }
+      else if (kind === 'bamboo') { x.rotate(.6); x.fillStyle = (b.hue || 0) > .5 ? 'rgba(74,140,92,.85)' : 'rgba(46,96,64,.8)'; x.beginPath(); x.ellipse(0, 0, s * .55, s * .1, 0, 0, 7); x.fill(); }
+      else if (kind === 'peach') { x.fillStyle = (b.hue || 0) > .5 ? 'rgba(255,183,207,.9)' : 'rgba(255,214,228,.9)'; x.beginPath(); x.moveTo(0, -s * .3); x.quadraticCurveTo(s * .3, -s * .1, 0, s * .3); x.quadraticCurveTo(-s * .3, -s * .1, 0, -s * .3); x.fill(); }
+      else if (kind === 'dust') { x.fillStyle = `rgba(255,${190 + Math.round((b.hue || 0) * 50)},140,.55)`; x.beginPath(); x.arc(0, 0, s * .09, 0, 7); x.fill(); }
+      else if (kind === 'glints') { x.fillStyle = 'rgba(232,196,120,.9)'; x.beginPath(); x.moveTo(0, -s * .3); x.lineTo(s * .1, 0); x.lineTo(0, s * .3); x.lineTo(-s * .1, 0); x.closePath(); x.fill(); }
+      else if (kind === 'doodles') { x.strokeStyle = (b.hue || 0) > .5 ? 'rgba(224,122,95,.85)' : 'rgba(61,142,185,.85)'; x.lineWidth = 1.6 * k; x.beginPath(); for (let i = 0; i <= 5; i++) { const a = i * Math.PI * 4 / 5 - Math.PI / 2; x.lineTo(Math.cos(a) * s * .3, Math.sin(a) * s * .3); } x.stroke(); }
+      else if (kind === 'snow') { x.fillStyle = 'rgba(255,255,255,.85)'; x.beginPath(); x.arc(0, 0, s * .08, 0, 7); x.fill(); }
       else if (kind === 'embers') { x.fillStyle = (b.hue || 0) > .5 ? 'rgba(255,210,63,.9)' : 'rgba(255,106,26,.85)'; x.beginPath(); x.arc(0, 0, s * .1, 0, 7); x.fill(); }
       x.restore();
     }
@@ -186,7 +182,7 @@ export function createOverlay(/** @type {HTMLCanvasElement} */ canvas) {
     } else if (ov === 'gothic') {   // 暗黑哥特：银色尖拱
       x.strokeStyle = 'rgba(207,210,223,.75)'; x.lineWidth = 2.4 * k;
       x.beginPath(); x.moveTo(m, H - m); x.lineTo(m, H * .36); x.quadraticCurveTo(m, top + 10 * k, W / 2, top - 6 * k); x.quadraticCurveTo(W - m, top + 10 * k, W - m, H * .36); x.lineTo(W - m, H - m); x.stroke();
-    } else if (ov === 'energy') {   // 光之巨人：脸周围的能量环 + 胸口能量核
+    } else if (ov === 'energy') {   // 特摄英雄：脸周围的能量环 + 胸口能量核
       if (f) {
         const r = f.height * .78;
         x.strokeStyle = 'rgba(79,215,255,.85)'; x.lineWidth = 3 * k; x.shadowColor = '#4fd7ff'; x.shadowBlur = 16 * k;
@@ -229,9 +225,12 @@ export function createOverlay(/** @type {HTMLCanvasElement} */ canvas) {
     } else if (ov === 'rain') {   // 赛博霓虹：霓虹灯管框
       const g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, '#ff2bd6'); g.addColorStop(1, '#22e6ff');
       x.strokeStyle = g; x.lineWidth = 3 * k; x.shadowColor = '#ff2bd6'; x.shadowBlur = 14 * k; rr(m, top, W - m * 2, H - top - 190 * k, 22 * k); x.stroke();
-    } else if (ov === 'dots') {   // 蓝胖子：复古电视圆角框
-      x.strokeStyle = 'rgba(30,136,229,.9)'; x.lineWidth = 12 * k; rr(m, top, W - m * 2, H - top - 190 * k, 60 * k); x.stroke();
-      x.fillStyle = '#ffd23f'; for (const [px, py] of [[m + 30 * k, top + 30 * k], [W - m - 30 * k, top + 30 * k]]) { x.beginPath(); x.arc(px, py, 7 * k, 0, 7); x.fill(); }
+    } else if (ov === 'robot') {   // Q版机器人：圆角电视框 + 四颗螺丝
+      x.strokeStyle = 'rgba(56,182,255,.92)'; x.lineWidth = 12 * k; rr(m, top, W - m * 2, H - top - 190 * k, 54 * k); x.stroke();
+      for (const [px, py] of [[m + 26 * k, top + 26 * k], [W - m - 26 * k, top + 26 * k], [m + 26 * k, H - 216 * k], [W - m - 26 * k, H - 216 * k]]) {
+        x.fillStyle = '#ffd23f'; x.beginPath(); x.arc(px, py, 8 * k, 0, 7); x.fill();
+        x.strokeStyle = 'rgba(120,80,0,.7)'; x.lineWidth = 2 * k; x.beginPath(); x.moveTo(px - 4 * k, py - 4 * k); x.lineTo(px + 4 * k, py + 4 * k); x.stroke();
+      }
     } else if (ov === 'magic') {   // 魔法少女：脚下旋转的魔法阵 + 星月框
       const cx = f ? f.center.x : W / 2, cy = f ? f.chin.y + f.height * .55 : H * .7, r = (f ? f.width : W * .4) * 1.1;
       x.save(); x.translate(cx, cy); x.scale(1, .32); x.rotate(t / 1600);
@@ -253,15 +252,95 @@ export function createOverlay(/** @type {HTMLCanvasElement} */ canvas) {
       x.fillStyle = 'rgba(0,0,0,.4)'; rr(m + 64 * k, top, 86 * k, 24 * k, 6 * k); x.fill();
       x.fillStyle = '#fff'; x.fillText('👁 ' + (12800 + Math.floor((t - started) / 90)).toLocaleString(), m + 72 * k, top + 17 * k);
       x.strokeStyle = 'rgba(41,211,255,.85)'; x.shadowColor = '#29d3ff'; x.shadowBlur = 10 * k; x.lineWidth = 2.5 * k; rr(m, top + 32 * k, W - m * 2, H - top - 222 * k, 24 * k); x.stroke();
-    } else if (ov === 'dora') {   // 蓝胖子：复古电视圆角框 + 金色小铃铛
-      x.strokeStyle = 'rgba(30,136,229,.9)'; x.lineWidth = 12 * k; rr(m, top, W - m * 2, H - top - 190 * k, 60 * k); x.stroke();
-      x.fillStyle = '#ffd23f'; x.beginPath(); x.arc(W / 2, H - 190 * k + 4 * k, 12 * k, 0, 7); x.fill(); x.strokeStyle = '#8a6a00'; x.lineWidth = 2 * k; x.stroke();
-    } else if (ov === 'sparkle' && f) {   // 动漫主角：眼神光点
+    } else if ((ov === 'sparkle' || ov === 'flowers') && f) {   // 动漫主角 / 少女漫画：眼神光点
+      if (ov === 'flowers') { const g = x.createRadialGradient(W / 2, H * .45, H * .25, W / 2, H * .45, H * .7); g.addColorStop(0, 'rgba(255,200,230,0)'); g.addColorStop(1, 'rgba(255,170,215,.35)'); x.fillStyle = g; x.fillRect(0, 0, W, H); }
       const s = img('sparkle'); if (s) for (const e of [f.eyeL, f.eyeR]) { const sz = f.width * .16 * (0.8 + .2 * Math.sin(t / 200)); x.drawImage(s, e.x - sz / 2 + f.width * .05, e.y - sz / 2 - f.width * .05, sz, sz); }
+    } else if (ov === 'bamboo') {   // 武侠侠客：水墨笔触的四角 + 脚下的雾
+      inkCorners('rgba(30,40,32,.8)', m, top, W, H, k);
+      const g = x.createLinearGradient(0, H * .62, 0, H); g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(1, 'rgba(235,240,232,.45)'); x.fillStyle = g; x.fillRect(0, H * .62, W, H * .38);
+    } else if (ov === 'ink') {   // 丹青仙袂：金色祥云 + 朱红印章 + 宣纸的墨晕
+      cloudSwirl(m + 34 * k, top + 30 * k, 18 * k, k); cloudSwirl(W - m - 34 * k, top + 30 * k, 18 * k, k, -1);
+      const g = x.createLinearGradient(0, H * .7, 0, H); g.addColorStop(0, 'rgba(245,239,226,0)'); g.addColorStop(1, 'rgba(245,239,226,.5)'); x.fillStyle = g; x.fillRect(0, H * .7, W, H * .3);
+      seal(W - m - 40 * k, H - 236 * k, 30 * k);
+    } else if (ov === 'tarot') {   // 星运塔罗：金色双线卡牌框 + 顶上的月
+      x.strokeStyle = 'rgba(217,181,82,.95)'; x.shadowColor = 'rgba(243,217,138,.8)'; x.shadowBlur = 10 * k; x.lineWidth = 2.5 * k;
+      rr(m, top, W - m * 2, H - top - 190 * k, 18 * k); x.stroke(); x.lineWidth = 1 * k; rr(m + 7 * k, top + 7 * k, W - m * 2 - 14 * k, H - top - 204 * k, 12 * k); x.stroke();
+      x.fillStyle = '#f3d98a'; x.font = `${24 * k}px serif`; x.textAlign = 'center'; x.fillText('☾', W / 2, top + 30 * k);
+      x.font = `${14 * k}px serif`; for (const [px, py] of [[m + 20 * k, top + 26 * k], [W - m - 20 * k, top + 26 * k], [m + 20 * k, H - 206 * k], [W - m - 20 * k, H - 206 * k]]) x.fillText('✦', px, py);
+    } else if (ov === 'vhs') {   // 复古番剧：录像带的 PLAY、时间码和跑动的跟踪条
+      x.fillStyle = '#fff'; x.font = `${26 * k}px VT323, monospace`; x.textAlign = 'left'; x.shadowColor = '#ff4fd8'; x.shadowBlur = 0;
+      x.fillText('▶ PLAY', m + 4 * k, top + 26 * k);
+      const s2 = Math.floor((t - started) / 1000); x.fillText('SP ' + String(Math.floor(s2 / 60)).padStart(2, '0') + ':' + String(s2 % 60).padStart(2, '0'), m + 4 * k, H - 210 * k);
+      const band = ((t / 9) % (H + 80 * k)) - 40 * k; const g = x.createLinearGradient(0, band - 30 * k, 0, band + 30 * k);
+      g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(.5, 'rgba(255,255,255,.12)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, band - 30 * k, W, 60 * k);
+    } else if (ov === 'hk') {   // 港风电影：一角的暖色漏光 + 两侧红绿霓虹
+      const pulse = .75 + .25 * Math.sin(t / 900);
+      let g = x.createRadialGradient(W, top, 0, W, top, W * .9); g.addColorStop(0, `rgba(255,140,60,${.38 * pulse})`); g.addColorStop(1, 'rgba(255,140,60,0)'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+      g = x.createLinearGradient(0, 0, W * .25, 0); g.addColorStop(0, 'rgba(232,67,79,.28)'); g.addColorStop(1, 'rgba(232,67,79,0)'); x.fillStyle = g; x.fillRect(0, 0, W * .25, H);
+      g = x.createLinearGradient(W, 0, W * .75, 0); g.addColorStop(0, 'rgba(63,208,160,.22)'); g.addColorStop(1, 'rgba(63,208,160,0)'); x.fillStyle = g; x.fillRect(W * .75, 0, W * .25, H);
+    } else if (ov === 'gilt') {   // 古典油画：鎏金画框
+      const g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, '#f3d48a'); g.addColorStop(.5, '#a07a2c'); g.addColorStop(1, '#f0cf7e');
+      x.strokeStyle = g; x.lineWidth = 14 * k; rr(m, top, W - m * 2, H - top - 190 * k, 4 * k); x.stroke();
+      x.strokeStyle = 'rgba(80,55,15,.85)'; x.lineWidth = 2 * k; rr(m + 9 * k, top + 9 * k, W - m * 2 - 18 * k, H - top - 208 * k, 2 * k); x.stroke();
+    } else if (ov === 'doodle') {   // 绘本水彩：会「抖」的手绘边框（像手绘动画的线）
+      const seed = Math.floor(t / 160); x.strokeStyle = 'rgba(59,49,39,.75)'; x.lineWidth = 2.4 * k; x.lineJoin = 'round';
+      wobble(m, top, W - m * 2, H - top - 190 * k, seed, k);
+    } else if (ov === 'pop') {   // 波普艺术：角落的网点 + 开场的 POP!
+      for (const [ox, oy, sx, sy] of [[0, top - 20 * k, 1, 1], [W, H - 190 * k, -1, -1]]) for (let i = 0; i < 9; i++) for (let j = 0; j < 9 - i; j++) {
+        x.fillStyle = 'rgba(255,45,111,.55)'; x.beginPath(); x.arc(ox + sx * (i * 14 + 8) * k, oy + sy * (j * 14 + 8) * k, (5 - (i + j) * .45) * k, 0, 7); x.fill();
+      }
+      if (t - started < 2600) { const sc = Math.min(1, (t - started) / 220); x.save(); x.translate(W - m - 70 * k, top + 70 * k); x.rotate(-.2); x.scale(sc, sc); burstStar(46 * k, '#ffe14d'); x.fillStyle = '#111'; x.font = `900 ${26 * k}px system-ui, sans-serif`; x.textAlign = 'center'; x.fillText('POP!', 0, 9 * k); x.restore(); }
+    } else if (ov === 'wave') {   // 浮世木刻：底部的青海波
+      x.strokeStyle = 'rgba(43,76,126,.55)'; x.lineWidth = 2 * k; const r0 = 22 * k, yb = H - 190 * k;
+      for (let row = 0; row < 3; row++) for (let cx2 = -r0 + (row % 2) * r0; cx2 < W + r0; cx2 += r0 * 2) for (const rr2 of [r0, r0 * .7, r0 * .4]) { x.beginPath(); x.arc(cx2, yb - row * r0 * .6 + r0, rr2, Math.PI, 0); x.stroke(); }
+    } else if (ov === 'deco') {   // 南洋月份牌：装饰艺术的阶梯角框
+      x.strokeStyle = 'rgba(184,70,58,.85)'; x.lineWidth = 2.5 * k; rr(m, top, W - m * 2, H - top - 190 * k, 6 * k); x.stroke();
+      x.strokeStyle = 'rgba(62,138,126,.85)'; x.lineWidth = 1.5 * k;
+      for (const [cx2, cy2, sx, sy] of [[m, top, 1, 1], [W - m, top, -1, 1], [m, H - 190 * k, 1, -1], [W - m, H - 190 * k, -1, -1]]) for (let i = 1; i <= 3; i++) { x.beginPath(); x.moveTo(cx2 + sx * i * 9 * k, cy2 + sy * 40 * k); x.lineTo(cx2 + sx * i * 9 * k, cy2 + sy * i * 9 * k); x.lineTo(cx2 + sx * 40 * k, cy2 + sy * i * 9 * k); x.stroke(); }
+    } else if (ov === 'tiles') {   // 娘惹风华：一圈娘惹花砖
+      const sz = 26 * k, cols = ['#e05a7a', '#2ea39b', '#f2c14e'];
+      const tile = (/** @type {number} */ px, /** @type {number} */ py, /** @type {number} */ i) => { x.fillStyle = 'rgba(255,255,255,.88)'; x.fillRect(px, py, sz, sz); x.fillStyle = cols[i % 3]; x.beginPath(); x.arc(px + sz / 2, py + sz / 2, sz * .28, 0, 7); x.fill(); x.fillStyle = cols[(i + 1) % 3]; for (const [dx, dy] of [[0, 0], [1, 0], [0, 1], [1, 1]]) { x.beginPath(); x.arc(px + dx * sz, py + dy * sz, sz * .22, 0, 7); x.fill(); } };
+      let i = 0; for (let px = 0; px < W; px += sz) tile(px, top - 22 * k, i++);
+      for (let py = top - 22 * k + sz; py < H - 190 * k; py += sz) { tile(0, py, i++); tile(W - sz, py, i++); }
     } else if (ov === 'bubbles' || ov === 'candy' || ov === 'paws') {   // 贴纸白边感：粗圆角描边
       x.strokeStyle = 'rgba(255,255,255,.9)'; x.lineWidth = 8 * k; rr(m, top, W - m * 2, H - top - 190 * k, 34 * k); x.stroke();
     }
     x.restore();
+  }
+  /** 水墨笔触的角：粗起细收。 */
+  function inkCorners(/** @type {string} */ col, /** @type {number} */ m, /** @type {number} */ top, /** @type {number} */ W, /** @type {number} */ H, /** @type {number} */ k) {
+    const b = H - 190 * k; x.fillStyle = col;
+    for (const [cx, cy, sx, sy] of [[m, top, 1, 1], [W - m, top, -1, 1], [m, b, 1, -1], [W - m, b, -1, -1]]) {
+      x.beginPath(); x.moveTo(cx, cy + sy * 70 * k); x.quadraticCurveTo(cx - sx * 3 * k, cy, cx + sx * 70 * k, cy - sy * 2 * k); x.lineTo(cx + sx * 64 * k, cy + sy * 3 * k); x.quadraticCurveTo(cx + sx * 6 * k, cy + sy * 5 * k, cx + sx * 4 * k, cy + sy * 70 * k); x.closePath(); x.fill();
+    }
+  }
+  /** 金色祥云：一个回卷的涡纹。 */
+  function cloudSwirl(/** @type {number} */ cx, /** @type {number} */ cy, /** @type {number} */ r, /** @type {number} */ k, dir = 1) {
+    x.save(); x.strokeStyle = 'rgba(184,145,58,.9)'; x.lineWidth = 2.2 * k; x.lineCap = 'round'; x.beginPath();
+    for (let a = 0; a < Math.PI * 3.2; a += .15) { const rr3 = r * (1 - a / (Math.PI * 3.6)); x.lineTo(cx + dir * Math.cos(a) * rr3, cy + Math.sin(a) * rr3); }
+    x.stroke(); x.beginPath(); x.arc(cx + dir * r * 1.5, cy + r * .4, r * .55, Math.PI, Math.PI * 2.2); x.stroke(); x.restore();
+  }
+  /** 朱红印章「秀」。 */
+  function seal(/** @type {number} */ px, /** @type {number} */ py, /** @type {number} */ s) {
+    x.save(); x.fillStyle = 'rgba(200,55,45,.92)'; rr(px, py, s, s, s * .12); x.fill();
+    x.strokeStyle = 'rgba(255,245,232,.7)'; x.lineWidth = s * .05; rr(px + s * .1, py + s * .1, s * .8, s * .8, s * .08); x.stroke();
+    x.fillStyle = '#fff5e8'; x.font = `700 ${s * .62}px "STKaiti","KaiTi","Noto Serif SC",serif`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('秀', px + s / 2, py + s * .54); x.restore();
+  }
+  /** 手绘的抖动框：每隔一小会儿换一次抖动，像逐帧手绘的线。 */
+  function wobble(/** @type {number} */ X, /** @type {number} */ Y, /** @type {number} */ w, /** @type {number} */ h, /** @type {number} */ seed, /** @type {number} */ k) {
+    const j = (/** @type {number} */ i) => (Math.sin(i * 12.9898 + seed * 78.233) * 43758.5453 % 1) * 3 * k;
+    const pts = []; const n = 14;
+    for (let i = 0; i <= n; i++) pts.push([X + w * i / n + j(i), Y + j(i + 50)]);
+    for (let i = 1; i <= n; i++) pts.push([X + w + j(i + 100), Y + h * i / n + j(i + 150)]);
+    for (let i = 1; i <= n; i++) pts.push([X + w - w * i / n + j(i + 200), Y + h + j(i + 250)]);
+    for (let i = 1; i < n; i++) pts.push([X + j(i + 300), Y + h - h * i / n + j(i + 350)]);
+    x.beginPath(); pts.forEach(([px, py], i) => (i ? x.lineTo(px, py) : x.moveTo(px, py))); x.closePath(); x.stroke();
+  }
+  /** 漫画爆炸星。 */
+  function burstStar(/** @type {number} */ r, /** @type {string} */ col) {
+    x.fillStyle = col; x.strokeStyle = '#111'; x.lineWidth = 3; x.beginPath();
+    for (let i = 0; i < 24; i++) { const a = i * Math.PI / 12, d = i % 2 ? r * .62 : r; x.lineTo(Math.cos(a) * d, Math.sin(a) * d); }
+    x.closePath(); x.fill(); x.stroke();
   }
   function rr(/** @type {number} */ X, /** @type {number} */ Y, /** @type {number} */ w, /** @type {number} */ h, /** @type {number} */ r) { x.beginPath(); x.roundRect(X, Y, w, h, r); }
   function arch(/** @type {number} */ X, /** @type {number} */ Y, /** @type {number} */ w, /** @type {number} */ h) {

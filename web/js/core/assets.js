@@ -30,7 +30,7 @@ export function cover(/** @type {string} */ preset, size = 'm') {
   const who = p && hasArt(preset, p.hero) ? p.hero : 'mei';
   return { art: styleArt(preset, who, size), before: personArt(who, 'm'), who };
 }
-/** 首屏引导与轮播图标统一用同一张脸（mei）贯穿所有风格，「同一个人，十七个世界」一眼就懂。 */
+/** 首屏引导与轮播图标统一用同一张脸（mei）贯穿所有风格，「同一个人，三十多个世界」一眼就懂。 */
 export const icon = (/** @type {string} */ preset) => styleArt(preset, hasArt(preset, 'mei') ? 'mei' : (presetById(preset)?.hero || 'mei'), 't');
 export const samples = () => manifest.people.length ? manifest.people : ['mei', 'aiman', 'priya', 'jun', 'nur', 'kai'];
 /** 这个风格有哪些人的样张。 */

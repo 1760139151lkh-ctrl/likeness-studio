@@ -113,3 +113,12 @@ def test_a_burst_of_wrong_passwords_is_slowed_down(tmp_path):
         c.get("/")
         codes = [c.post("/api/auth/login", json={"handle": "ghost", "password": "wrong-one"}).status_code for _ in range(9)]
         assert codes[:8] == [401] * 8 and codes[8] == 429
+
+
+def test_threads_and_invented_styles_are_kept_in_the_private_space(client):
+    """对话微调的记录和自创风格也跟着账号走：刷新、换设备都还在。"""
+    rec = [{"coll": "threads", "id": "s1", "data": {"id": "s1", "messages": [{"me": True, "text": "蝴蝶结换成红色"}]}, "updated": 1},
+           {"coll": "styles", "id": "my-abc", "data": {"id": "my-abc", "custom": True, "name": "星河糖果"}, "updated": 1}]
+    assert client.post("/api/sync", json={"records": rec}).json()["applied"] == 2
+    got = {r["coll"] for r in client.get("/api/sync?cursor=0").json()["records"]}
+    assert {"threads", "styles"} <= got

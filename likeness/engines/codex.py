@@ -552,6 +552,10 @@ class Codex:
     def look(self, ask: LookAsk, picture: Path | None) -> dict:
         return self.ask(brief.look_brief(ask.text, picture is not None), LOOK_SCHEMA, picture)
 
+    def style(self, ask, picture: Path | None) -> dict:
+        from ..rooms import STYLE_SCHEMA
+        return self.ask(brief.style_brief(ask.text, picture is not None), STYLE_SCHEMA, picture)
+
     def backdrops(self, ask: BackdropAsk, picture: Path | None) -> list[dict]:
         return self.ask(brief.backdrops_brief(ask.text, ask.near, ask.dream, ask.room, picture is not None), BACKDROPS_SCHEMA, picture).get("backdrops") or []
 
