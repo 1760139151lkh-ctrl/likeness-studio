@@ -1,0 +1,44 @@
+# Packet 0005: install 哈基秀 on this computer and make it the owner's own website (phones included), with GPT Image
+# through the owner's OpenAI API key.  Run with   uv run likeness relay run 0005
+# The stages are the mechanical part. PROMPT.md is the whole job: the key, the website, the phone, the report.
+id = "0005-website"
+title = "Install 哈基秀 here and make it your own website on your phone, with your OpenAI API key"
+
+[[stage]]
+id = "sync"           # Python 3.12 and the server's packages, exactly as locked
+run = ["uv", "sync", "--locked"]
+timeout = 900
+
+[[stage]]
+id = "pytest"         # about 70 tests; nothing reaches the network, no key is used
+run = ["uv", "run", "pytest", "-q"]
+timeout = 900
+
+[[stage]]
+id = "npm"            # the bundler and the browser-test tools
+run = ["npm", "ci"]
+timeout = 900
+
+[[stage]]
+id = "build"          # the app's scripts in one file (the server picks it up by itself)
+run = ["npm", "run", "build"]
+timeout = 300
+expect = ["workstation/bundle/studio.js"]
+
+[[stage]]
+id = "key"            # the key in .env.local works and may use the models in studio.toml: GET /models, free, makes nothing
+run = ["uv", "run", "likeness", "probe", "openai", "--out", "relay/0005-website/out/key.json"]
+timeout = 120
+expect = ["relay/0005-website/out/key.json"]
+
+[[stage]]
+id = "browsers"       # Playwright's Chromium, for the browser tests below (about 150 MB, once)
+run = ["npx", "playwright", "install", "chromium"]
+timeout = 1200
+gate = false
+
+[[stage]]
+id = "browser"        # the app in Chromium against the static showcase and the simulator (about five minutes)
+run = ["npm", "test"]
+timeout = 1800
+gate = false

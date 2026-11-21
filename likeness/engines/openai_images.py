@@ -311,3 +311,47 @@ class OpenAIImages:
 
     def backdrops(self, ask: BackdropAsk, picture: Path | None) -> list[dict]:
         return self._words(brief.backdrops_brief(ask.text, ask.near, ask.dream, ask.room, picture is not None), BACKDROPS_SCHEMA, picture).get("backdrops") or []
+
+
+# ---- likeness probe openai ----
+PROBLEMS = {
+    401: "Key 无效、已删除或已过期（401）：换一个新 Key 放进 .env.local，再重启服务。",
+    403: "这个 Key 没有权限（403）：检查 OpenAI 项目 / 组织对这个 Key 的限制。",
+    429: "额度用完或被限流（429）：到 OpenAI 后台看看余额和每月预算上限。",
+}
+
+
+def probe(config: dict | None = None) -> dict:
+    """Is the key here and good, and may it use the models this studio asks for? GET /models costs nothing and makes
+    nothing. The report says only whether a key was found, never the key itself."""
+    config = dict(config or {})
+    base = (os.environ.get("OPENAI_BASE_URL") or config.get("base_url") or "https://api.openai.com/v1").rstrip("/")
+    key = _key(config)
+    paces = {name: {**DEFAULT_PACES[name], **(config.get("pace", {}).get(name) or {})} for name in PACES}
+    images = sorted({str(p["model"]) for p in paces.values() if p.get("model")})
+    text = str(config.get("text_model") or "gpt-5.4-mini")
+    report: dict = {"engine": "openai", "base": base, "key": "found" if key else "missing", "image_models": {}, "text_model": {}, "ok": False}
+    if not key:
+        report["problem"] = "没找到 OPENAI_API_KEY：在仓库根目录的 .env.local 里写一行 OPENAI_API_KEY=...（git 会忽略这个文件）。"
+        return report
+    request = urllib.request.Request(base + "/models", headers={"Authorization": f"Bearer {key}", "Accept": "application/json"})
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            listed = {str(m.get("id")) for m in json.loads(response.read().decode("utf-8")).get("data", []) if isinstance(m, dict)}
+    except urllib.error.HTTPError as error:
+        report["status"] = error.code
+        report["problem"] = PROBLEMS.get(error.code, f"OpenAI 回了 {error.code}，稍后再试。")
+        return report
+    except (urllib.error.URLError, TimeoutError, socket.timeout, OSError, ValueError):
+        report["problem"] = "连不上 OpenAI：检查这台电脑的网络；要走代理或别的地址时设置 OPENAI_BASE_URL。"
+        return report
+    # some gateways do not list models: then nothing can be checked, and nothing is held against the key
+    report["image_models"] = {m: (m in listed) if listed else None for m in images}
+    report["text_model"] = {text: (text in listed) if listed else None}
+    missing = [m for m, ok in report["image_models"].items() if ok is False]
+    report["ok"] = not missing
+    if missing:
+        report["problem"] = "这个 Key 用不了 " + "、".join(missing) + "：在 private/studio.toml 的 [openai.pace.*] 里换成它能用的型号。"
+    elif report["text_model"].get(text) is False:
+        report["note"] = f"这个 Key 用不了文字模型 {text}：出图照常，每一步的回复改用本地的口吻。"
+    return report

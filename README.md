@@ -33,7 +33,9 @@ uv run likeness serve --engine simulator
 npm run serve              # http://127.0.0.1:4173/
 ```
 
-手机访问：`uv run likeness serve --host 0.0.0.0` 会打印同一 Wi-Fi 下的配对二维码。手机浏览器只在 HTTPS 下开放摄像头，用 `--cert/--key` 提供证书（例如 mkcert）。上线前 `npm run build` 生成打包后的脚本，服务器会自动使用。
+**做成自己的网站、手机随时用（交给 Codex 安装）**：照 [`relay/0005-website/PROMPT.md`](relay/0005-website/PROMPT.md) 做。Key 放 `.env.local`，`uv run likeness probe openai` 免费检查 Key；Cloudflare Tunnel 提供 https 网址；owner link 模式（`uv run likeness link`）保证只有你自己的设备进得来。
+
+同一 Wi-Fi 下临时试用：`uv run likeness serve --host 0.0.0.0` 会打印配对二维码。手机浏览器只在 HTTPS 下开放摄像头，用 `--cert/--key` 提供证书（例如 mkcert）。上线前 `npm run build` 生成打包后的脚本，服务器会自动使用。
 
 ## 画质与速度（GPT Image，实测）
 
@@ -85,7 +87,7 @@ GET  /api/sync?cursor=N · POST /api/sync      作品/原图/收藏/草稿/偏�
 ## 测试与验收
 
 ```sh
-uv run pytest              # 62 项：生成协议、部位遮罩与合成、回复与灵感、OpenAI 引擎（本地假 API）、账号隔离、注册原地升级、登录归属、同步游标、限流
+uv run pytest              # 71 项：网站模式的访问控制与 Key 检查、生成协议、部位遮罩与合成、回复与灵感、OpenAI 引擎（本地假 API）、账号隔离、注册原地升级、登录归属、同步游标、限流
 npm run check              # 前端类型检查
 npm test                   # Playwright 18 项：静态演示版 + 模拟引擎服务器，使用 tests/fixtures/camera/selfie.mjpeg 作为假摄像头
 npm run accept             # 验收：Chromium + iPhone 13（WebKit）。零跳动、两种键盘行为、安全区、33 个风格卡与全部细节、

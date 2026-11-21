@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import socket
 import sys
 from pathlib import Path
@@ -49,7 +50,9 @@ def serve(args) -> int:
     local = f"{scheme}://127.0.0.1:{args.port}/"
     honest = "  (every picture is a stand-in, stamped as one)" if engine.kind == "simulator" else ""
     print(f"\n  哈基秀 {__version__}  ·  {engine.describe()['label']}{honest}\n\n  On this machine   {local}\n")
-    if args.host not in {"localhost", "127.0.0.1", "::1"}:
+    if os.environ.get("LIKENESS_OWNER_LINK") == "1":
+        print("  Owner link mode: only browsers that have opened your private link come in (likeness link prints it).\n")
+    elif args.host not in {"localhost", "127.0.0.1", "::1"}:
         phone = f"{scheme}://{_lan_address()}:{args.port}/?pair={pairing_key(home)}"
         print(f"  On your phone     {phone}\n")
         try:
@@ -62,6 +65,36 @@ def serve(args) -> int:
     print("  Ctrl+C stops the studio.\n", flush=True)
     tls = {"ssl_certfile": args.cert, "ssl_keyfile": args.key} if scheme == "https" else {}
     uvicorn.run(app, host=args.host, port=args.port, log_level="warning", access_log=False, **tls)
+    return 0
+
+
+def link(args) -> int:
+    """Owner link mode, for the studio as a website: only browsers that have opened this private link come in.
+    Makes the secret on first use (under the private folder, which git ignores) and prints the link."""
+    import secrets
+
+    from .server import owner_link_token, owner_secret_path
+
+    path = owner_secret_path() or paths.home() / "owner.secret"
+    made = args.new or not path.is_file()
+    if made:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(secrets.token_urlsafe(48), encoding="utf-8")
+        try:
+            path.chmod(0o600)
+        except OSError:
+            pass
+    token = owner_link_token(path.read_bytes().strip())
+    base = (args.base or "https://<your-site>").rstrip("/")
+    try:
+        shown = path.relative_to(paths.ROOT).as_posix()
+    except ValueError:
+        shown = str(path)
+    print(("\n  A new secret: " if made else "\n  Secret: ") + shown + "  (keep it private; never commit it)")
+    if os.environ.get("LIKENESS_OWNER_LINK") != "1" or owner_secret_path() is None:
+        print("\n  Turn owner link mode on: put these two lines in .env.local, then restart  likeness serve\n"
+              f"    LIKENESS_OWNER_LINK=1\n    LIKENESS_OWNER_SECRET_FILE={shown}")
+    print(f"\n  Your private link (open it once on each phone or computer; anyone holding it can use your key):\n\n    {base}/open/{token}\n")
     return 0
 
 
@@ -84,9 +117,13 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--key", default="", help="the certificate's private key (PEM)")
 
     p = sub.add_parser("probe", help="check an engine on this machine")
-    p.add_argument("engine", choices=["codex"])
+    p.add_argument("engine", choices=["codex", "openai"])
     p.add_argument("--smoke", action="store_true", help="also make pictures through the real engine and time them")
     p.add_argument("--out", help="write the report here too (pictures go beside it)")
+
+    p = sub.add_parser("link", help="your private access link to the studio as a website (owner link mode)")
+    p.add_argument("--base", default="", help="the website's address, e.g. https://studio.example.com")
+    p.add_argument("--new", action="store_true", help="make a new secret: every device must open the new link again")
 
     p = sub.add_parser("relay", help="run a relay packet")
     p.add_argument("action", choices=["run", "pending"])
@@ -101,11 +138,20 @@ def main(argv: list[str] | None = None) -> int:
         return serve(args)
     if args.command == "probe":
         from . import settings
+
+        if args.engine == "openai":
+            from .engines import openai_images
+
+            report = openai_images.probe(settings.load().get("openai", {}))
+            _write(report, args.out)
+            return 0 if report["ok"] else 1
         from .engines import codex
 
         report = codex.probe(settings.load().get("codex", {}), smoke=args.smoke, out=Path(args.out).parent if args.out else None)
         _write(report, args.out)
         return 0 if report["ok"] else 1
+    if args.command == "link":
+        return link(args)
     from . import relay
 
     if args.action == "pending":

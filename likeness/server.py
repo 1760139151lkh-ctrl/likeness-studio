@@ -160,6 +160,16 @@ def app_shell(builds: dict[str, str], bundled: bool) -> str:
     return template.replace("<!-- studio-state -->", support + "<!-- studio-state -->", 1)
 
 
+def owner_secret_path() -> Path | None:
+    """LIKENESS_OWNER_SECRET_FILE, a relative path read from the repository's root (so it works whatever folder the
+    studio is started from)."""
+    raw = os.environ.get("LIKENESS_OWNER_SECRET_FILE", "").strip()
+    if not raw:
+        return None
+    path = Path(raw).expanduser()
+    return path if path.is_absolute() else paths.ROOT / path
+
+
 def owner_link_token(secret: bytes) -> str:
     return hmac.new(secret, b"likeness-owner-open-v1", hashlib.sha256).hexdigest()
 
@@ -188,7 +198,7 @@ def create_app(engine: engines.Engine | None = None, home: Path | None = None, o
     home.mkdir(parents=True, exist_ok=True)
     config = settings.load(home) if config is None else config
     engine = engine or engines.create(os.environ.get("LIKENESS_ENGINE") or config["studio"].get("engine", "auto"), config, home)
-    owner_file = os.environ.get("LIKENESS_OWNER_SECRET_FILE")
+    owner_file = owner_secret_path()
     link_only = os.environ.get("LIKENESS_OWNER_LINK") == "1"
     if link_only and not owner_file:
         raise ValueError("Passwordless owner access requires a local owner secret file.")

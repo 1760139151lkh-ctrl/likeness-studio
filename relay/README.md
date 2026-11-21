@@ -17,7 +17,7 @@ relay/NNNN-slug/
 1. A packet is written and pushed.
 2. On the workstation the user opens Codex and says:
 
-   > Clone https://github.com/1760139151lkh-ctrl/likeness-studio (or use the copy already here), switch to the studio branch, and carry out relay/START.md.
+   > Clone https://github.com/1760139151lkh-ctrl/likeness-studio (or use the copy already here), switch to the hajixiu branch, and carry out relay/0005-website/PROMPT.md.
 
 3. Codex follows the prompt. The mechanical part is one command, `uv run likeness relay run <id>`. It runs the stages in order, stops at the first failed gate, and writes everything down in `out/`.
 4. Codex fixes what it finds, commits and pushes the code, and leaves `REPORT.md` for the user.
@@ -26,7 +26,8 @@ relay/NNNN-slug/
 
 | Packet | What it is for |
 |---|---|
-| `0003-codex-studio` | Wire the Codex engine to the workstation, prove every flow end to end with real pictures, calibrate time estimates, polish what real use reveals, and connect the phone last. A one-shot hand-off. |
+| `0005-website` | **Current.** Install 哈基秀 on the owner's computer, make real pictures with the owner's OpenAI API key, and put it online as the owner's own https website (Cloudflare Tunnel, owner link mode), checked on the phone. |
+| `0003-codex-studio` | Historical: the earlier architecture, where Codex CLI on the workstation made the pictures. |
 
 ## The runner
 
