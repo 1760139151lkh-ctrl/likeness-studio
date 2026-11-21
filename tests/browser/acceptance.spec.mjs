@@ -106,11 +106,12 @@ for (const [w, h] of [[390, 844], [360, 640], [1280, 800]]) {
       const r = (/** @type {string} */ s) => document.querySelector(s)?.getBoundingClientRect();
       return [r('.tpanel')?.height, r('.frame__fit')?.height, (r('.frame__fit')?.top || 0) - base, (r('.tpanel')?.top || 0) - base].map(v => Math.round(v || 0));
     });
-    /** 动画（面板滑出、照片让位）走完后的样子。 */
+    /** 动画（面板滑出、照片让位）走完后的样子：没有还在跑的过渡动画，并且连着两次量都一样。 */
     const settled = async () => {
+      await page.waitForFunction(() => !document.getAnimations().some(a => a instanceof CSSTransition && a.playState === 'running'), null, { timeout: 10000 }).catch(() => {});
       let last = await measure();
       for (let i = 0; i < 30; i++) {
-        await page.waitForTimeout(150);
+        await page.waitForTimeout(200);
         const now = await measure();
         if (JSON.stringify(now) === JSON.stringify(last)) return now;
         last = now;
@@ -130,21 +131,22 @@ for (const [w, h] of [[390, 844], [360, 640], [1280, 800]]) {
 test('软键盘弹出：布局不被顶崩，输入框始终可见', async ({ page }) => {
   await useSample(page, 1);
   const stageH = await page.locator('#stage').evaluate(el => el.getBoundingClientRect().height);
+  const screen = /** @type {{ width: number, height: number }} */ (page.viewportSize()), KB = 320, top = screen.height - KB;
   /** 两种浏览器：旧式（整个视口缩小）与新式（interactive-widget=resizes-visual，只缩可见区域）。 */
   const check = async (/** @type {string} */ field, /** @type {'layout' | 'visual'} */ how) => {
     await page.locator(field).focus();
     await page.waitForTimeout(200);
-    if (how === 'layout') await page.setViewportSize({ width: 390, height: 844 - 320 });
-    else await keyboardUp(page, 320);
+    if (how === 'layout') await page.setViewportSize({ width: screen.width, height: top });
+    else await keyboardUp(page, KB);
     await page.waitForTimeout(600);
     const after = await page.locator('#stage').evaluate(el => el.getBoundingClientRect().height);
     expect(after, '舞台高度保持不变，键盘盖在上面而不是把页面挤扁').toBeGreaterThanOrEqual(stageH - 1);
     const rect = () => page.locator(field).evaluate(el => el.getBoundingClientRect().toJSON());
-    await expect.poll(async () => (await rect()).bottom, { message: field + ' 在键盘上方', timeout: 4000 }).toBeLessThanOrEqual(844 - 320 + 1);
+    await expect.poll(async () => (await rect()).bottom, { message: field + ' 在键盘上方', timeout: 4000 }).toBeLessThanOrEqual(top + 1);
     expect((await rect()).top, field + ' 没被顶出屏幕').toBeGreaterThanOrEqual(0);
     expect(await page.evaluate(() => document.scrollingElement.scrollWidth <= innerWidth + 1)).toBe(true);
     await expect(page.locator('.screen:not([hidden]) .bar').first(), '顶栏还在原处').toBeInViewport();
-    if (how === 'layout') await page.setViewportSize({ width: 390, height: 844 });
+    if (how === 'layout') await page.setViewportSize(screen);
     else await keyboardDown(page);
     await page.locator(field).blur();
     await page.waitForTimeout(400);

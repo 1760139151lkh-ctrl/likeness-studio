@@ -10,7 +10,7 @@ import { works, favs, pref, setPref, resultUrl, switchAccount, sync, exportBacku
 import { download } from '../core/image.js';
 import { persisted, durable } from '../core/db.js';
 import { topBar } from '../ui/parts.js';
-import { sheet } from '../ui/sheet.js';
+import { sheet, focusSoon } from '../ui/sheet.js';
 import { T } from '../copy.js';
 
 export function meScreen() {
@@ -83,7 +83,7 @@ export function meScreen() {
     h('p.auth__note', null, mode === 'signup' ? '注册后，你现在的作品和记录会直接归到新账号里。' : '登录后，这台设备上的访客作品会自动归到你的账号。'),
     h('button.auth__switch', { type: 'button', onclick: () => { close(); setTimeout(() => authBox(mode === 'signup' ? 'login' : 'signup'), 280); } }, mode === 'signup' ? '已有账号？去登录' : '还没账号？注册一个'));
     const { close } = sheet(() => [form], { title: mode === 'signup' ? '注册哈基秀' : '登录哈基秀', cls: 'sheet--top' });
-    setTimeout(() => handle.focus({ preventScroll: true }), 120);
+    focusSoon(handle);
   }
   /** 我的口味：每次出片都会带上的长期偏好（旧版 Rooms 的 taste note）。 */
   function tasteBox() {
@@ -96,7 +96,7 @@ export function meScreen() {
         h('button.btn.btn--ghost', { type: 'button', onclick: () => { setPref('taste', ''); c(); paint(); toast('已清空我的口味'); } }, '清空'),
         h('button.btn.btn--main', { type: 'button', onclick: () => { setPref('taste', field.value.trim().slice(0, 200)); c(); paint(); toast('记住了，之后每张都会照着来', { tone: 'ok' }); } }, '记住'))], { title: '我的口味', cls: 'sheet--top' });
     void close;
-    setTimeout(() => field.focus({ preventScroll: true }), 120);
+    focusSoon(field);
   }
   /** 备份：整个私人空间打包成一个文件（作品、原图、收藏、草稿、偏好、自创风格）。 */
   async function backupNow() {
@@ -121,7 +121,7 @@ export function meScreen() {
       try { const r = await rename(field.value); studio.account = r.account; c(); paint(); toast('改好了'); } catch (e) { toast(/** @type {any} */ (e)?.message || '没改成'); }
     } }, T.done))], { title: '改昵称', cls: 'sheet--top' });
     void close;
-    setTimeout(() => field.focus({ preventScroll: true }), 120);
+    focusSoon(field);
   }
   async function doLogout() {
     await sync().catch(() => {});

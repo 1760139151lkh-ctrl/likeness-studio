@@ -24,6 +24,37 @@ import { meScreen } from './screens/me.js';
 import { onboard } from './screens/onboard.js';
 import { watchKeyboard } from './core/keyboard.js';
 
+// 页面要走了（刷新、跳到别处）：还没下载完的东西（例如认脸模型）会被浏览器取消，Safari 会把这报成一个错误。
+// 这时候的错误不是错误，不往控制台报；三秒后还没走（例如只是唤起了别的 App），恢复正常。
+let leaving = false;
+const leave = () => { leaving = true; setTimeout(() => { leaving = false; }, 3000); };
+addEventListener('pagehide', leave);
+addEventListener('beforeunload', leave);
+addEventListener('pageshow', () => { leaving = false; });
+addEventListener('unhandledrejection', e => { if (leaving) e.preventDefault(); });
+addEventListener('error', e => { if (leaving) e.preventDefault(); });
+// 认脸模型下载到一半页面走了：Safari 掐断下载后，模型加载器会换一种方式再下一次，而页面卸载时这一下必然被拦下，
+// 还会在控制台留下一条错误。所以页面在走的时候，模型文件的下载失败就停在那儿（不报错、不重试），反正这一页马上就没了。
+{
+  const realFetch = window.fetch.bind(window);
+  const hang = () => new Promise(() => {});
+  window.fetch = async (input, init) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+    if (!url.includes('/vendor/mediapipe/')) return realFetch(input, init);
+    let res;
+    try { res = await realFetch(input, init); } catch (err) { if (leaving) return hang(); throw err; }
+    if (!res.body) return res;
+    const reader = res.body.getReader();
+    return new Response(new ReadableStream({
+      async pull(ctrl) {
+        try { const { done, value } = await reader.read(); if (done) ctrl.close(); else ctrl.enqueue(value); }
+        catch (err) { if (leaving) return hang(); ctrl.error(err); }
+      },
+      cancel: reason => reader.cancel(reason),
+    }), { status: res.status, statusText: res.statusText, headers: res.headers });
+  };
+}
+
 await Promise.all([connect(), loadManifest(), ready()]);
 await boot();
 const stage = /** @type {HTMLElement} */ (document.getElementById('stage'));

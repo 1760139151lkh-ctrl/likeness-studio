@@ -2,7 +2,11 @@
 <html lang="zh-SG">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-visual">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+  /* 软键盘只缩可见区、不缩布局（安卓 Chrome / Firefox 要这样写明）。Safari 本来就是这样，但不认识这个写法、会在控制台报一条错，所以不给它加。 */
+  if (navigator.vendor !== 'Apple Computer, Inc.') document.querySelector('meta[name="viewport"]').content += ', interactive-widget=resizes-visual';
+</script>
 <meta name="theme-color" content="#0d0a1a">
 <meta name="color-scheme" content="light dark">
 <title>哈基秀 · 一张自拍，秒变艺术头像</title>

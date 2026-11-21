@@ -40,8 +40,15 @@ export async function boot() {
 }
 
 // ── 通用写入：本机立刻生效，标记待同步 ──
+/**
+ * 每条记录本机最后一次写下的时间（严格递增）。同步时用它判断谁更新：
+ * 正在同步的那一两秒里你又改了什么，服务器回来的旧版本不会把它盖掉，推送完也不会把它错标成「已同步」。
+ */
+const lastWrite = /** @type {Map<string, number>} */ (new Map());
+let lastStamp = 0;
 async function write(/** @type {keyof typeof mem} */ coll, /** @type {any} */ data, deleted = false) {
-  const updated = Date.now();
+  const updated = lastStamp = Math.max(Date.now(), lastStamp + 1);
+  lastWrite.set(coll + '/' + data.id, updated);
   if (deleted) mem[coll].delete(data.id); else mem[coll].set(data.id, data);
   await putRecord({ coll, id: data.id, data, updated, deleted, dirty: true });
   if (coll === 'styles') setCustom([...mem.styles.values()]);
@@ -193,7 +200,8 @@ export async function sync() {
       for (let i = 0; i < dirty.length; i += 150) {
         const batch = dirty.slice(i, i + 150);
         await push(batch.map(r => ({ coll: r.coll, id: r.id, data: r.deleted ? {} : r.data, updated: r.updated, deleted: !!r.deleted })));
-        for (const r of batch) await putRecord({ ...r, dirty: false });
+        // 推送途中又改过的，本机那份比刚推上去的新：保持「待同步」，下一轮再推
+        for (const r of batch) if ((lastWrite.get(r.coll + '/' + r.id) || 0) <= r.updated) await putRecord({ ...r, dirty: false });
       }
       let cursor = Number(await getMeta('cursor')) || 0, changed = new Set();
       for (let page = 0; page < 20; page++) {
@@ -202,6 +210,7 @@ export async function sync() {
           if (!mem[r.coll]) continue;
           const mine = mem[r.coll].get(r.id);
           if (mine && (mine.updatedAt || 0) > (r.data?.updatedAt || 0) && !r.deleted) continue;
+          if ((lastWrite.get(r.coll + '/' + r.id) || 0) > (r.updated || 0)) { again = true; continue; }   // 本机刚改过、比服务器这份新：留着本机的，稍后推上去
           if (r.deleted) mem[r.coll].delete(r.id); else mem[r.coll].set(r.id, r.data);
           await putRecord({ coll: r.coll, id: r.id, data: r.data, updated: r.updated, deleted: r.deleted, dirty: false });
           changed.add(r.coll);

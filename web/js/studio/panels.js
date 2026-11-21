@@ -12,7 +12,7 @@ import { isFav, toggleFav, pref, setPref, saveStyle, addSource, ensureUploaded }
 import { studio, inventStyle } from '../core/api.js';
 import { prepare } from '../core/image.js';
 import { applyTheme } from '../core/theme.js';
-import { sheet } from '../ui/sheet.js';
+import { sheet, focusSoon } from '../ui/sheet.js';
 import { etaText } from '../ui/parts.js';
 import { T, level } from '../copy.js';
 
@@ -89,7 +89,7 @@ export function stylePanel(/** @type {any} */ ctx) {
       finally { goBtn.removeAttribute('disabled'); }
     } }, h('span', { html: icon('wand') }), '造出来');
     const { close } = sheet(() => [field, ideas, status, h('div.sheet__acts', null, refBtn, goBtn)], { title: '自创风格', cls: 'sheet--top' });
-    setTimeout(() => field.focus({ preventScroll: true }), 120);
+    focusSoon(field);
   }
   return {
     body, foot,

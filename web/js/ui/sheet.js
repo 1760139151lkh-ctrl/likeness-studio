@@ -4,6 +4,19 @@
 import { h, iconBtn, stageEl, reduced } from '../core/dom.js';
 import { overlay } from '../core/nav.js';
 
+/**
+ * 抽屉打开后把光标放进它的第一个输入框。已经在抽屉里别的地方打字了（或已经在这个框里）就不抢：
+ * 不然刚打的字会落到别处去。
+ */
+export function focusSoon(/** @type {HTMLElement} */ el, ms = 120) {
+  setTimeout(() => {
+    const a = /** @type {HTMLElement | null} */ (document.activeElement), box = el.closest('.sheet');
+    if (!el.isConnected || a === el) return;
+    if (a && box?.contains(a) && !a.classList.contains('sheet__close')) return;
+    el.focus({ preventScroll: true });
+  }, ms);
+}
+
 /** 有没有抽屉开着（Esc 先关抽屉）。 */
 export const sheetOpen = () => open.length > 0;
 /**
@@ -32,7 +45,8 @@ export function sheet(build, o) {
   open.push(panel);
   requestAnimationFrame(() => { scrim.classList.add('is-in'); panel.classList.add('is-in'); });
   document.addEventListener('keydown', onKey);
-  setTimeout(() => /** @type {HTMLElement | null} */ (panel.querySelector('.sheet__close'))?.focus({ preventScroll: true }), 60);
+  // 键盘和读屏用户：焦点先落在抽屉里（关闭按钮）。已经有东西在抽屉里拿到焦点了（例如已经点进输入框）就不抢
+  setTimeout(() => { if (!panel.contains(document.activeElement)) /** @type {HTMLElement | null} */ (panel.querySelector('.sheet__close'))?.focus({ preventScroll: true }); }, 60);
   return { close: () => dismiss(), panel };
 }
 

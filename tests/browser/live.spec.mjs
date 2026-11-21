@@ -2,7 +2,8 @@
 import { test, expect } from '@playwright/test';
 import { open, tidy, useSample, camera, tool, cta, make } from './kit.mjs';
 
-test('shutter → instant result → switch style without reshooting → more takes → tweak in 上传精修', async ({ page }) => {
+test('shutter → instant result → switch style without reshooting → more takes → tweak in 上传精修', async ({ page, browserName }) => {
+  test.skip(browserName === 'webkit', 'WebKit 没有假摄像头：拍照这一段只在 Chromium 里跑（WebKit 里测的是摄像头被拒后的上传路径）');
   const errors = await open(page);
   await camera(page);
   await expect(page.locator('.live')).toHaveAttribute('data-cam', 'on');
@@ -35,6 +36,8 @@ test('shutter → instant result → switch style without reshooting → more ta
 
 test('a generation can be cancelled and retried', async ({ page }) => {
   await useSample(page, 1);
+  // 让请求慢一点（2.5 秒）：「停」一定还在屏幕上，慢的浏览器里也一样
+  await page.route('**/api/turns', async r => { await new Promise(res => setTimeout(res, 2500)); await r.continue().catch(() => {}); });
   await cta(page).click();
   await page.locator('.frame .prog__stop').click();
   await expect(page.locator('.frame')).toHaveAttribute('data-state', 'stopped', { timeout: 15000 });
