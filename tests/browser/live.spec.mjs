@@ -1,8 +1,8 @@
-/** The real server (simulator engine): the whole loop, the account, and nothing lost on reload. */
+/** The real server (simulator engine): the whole loop, every way of changing a picture, the account, and nothing lost on reload. */
 import { test, expect } from '@playwright/test';
-import { open, tidy, useSample, camera } from './kit.mjs';
+import { open, tidy, useSample, camera, tool, cta, make } from './kit.mjs';
 
-test('shutter → instant result → switch style without reshooting → tweak in 上传精修', async ({ page }) => {
+test('shutter → instant result → switch style without reshooting → more takes → tweak in 上传精修', async ({ page }) => {
   const errors = await open(page);
   await camera(page);
   await expect(page.locator('.live')).toHaveAttribute('data-cam', 'on');
@@ -14,35 +14,97 @@ test('shutter → instant result → switch style without reshooting → tweak i
   await page.locator('.res__styles .dot').nth(1).click();
   await expect(page.locator('.result')).toHaveAttribute('data-state', 'working');
   await expect(page.locator('.result')).toHaveAttribute('data-state', 'done', { timeout: 30000 });
+  // 撤回一步：回到换风格之前那一版，还能恢复
+  await page.locator('.result .bar__right .ibtn').first().click();
+  await expect(page.locator('.toast')).toContainText('已撤回');
+  await page.locator('.result .bar__right .ibtn').nth(1).click();
+  // 更多 → 多来几张：一次三张，右边一排小图随便挑
+  await page.locator('.act', { hasText: '更多' }).click();
+  await page.locator('.mitem', { hasText: '多来几张' }).click();
+  await expect(page.locator('.res__sib')).toHaveCount(3);
+  await expect(page.locator('.result')).toHaveAttribute('data-state', 'done', { timeout: 30000 });
+  await page.locator('.res__sib').nth(2).click();
+  await expect(page.locator('.res__sib').nth(2)).toHaveAttribute('aria-selected', 'true');
   await page.getByRole('button', { name: '微调细节' }).click();
   await expect(page).toHaveURL(/#\/studio/);
-  await expect(page.locator('.seg__opt[aria-selected="true"]')).toHaveText('细节');
-  await expect(page.locator('.versions .ver')).toHaveCount(3);
+  await expect(page.locator('.tool2[aria-selected="true"]')).toHaveText('微调');
+  await expect(page.locator('.versions .ver')).toHaveCount(6);
   await tidy(page);
   expect(errors).toEqual([]);
 });
 
 test('a generation can be cancelled and retried', async ({ page }) => {
   await useSample(page, 1);
-  await page.locator('.cta').click();
+  await cta(page).click();
   await page.locator('.frame .prog__stop').click();
   await expect(page.locator('.frame')).toHaveAttribute('data-state', 'stopped', { timeout: 15000 });
-  await page.locator('.frame__fail .btn').click();
+  await page.locator('.frame__fail .btn--main').click();
   await expect(page.locator('.frame')).toHaveAttribute('data-state', 'done', { timeout: 30000 });
 });
 
-test('works, favourites and drafts survive a reload, and signing up keeps them', async ({ page }) => {
-  await useSample(page, 3);
-  await page.locator('.seg__opt', { hasText: '细节' }).click();
-  await page.locator('.chip2').first().click();
-  await page.locator('.cta').click();
+test('部位精修 sends one mask per part and only those parts change; the studio answers with three ideas', async ({ page }) => {
+  const errors = await open(page);
+  await useSample(page, 0);
+  await make(page);
+  await tool(page, '部位');
+  await expect(page.locator('.pp__hint')).not.toContainText('正在认脸', { timeout: 30000 });
+  await page.locator('.pp__part', { hasText: '刘海' }).click();
+  await page.locator('.pp__opt', { hasText: '八字刘海' }).click();
+  await page.locator('.pp__part', { hasText: '唇妆' }).click();
+  await page.locator('.pp__opt', { hasText: '豆沙' }).click();
+  await expect(cta(page).locator('.cta__label')).toHaveText('精修这 2 处');
+  const sent = page.waitForRequest(r => r.url().endsWith('/api/turns') && r.method() === 'POST');
+  await cta(page).click();
+  const region = (await sent).postDataJSON();
+  await expect(page.locator('.ver[data-op="region"]')).toHaveCount(1);
   await expect(page.locator('.frame')).toHaveAttribute('data-state', 'done', { timeout: 30000 });
-  await page.locator('.seg__opt', { hasText: '风格' }).click();
-  await page.locator('.card .card__fav').first().click();
+  expect(region.intent.op).toBe('region');
+  expect(region.pins).toHaveLength(2);
+  expect(region.pins.every(p => p.mask)).toBe(true);
+  expect(region.say).toContain('八字刘海');
+  await tool(page, '对话');
+  await expect(page.locator('.chat__ideas .chip2--idea')).toHaveCount(3);
+  expect(errors).toEqual([]);
+});
+
+test('对话微调：一句话改一版，回复和「接着改」都在对话里，点缩略图回到任何一版', async ({ page }) => {
+  const errors = await open(page);
+  await useSample(page, 2);
+  await make(page);
+  await tool(page, '对话');
+  await page.locator('.chat__field').fill('背景换成海边日落');
+  await page.locator('.chat__send').click();
+  await expect(page.locator('.msg--me').last()).toHaveText('背景换成海边日落');
+  await expect(page.locator('.msg--ai').last().locator('.msg__thumb[data-state="done"]')).toHaveCount(1, { timeout: 30000 });
+  await expect(page.locator('.chat__ideas .chip2--idea')).toHaveCount(3);
+  await page.locator('.chat__ideas .chip2--idea').first().click();
+  await expect(page.locator('.chat__field')).not.toHaveValue('');
+  await page.locator('.msg__thumb').first().click();
+  await expect(page.locator('.msg__thumb').first()).toHaveAttribute('aria-pressed', 'true');
+  await page.locator('.chat__q', { hasText: '多来几张' }).click();
+  await expect(page.locator('.msg--ai').last().locator('.msg__thumb')).toHaveCount(3);
+  await expect(page.locator('.msg--ai').last().locator('.msg__thumb[data-state="done"]')).toHaveCount(3, { timeout: 30000 });
+  await tidy(page);
+  expect(errors).toEqual([]);
+});
+
+test('works, favourites, drafts and the undo history survive a reload, and signing up keeps them', async ({ page }) => {
+  await useSample(page, 3);
+  await tool(page, '细节');
+  await page.locator('.dgroup .chip2').first().click();
+  await make(page);
+  await tool(page, '风格');
+  await page.locator('.scard .scard__fav').first().click();
   await page.reload();
   await expect(page.locator('.studio')).toHaveAttribute('data-has', 'photo');
+  await expect(page.locator('.studio')).toHaveAttribute('data-panel', 'style');
   await expect(page.locator('.versions .ver:not(.ver--src)')).toHaveCount(1);
+  await expect(page.getByRole('button', { name: '撤回一步' }).first()).toBeEnabled();
   await page.evaluate(() => { location.hash = '#/me'; });
+  await page.locator('.me__row', { hasText: '我的口味' }).click();
+  await page.locator('.sheet textarea').fill('保留我的痣');
+  await page.locator('.sheet .btn--main').click();
+  await expect(page.locator('.me__row', { hasText: '我的口味' })).toContainText('保留我的痣');
   await page.getByRole('button', { name: '注册', exact: true }).click();
   await page.locator('.auth input').nth(0).fill('tester' + Date.now() % 100000);
   await page.locator('.auth input').nth(1).fill('secret123');
@@ -59,7 +121,8 @@ for (const [w, h] of [[360, 640], [430, 932], [1280, 800]]) {
   test(`every screen is tidy at ${w}×${h}`, async ({ page }) => {
     await page.setViewportSize({ width: w, height: h });
     await useSample(page, 0);
-    for (const t of ['风格', '微调', '细节']) { await page.locator('.seg__opt', { hasText: t }).click(); await tidy(page); }
+    await tidy(page);
+    for (const t of ['风格', '微调', '细节', '部位', '对话']) { await tool(page, t); await tidy(page); }
     for (const route of ['#/gallery', '#/me', '#/live']) { await page.evaluate(r => { location.hash = r; }, route); await page.waitForTimeout(400); await tidy(page); }
   });
 }

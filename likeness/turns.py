@@ -72,6 +72,7 @@ class Turn(BaseModel):
     taste: str = Field("", max_length=600)   # what the person always wants, in their words
     aspect: Aspect | None = None   # the portrait studio's format: portrait 2:3, a square avatar, a tall wallpaper
     preset: str | None = Field(None, max_length=40, pattern=r"^[a-z0-9-]+$")   # which 哈基秀 style asked (for the record)
+    say: str = Field("", max_length=400)   # what the person said, in their own words (the reply answers this, not the prompt)
 
     def asset_ids(self) -> list[str]:
         ids = list(self.handles.values()) + [r.asset for r in self.intent.refs] + [p.mask for p in self.pins if p.mask]

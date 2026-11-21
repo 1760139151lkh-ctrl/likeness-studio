@@ -26,6 +26,9 @@ from PIL import Image, ImageChops
 
 from .. import brief
 from ..rooms import BACKDROPS_SCHEMA, LOOK_SCHEMA, ROOM_SCHEMA, STYLE_SCHEMA
+
+REPLY_SCHEMA = {"type": "object", "additionalProperties": False, "required": ["reply", "suggestions"],
+                "properties": {"reply": {"type": "string"}, "suggestions": {"type": "array", "items": {"type": "string"}}}}
 from ..turns import SIZES, BackdropAsk, Inputs, LookAsk, RoomAsk, StyleAsk, Turn
 from . import EngineError, Work, shaped
 from .codex import _composite_region
@@ -245,6 +248,7 @@ class OpenAIImages:
         work.stage("read")
         prompt = brief.direct_brief(turn, inputs)
         work.plan("GPT Image, " + PACES.get(turn.pace, turn.pace).lower() + (f", {turn.n} pictures" if turn.n > 1 else ""), prompt)
+        talk = self._talk(turn)   # the reply is written while the picture is made, so it costs no time
         prompts = [prompt] * turn.n
         if turn.intent.op == "angles":
             prompts = [brief.angle_brief(turn, inputs, ANGLES[i % len(ANGLES)]) for i in range(turn.n)]
@@ -254,17 +258,42 @@ class OpenAIImages:
             with ThreadPoolExecutor(max_workers=min(4, turn.n)) as pool:
                 for future in [pool.submit(self._one, turn, inputs, work, i, prompts[i]) for i in range(turn.n)]:
                     future.result()
+        work.reply(*self._answer(turn, talk))
+
+    def _talk(self, turn: Turn):
+        """Ask the words model for the studio's reply, in the background. None when there is no words model."""
+        if not self.config.get("text_model", "gpt-5.4-mini"):
+            return None
+        pool = ThreadPoolExecutor(max_workers=1)
+        try:
+            return pool.submit(self._words, brief.reply_brief(turn), REPLY_SCHEMA, None, 30.0)
+        finally:
+            pool.shutdown(wait=False)
+
+    @staticmethod
+    def _answer(turn: Turn, talk) -> tuple[str, list[str]]:
+        """The reply and three ideas: the words model's when it answered in time, else the style's own voice."""
         voice = turn.room.voice if turn.room and turn.room.voice else ["出片啦"]
-        work.reply(voice[secrets.randbelow(len(voice))])
+        fallback = (voice[secrets.randbelow(len(voice))], brief.IDEAS.get(turn.intent.op, brief.IDEAS["edit"]))
+        if talk is None:
+            return fallback
+        try:
+            answer = talk.result(timeout=5)   # the picture took seconds already: the words get a few more, never longer
+        except Exception:
+            talk.cancel()
+            return fallback
+        reply = str(answer.get("reply") or "").strip()
+        ideas = [str(s).strip() for s in answer.get("suggestions") or [] if str(s).strip()]
+        return reply or fallback[0], (ideas[:3] if len(ideas) >= 2 else fallback[1])
 
     # ---- words only ----
-    def _words(self, text: str, schema: dict, picture: Path | None = None) -> dict:
+    def _words(self, text: str, schema: dict, picture: Path | None = None, timeout: float = 90.0) -> dict:
         content: list[dict] = [{"type": "text", "text": text}]
         if picture is not None:
             content.append({"type": "image_url", "image_url": {"url": "data:image/png;base64," + base64.b64encode(_png(picture)).decode()}})
         body = json.dumps({"model": str(self.config.get("text_model") or "gpt-5.4-mini"), "messages": [{"role": "user", "content": content}],
                            "response_format": {"type": "json_schema", "json_schema": {"name": "answer", "strict": True, "schema": schema}}}).encode()
-        with self._open("/chat/completions", body, "application/json", 90) as response:
+        with self._open("/chat/completions", body, "application/json", timeout) as response:
             answer = json.loads(response.read().decode("utf-8"))
         try:
             return json.loads(answer["choices"][0]["message"]["content"])

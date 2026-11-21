@@ -26,7 +26,8 @@ OPS = {
     "restyle": "Repaint the subject picture in the look described below. Keep its composition, its people and what it shows.",
     "reference": "Change the subject picture so it takes on the style reference's palette, light and texture. Keep the subject's composition and content.",
     "blend": "Combine the pictures into one, as the words say.",
-    "region": "Change only the marked regions of the subject picture, each as its note says. Leave everything outside the masks exactly as it is.",
+    "region": "Change only the marked regions of the subject picture, each as its note says. Leave everything outside the masks exactly as it is."
+              " Inside a mask, change only what its note asks for: anything else there (a crown, clips, a hat, glasses, jewellery) stays as it was.",
     "backdrop": "Replace the background behind the subject with the place described below. Keep the subject exactly, and match the light to the new place.",
     "remove": "Remove what the words (or the marked regions) point at, and fill the space so nobody could tell.",
     "vary": "Make variations of the subject picture: the same subject, different takes on it.",
@@ -36,6 +37,18 @@ OPS = {
                "make-up, clothes, light and backdrop. Only the camera moves."),
 }
 PIN_MARKS = "①②③④⑤⑥⑦⑧⑨"
+# what a change is called, for the studio's reply (zh-SG)
+OP_WORDS = {"create": "a new picture", "edit": "an edit they asked for in words", "restyle": "the whole photo turned into an art style",
+            "reference": "an edit borrowing a reference's look", "blend": "pictures combined", "region": "only some parts of the face or hair changed",
+            "backdrop": "a new background", "remove": "something removed", "vary": "three more takes of the same picture", "angles": "the same look from other angles"}
+# next things to try when the words model is not there (or too slow): short zh-SG instructions
+IDEAS = {
+    "restyle": ["背景换成夜景霓虹", "加点闪闪发光", "换成灿烂笑容"], "edit": ["再自然一点", "背景换成海边日落", "加点闪闪发光"],
+    "region": ["颜色再浅一点", "换个发型试试", "加个小皇冠"], "vary": ["换个角度看看", "背景换成星空", "加点烟花"],
+    "angles": ["换回正脸", "背景换成樱花", "整体再梦幻一点"], "backdrop": ["换成黄昏光线", "换个地方", "改成夜景"],
+    "create": ["光线暖一点", "改成夜景", "多来几张"], "reference": ["更像参考图", "颜色保留多一点", "多来几张"],
+    "blend": ["第一张多一点", "第二张多一点", "换个背景"], "remove": ["再清干净一点", "换个背景", "光线暖一点"],
+}
 
 
 def direct_brief(turn: Turn, inputs: Inputs) -> str:
@@ -58,6 +71,23 @@ def direct_brief(turn: Turn, inputs: Inputs) -> str:
     if turn.taste.strip():
         lines.append(f"Always (unless said otherwise): {turn.taste.strip()}")
     return " ".join(line for line in lines if line)[:3900]
+
+
+def reply_brief(turn: Turn) -> str:
+    """The words model's brief for the studio's answer: one short line in the app's voice and three things to try next."""
+    op = turn.intent.op
+    said = (turn.say or turn.text).strip()[:600]
+    style = turn.room.name if turn.room and turn.room.name else (turn.preset or "")
+    return "\n".join([
+        "You are the voice of 哈基秀 (Hajixiu), a selfie-to-art app loved by young TikTok creators in Singapore and Malaysia.",
+        f"The person just asked for this, and their picture is being made right now: «{said or OP_WORDS.get(op, 'a new picture')}».",
+        f"The kind of change: {OP_WORDS.get(op, OP_WORDS['edit'])}." + (f" Their style: «{style}»." if style else ""),
+        "Write reply: one line in Simplified Chinese (zh-SG), warm, playful and casual like a friend on TikTok (a light 'lah' or 'leh' is fine;"
+        " at most one emoji), at most 24 characters, saying it is ready. When they asked for specific changes, name them in a word or two"
+        " (like 发色和刘海都换好啦 or 滨海湾夜景安排上了). Do not describe their face or body, and do not promise details you cannot see.",
+        "Write suggestions: exactly 3 different next edits they would enjoy on this same picture, each 4 to 10 Chinese characters, written as a"
+        " direct instruction (like 背景换成海边日落 or 加一只小猫在肩上), none repeating what they just asked, all safe for every age.",
+    ])
 
 
 def angle_brief(turn: Turn, inputs: Inputs, angle: str) -> str:

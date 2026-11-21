@@ -182,27 +182,39 @@ export function liveScreen() {
   function loop() {
     if (running) return;
     running = true;
+    // 慢设备自适应：读脸花得越久，读得越疏；画一帧太慢就降一点分辨率——界面始终跟手
+    let detectCost = 0, every = 30, drawCost = 0, scale = 1, frames = 0;
     const frame = (/** @type {number} */ t) => {
       if (!running) return;
       raf = requestAnimationFrame(frame);
       if (!camera.ready) return;
-      const r = gl.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 1.75);
+      if (++frames % 30 === 0) scale = drawCost > 22 ? Math.max(.5, scale * .85) : drawCost < 8 && scale < 1 ? Math.min(1, scale / .85) : scale;
+      const r = gl.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 1.75) * scale;
       const W = Math.round(r.width * dpr), H = Math.round(r.height * dpr);
       renderer?.resize(W, H); overlay.resize(W, H);
       // face: read at most ~30 times a second, never two at once
-      if (tracker && !detecting && t - lastDetect > 30) {
+      if (tracker && !detecting && t - lastDetect > every) {
+        // 读脸放到下一个任务里做：画面先画出来，中间有点击也能先响应
         detecting = true; lastDetect = t;
-        try {
-          const res = tracker.detectForVideo(video, t);
-          const lm = res?.faceLandmarks?.[0];
-          face = lm?.length ? smoothFace(face, summarise(lm, video.videoWidth / video.videoHeight)) : (face && t - face.seen < 300 ? face : null);
-        } catch { /* a dropped frame */ }
-        detecting = false;
+        setTimeout(() => {
+          if (!running || !camera.ready) { detecting = false; return; }
+          const s0 = performance.now();
+          try {
+            const res = tracker.detectForVideo(video, s0);
+            const lm = res?.faceLandmarks?.[0];
+            face = lm?.length ? smoothFace(face, summarise(lm, video.videoWidth / video.videoHeight)) : (face && s0 - face.seen < 300 ? face : null);
+          } catch { /* a dropped frame */ }
+          detecting = false;
+          detectCost = detectCost * .8 + (performance.now() - s0) * .2;
+          every = Math.max(30, Math.min(300, detectCost * 3));
+        }, 0);
       }
+      const d0 = performance.now();
       const f = face && toCanvas(face, W, H);
       renderer?.setFace(f ? { cx: f.center.x / W, cy: 1 - f.center.y / H, r: f.height / H, el: [f.eyeL.x / W, 1 - f.eyeL.y / H], er: [f.eyeR.x / W, 1 - f.eyeR.y / H] } : null);
       renderer?.draw(video, video.videoWidth, video.videoHeight, t);
       overlay.draw(f, t);
+      drawCost = drawCost * .9 + (performance.now() - d0) * .1;
       el.classList.toggle('has-face', !!f);
     };
     raf = requestAnimationFrame(frame);
@@ -245,7 +257,7 @@ export function liveScreen() {
       const work = (async () => {
         const { blob, w, h: hh } = await prepare(await blobOf(raw, 'image/jpeg', .92));
         const src = await addSource(blob, { w, h: hh });
-        const w0 = await create({ source: src.id, preset: presetNow, params, format: 'portrait', mode: 'live' });
+        const w0 = await create({ source: src.id, preset: presetNow, params, format: 'portrait', mode: 'live', pace: pref('livePace', 'quick') });
         blobOf(pv, 'image/jpeg', .8).then(b => setPreview(w0.id, URL.createObjectURL(b))).catch(() => {});
         return w0.id;
       })();

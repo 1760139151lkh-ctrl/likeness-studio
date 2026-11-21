@@ -2,18 +2,13 @@
  * 人脸关键点追踪（MediaPipe Face Landmarker，478 个点，全部在手机本地跑，画面不出设备）。
  * 优先用 GPU，不行就退到 CPU；模型和运行时都在 vendor/ 里，离线也能用。追踪结果做了平滑，贴纸不抖。
  */
-import { asset } from '../core/dom.js';
+import { asset, hushVision } from '../core/dom.js';
 
 const VENDOR = () => new URL(asset('vendor/mediapipe/'), location.href).href;
 let loading = /** @type {Promise<any> | null} */ (null);
 
 /** 静音 MediaPipe 自己的日志。 */
-function quiet() {
-  for (const k of /** @type {const} */ (['log', 'info', 'warn'])) {
-    const was = console[k];
-    console[k] = (...a) => { if (!/^(INFO|W\d|I\d|Created TensorFlow|Graph|gl_context|OpenGL|Feedback manager)/.test(String(a[0] ?? ''))) was.apply(console, a); };
-  }
-}
+const quiet = hushVision;
 
 export function loadTracker(/** @type {'VIDEO' | 'IMAGE'} */ mode = 'VIDEO') {
   loading ||= (async () => {

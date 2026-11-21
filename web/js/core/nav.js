@@ -18,6 +18,9 @@ let current = null;
 const overlays = [];
 let depth = 0;   // how many entries this session has pushed (so back never leaves the app)
 let overlaySeq = 0;
+let swallow = 0;   // back steps we took ourselves to close a layer from its own button: their popstate is not a navigation
+/** @type {[string, Record<string, string>, { replace: boolean }] | null} */
+let queued = null;   // a go() asked for while such a back step is still on its way (it runs right after)
 
 export const ROOTS = ['live', 'studio'];
 
@@ -35,6 +38,7 @@ const hashOf = (/** @type {string} */ name, /** @type {Record<string, string>} *
 
 /** 去某个页面。replace：替换当前这一格（例如两个根页面之间切换）。 */
 export function go(/** @type {string} */ name, /** @type {Record<string, string>} */ p = {}, o = { replace: false }) {
+  if (swallow > 0) { queued = [name, p, o]; return; }
   // an open sheet's history entry becomes the new page's, so one back gesture returns to where the sheet was opened
   const fromOverlay = overlays.length > 0;
   closeOverlays();
@@ -96,16 +100,33 @@ export function overlay(close) {
   const id = ++overlaySeq;
   overlays.push({ id, close });
   history.pushState({ app: true, depth, overlay: id }, '');
-  return () => { if (overlays.some(o => o.id === id)) history.back(); };
+  // 点「关闭」：层立刻收起（不等浏览器的后退事件），再把它那一格历史退掉
+  return () => {
+    const i = overlays.findIndex(o => o.id === id);
+    if (i < 0) return;
+    overlays.splice(i, 1);
+    close();
+    swallow++;
+    history.back();
+  };
 }
 function closeOverlays() { while (overlays.length) overlays.pop()?.close(); }
 
 window.addEventListener('popstate', () => {
-  if (overlays.length) {
+  if (swallow > 0) {
+    swallow--;
+    if (!swallow && queued) { const q = queued; queued = null; go(...q); }
+    return;
+  }
+  // 返回手势：回到同一个页面的那一格 = 关掉最上面那一层；地址变了（例如直接改了地址）= 收起所有层，去那个页面
+  const to = parse();
+  const same = !to.name || (current && to.name === current.name && JSON.stringify(to.params) === JSON.stringify(current.params));
+  if (overlays.length && same) {
     const top = overlays.pop();
     top?.close();
     return;
   }
+  if (overlays.length) closeOverlays();
   depth = Math.max(0, (history.state?.depth ?? depth - 1));
   const { name, params: p } = parse();
   show(name || rootPref, p);

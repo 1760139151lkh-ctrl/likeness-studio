@@ -5,7 +5,7 @@
  * 移植自旧版 Lookbook 的 studio/face.js（刘海、眉毛、眼妆、唇妆、胡子、发色），新增腮红、耳饰、头饰与表情的区域。
  * 找不到脸（例如很夸张的卡通成片）时返回 null，界面会改用「对话」或「圈选」。
  */
-import { asset } from './dom.js';
+import { asset, hushVision } from './dom.js';
 
 const VENDOR = () => new URL(asset('vendor/mediapipe/'), location.href).href;
 
@@ -25,14 +25,7 @@ function visionKit() {
   return kit;
 }
 /** 静音 MediaPipe 自己的日志。 */
-let hushed = false;
-function quiet() {
-  if (hushed) return; hushed = true;
-  for (const k of /** @type {const} */ (['log', 'info', 'warn'])) {
-    const was = console[k];
-    console[k] = (...a) => { if (!/^(INFO|W\d|I\d|Created TensorFlow|Graph|gl_context|OpenGL|Feedback manager)/.test(String(a[0] ?? ''))) was.apply(console, a); };
-  }
-}
+const quiet = hushVision;
 let landmarker = /** @type {Promise<any> | null} */ (null);
 function stillLandmarker() {
   landmarker ||= (async () => {
@@ -62,7 +55,7 @@ export function canvasFrom(img, longest = 768) {
   const w0 = /** @type {any} */ (img).naturalWidth || img.width || 1, h0 = /** @type {any} */ (img).naturalHeight || img.height || 1;
   const k = Math.min(1, longest / Math.max(w0, h0));
   const c = make(w0 * k, h0 * k);
-  /** @type {CanvasRenderingContext2D} */ (c.getContext('2d')).drawImage(img, 0, 0, c.width, c.height);
+  /** @type {CanvasRenderingContext2D} */ (c.getContext('2d', { willReadFrequently: true })).drawImage(img, 0, 0, c.width, c.height);
   return c;
 }
 

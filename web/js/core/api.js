@@ -52,27 +52,25 @@ export const pull = (/** @type {number} */ cursor) => fetch('api/sync?cursor=' +
 export const push = (/** @type {any[]} */ records) => post('api/sync', { records });
 
 // ── 图片 ──
-/** 传一张图到你的私人空间。 @returns {Promise<{ id: string, url: string, w: number, h: number }>} */
-export async function upload(/** @type {Blob} */ blob) {
+/** 传一张图（或一块遮罩）到你的私人空间。 @param {Blob} blob @param {'image' | 'mask'} kind @returns {Promise<{ id: string, url: string, w: number, h: number }>} */
+export async function uploadBlob(blob, kind = 'image') {
   const form = new FormData();
-  form.append('file', blob, 'photo.jpg'); form.append('kind', 'image');
+  form.append('file', blob, kind === 'mask' ? 'mask.png' : 'photo.jpg'); form.append('kind', kind);
   for (let attempt = 0; ; attempt++) {
     try { return await fetch('api/assets', { method: 'POST', body: form }).then(json); }
     catch (e) { if (attempt >= 2 || (e.status && e.status < 500)) throw e; await new Promise(r => setTimeout(r, 800 * (attempt + 1))); }
   }
 }
+/** 传一张照片。 @param {Blob} blob */
+export const upload = (blob) => uploadBlob(blob, 'image');
 export const fetchBlob = (/** @type {string} */ url) => fetch(url).then(r => { if (!r.ok) throw new Error('成片下载失败，再试一次'); return r.blob(); });
 
 // ── 生成 ──
 /**
- * 发起一次变身。返回 { job, eta }。同一个 id 重发（断网重试）不会生成两次。
- * @param {{ id: string, prompt: string, asset: string, pace: string, aspect: string, preset: string, voice?: string[] }} o
+ * 发一张单子（整体换风格 / 部位精修 / 对话微调 / 多来几张 / 多角度）。返回 { job, eta }。同一个 id 重发（断网重试）不会生成两次。
+ * @param {Record<string, any> & { id: string }} body
  */
-export async function startTurn(o) {
-  const body = {
-    id: o.id, text: o.prompt, pace: o.pace, n: 1, handles: { A: o.asset }, aspect: o.aspect, preset: o.preset,
-    intent: { op: 'restyle', subject: o.asset, refs: [] }, room: { id: o.preset, name: o.preset, line: '', colors: {}, voice: o.voice || [] },
-  };
+export async function sendTurn(body) {
   for (let attempt = 0; ; attempt++) {
     try {
       return await fetch('api/turns', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(15000) }).then(json);
@@ -82,6 +80,8 @@ export async function startTurn(o) {
     }
   }
 }
+/** 自创风格：一句话（和 / 或一张参考图）变成一个全新的风格。 @param {{ text: string, asset?: string }} b */
+export const inventStyle = (b) => post('api/styles', b);
 export const cancelJob = (/** @type {string} */ job) => fetch(`api/jobs/${job}/cancel`, { method: 'POST' }).catch(() => {});
 
 /**

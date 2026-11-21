@@ -34,6 +34,11 @@ export const T = {
   faved: '已收藏',
   del: '删除',
   shoot: '拍照',
+  undo: '撤回一步',
+  redo: '恢复一步',
+  undone: '已撤回',
+  redone: '已恢复',
+  fold: '收起',
 
   // 工具条
   flip: '翻转',
@@ -56,6 +61,7 @@ export const T = {
   sending: '照片上传中…',
   queued: '排队中，马上轮到你',
   doneSaved: '已自动存入你的专属作品库',
+  replies: ['搞定啦，看看喜不喜欢 ✨', '改好咯，这张很可以哦', '出片啦，美到发光', '好了好了，快看看', '新鲜出炉，请过目'],
   seeIt: '去看看',
   stopped: '已取消，照片和设置都还在',
   failed: '这次没成功',

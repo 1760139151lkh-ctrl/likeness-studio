@@ -68,8 +68,10 @@ export const styleDot = (/** @type {string} */ id) => {
 /**
  * 前后对比：拖动分割线；按住画面看原图。键盘左右键也能拖。
  * @param {HTMLElement} box 放图的容器（相对定位） @param {HTMLImageElement} before @param {HTMLImageElement} after
+ * @param {{ enabled?: () => boolean }} [o] enabled：现在能不能对比（部位精修、圈选时画面要留给手指）
  */
-export function compare(box, before, after) {
+export function compare(box, before, after, o = {}) {
+  const can = () => !o.enabled || o.enabled();
   let pos = 1;   // 1 = 全是成片
   const handle = h('div.cmp__handle', { 'aria-hidden': 'true' }, h('span.cmp__knob', { html: icon('compare') }));
   const range = /** @type {HTMLInputElement} */ (h('input.cmp__range', { type: 'range', min: '0', max: '100', value: '100', 'aria-label': '前后对比：向左拖看原图' }));
@@ -81,12 +83,14 @@ export function compare(box, before, after) {
   // 拖动：从分割线附近开始拖才算拖；其余地方是「按住看原图」
   let drag = false;
   box.addEventListener('pointerdown', e => {
+    if (!can()) return;
     const r = box.getBoundingClientRect(), x = (e.clientX - r.left) / r.width;
     if (Math.abs(x - pos) < .08 || box.classList.contains('is-split')) { drag = true; box.setPointerCapture(e.pointerId); set(x); e.preventDefault(); }
   });
   box.addEventListener('pointermove', e => { if (!drag) return; const r = box.getBoundingClientRect(); set((e.clientX - r.left) / r.width); });
   box.addEventListener('pointerup', () => { drag = false; });
-  holdable(box, on => { if (!drag) box.classList.toggle('is-before', on); }, 160);
+  holdable(box, on => { if (!drag) box.classList.toggle('is-before', on && can()); }, 160);
+  range.addEventListener('focus', () => { if (!can()) range.blur(); });
   void before; void after;
   set(1);
   return {
@@ -155,11 +159,21 @@ export async function shareTikTok(/** @type {any} */ w, /** @type {string} */ ur
 }
 
 /** 作品的来历标签：只有真正由模型生成的才叫成片。 */
-export function kindBadge(/** @type {any} */ w) {
-  if (w.kind === 'preview') return h('span.badge', null, T.preview);
-  if (w.kind === 'example') return h('span.badge', null, T.example);
-  if (w.kind === 'simulated') return h('span.badge', null, T.simulated);
-  return null;
+export function kindBadge(/** @type {any} */ w, short = false) {
+  const long = w.kind === 'preview' ? T.preview : w.kind === 'example' ? T.example : w.kind === 'simulated' ? T.simulated : '';
+  if (!long) return null;
+  return h('span.badge', { title: long }, short ? long.split(' · ')[0] : long);
+}
+
+/** 一个版本是怎么来的（短名字）。 @param {any} w */
+export function opLabel(w) {
+  if (!w) return '原图';
+  return ({ region: '部位精修', edit: '对话微调', vary: '多来几张', angles: '多角度' })[/** @type {string} */ (w.op)] || presetById(w.preset)?.name || '作品';
+}
+/** 版本缩略图角上的小图标（整体换风格没有）。 @param {any} w */
+export function opBadge(w) {
+  const name = ({ region: 'face', edit: 'chat', vary: 'layers', angles: 'rotate' })[/** @type {string} */ (w?.op)];
+  return name ? h('i.opb', { 'aria-hidden': 'true', html: icon(/** @type {any} */ (name)) }) : null;
 }
 
 /** 画质的说法（显示在按钮下）。 */

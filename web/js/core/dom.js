@@ -76,6 +76,19 @@ const P = {
   chat: '<path d="M4 5h16v11H9l-5 4V5z"/>',
   logout: '<path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4"/><path d="M10 8l-4 4 4 4M6 12h10"/>',
   shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5L16 9.5"/>',
+  face: '<circle cx="12" cy="12" r="9"/><path d="M8.5 14.6c.9 1.1 2.1 1.7 3.5 1.7s2.6-.6 3.5-1.7"/><path d="M9 9.6v.6M15 9.6v.6" stroke-width="2.4"/>',
+  chevronDown: '<path d="M6 9l6 6 6-6"/>',
+  undo: '<path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+  redo: '<path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/>',
+  brush: '<path d="M14.6 4.4l5 5L11 18l-5-5z"/><path d="M6 13c-2 1-3 3-2.4 6.4C7 20 9.2 19 11 18"/>',
+  eraser: '<path d="M20 20H9"/><path d="M3.8 14.2l9.4-9.4a2 2 0 0 1 2.8 0l3.2 3.2a2 2 0 0 1 0 2.8L11 19H8.6z"/><path d="M8.6 9.4l6 6"/>',
+  layers: '<path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/>',
+  rotate: '<path d="M12 3a9 9 0 1 1-8.5 6"/><path d="M3 4v5h5"/><circle cx="12" cy="12" r="2.6"/>',
+  card: '<rect x="6" y="2.5" width="12" height="19" rx="2.5"/><circle cx="12" cy="10" r="3"/><path d="M9 17h6"/>',
+  more: '<path d="M5 12h.01M12 12h.01M19 12h.01" stroke-width="3.2"/>',
+  hd: '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M7 9v6M7 12h3.6M10.6 9v6M14 9v6h1.4a3 3 0 0 0 0-6z"/>',
+  history: '<path d="M3 12a9 9 0 1 0 2.6-6.4L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/>',
+  file: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>',
 };
 /** @param {keyof typeof P} name */
 export const icon = (name, cls = '') => `<svg class="ico ${cls}" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[name] || ''}</svg>`;
@@ -106,16 +119,27 @@ export function toast(text, o = {}) {
 
 export const stageEl = () => /** @type {HTMLElement} */ (document.getElementById('stage'));
 
-/** 选文件（照片）。 @param {{ capture?: boolean }} [o] @returns {Promise<File | null>} */
+/** 选文件（默认照片）。 @param {{ capture?: boolean, accept?: string }} [o] @returns {Promise<File | null>} */
 export function chooseFile(o = {}) {
   return new Promise(resolve => {
-    const input = /** @type {HTMLInputElement} */ (h('input', { type: 'file', accept: 'image/*', hidden: true, ...(o.capture ? { capture: 'user' } : {}) }));
+    const input = /** @type {HTMLInputElement} */ (h('input', { type: 'file', accept: o.accept || 'image/*', hidden: true, ...(o.capture ? { capture: 'user' } : {}) }));
     let done = false;
     input.addEventListener('change', () => { done = true; resolve(input.files?.[0] || null); input.remove(); });
     window.addEventListener('focus', () => setTimeout(() => { if (!done) { resolve(null); input.remove(); } }, 1200), { once: true });
     document.body.append(input);
     input.click();
   });
+}
+
+/** 人脸模型（MediaPipe / TFLite）自己的启动日志不进控制台（它连 INFO 都走 console.error）；真正的错误照常显示。 */
+let hushed = false;
+export function hushVision() {
+  if (hushed) return; hushed = true;
+  const noise = /^(INFO|W\d|I\d|Created TensorFlow|Graph|gl_context|OpenGL|Feedback manager)/;
+  for (const k of /** @type {const} */ (['log', 'info', 'warn', 'error'])) {
+    const was = console[k];
+    console[k] = (...a) => { if (!noise.test(String(a[0] ?? ''))) was.apply(console, a); };
+  }
 }
 
 /** 时间说人话：8 秒 / 1 分 10 秒。 */

@@ -15,6 +15,7 @@ from pathlib import Path
 
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
 
+from .. import brief
 from ..estimates import DEFAULTS, OPS
 from ..rooms import colours_for
 from ..turns import BackdropAsk, Inputs, LookAsk, RoomAsk, Turn
@@ -40,13 +41,6 @@ NOTES = {
     "blend": ["Lining the pictures up", "Finding the seam", "Mixing the light"], "region": ["Finding the marked parts", "Changing only those", "Feathering the edges"],
     "backdrop": ["Lifting the subject", "Building the place", "Matching the light"], "remove": ["Finding what goes", "Filling the space", "Checking the seams"],
     "vary": ["A first take", "Another one", "Comparing them"], "angles": ["From their right", "In profile", "From their left"],
-}
-SUGGEST = {
-    "create": ["Warmer light", "Make it night", "Three variations"], "edit": ["A little brighter", "Try a backdrop", "Three variations"],
-    "restyle": ["Stronger", "Softer", "Another look"], "reference": ["Closer to the reference", "Keep more colour", "Three variations"],
-    "blend": ["More of the first", "More of the second", "Try a backdrop"], "region": ["Brighter", "Try a backdrop", "Three variations"],
-    "backdrop": ["Golden hour light", "Another place", "Make it night"], "remove": ["Clean up more", "Try a backdrop", "Warmer light"],
-    "vary": ["Wilder", "Make it night", "Try a backdrop"], "angles": ["Closer", "Softer light", "Three variations"],
 }
 ROOM_WORDS = [   # (words, what they suggest); the first match wins for each setting
     (r"night|midnight|noir|space|neon|goth|dark|moon|cosmic|galaxy", {"dark": True}),
@@ -407,8 +401,8 @@ class Simulator:
         self._wait(work, total * .1)
         for i, picture in enumerate(pictures):
             work.result(i, stamp(picture), turn.text)
-        voice = turn.room.voice if turn.room and turn.room.voice else ["Here it is."]
-        work.reply(rnd.choice(voice), SUGGEST.get(op, SUGGEST["edit"]))
+        voice = turn.room.voice if turn.room and turn.room.voice else ["出片啦"]
+        work.reply(rnd.choice(voice), brief.IDEAS.get(op, brief.IDEAS["edit"]))
 
     def room(self, ask: RoomAsk) -> dict:
         text = ask.text.strip()

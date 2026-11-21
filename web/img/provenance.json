@@ -44,11 +44,6 @@
   "made": "2026-11-20",
   "prompt": "A cosy, adorable backdrop: soft blush-pink and apricot gradients, fluffy cloud shapes, tiny paw prints, little hearts and sparkles, warm and gentle. No people, no faces, no characters, no text, no logos. Soft, plenty of calm space in the middle for interface elements, tall phone-wallpaper composition."
  },
- "bg/robocat": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "A bright Doraemon-anime backdrop in retro 1980s cel animation style: a sky-blue sky with round puffy white clouds over a grassy field, the pink Anywhere Door standing open, a little yellow Take-copter flying, cheerful flat colours. No people, no faces, no characters, no text, no logos. Soft, plenty of calm space in the middle for interface elements, tall phone-wallpaper composition."
- },
  "bg/clay": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
@@ -58,11 +53,6 @@
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
   "prompt": "A premium designer-toy studio backdrop: a soft lavender seamless sweep, glossy pastel pedestals, little floating sparkles, softbox reflections, clean product-photography mood. No people, no faces, no characters, no text, no logos. Soft, plenty of calm space in the middle for interface elements, tall phone-wallpaper composition."
- },
- "bg/giant": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "An epic Ultraman tokusatsu backdrop: a city at dusk under a deep blue sky, a giant kaiju silhouette far away in the haze, silver and red light streaks, a brilliant blue beam of light and lens flares, cinematic Showa-era film still. No people, no faces, no characters, no text, no logos. Soft, plenty of calm space in the middle for interface elements, tall phone-wallpaper composition."
  },
  "bg/pilot": {
   "model": "gpt-image-2.6-sunburst",
@@ -129,25 +119,15 @@
   "made": "2026-11-20",
   "prompt": "A pair of fluffy cream-and-pink kitten ears on a thin headband, soft fur, pink inner ears. Only the accessory itself, as a standalone object: no head, no hair, no face, no person, no mannequin. Seen from the front as it would be worn, its bottom edge where it would meet the hairline. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
  },
- "stickers/robo-ears": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "A headband in a bright retro cartoon style: two small pointed sky-blue cat ears with white inner ears and a tiny yellow antenna ball in the middle, flat cel-shaded. Only the accessory itself, as a standalone object: no head, no hair, no face, no person, no mannequin. Seen from the front as it would be worn, its bottom edge where it would meet the hairline. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
- },
  "stickers/dragon-hood": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
-  "prompt": "A cute plush headband of a chubby yellow cartoon dragon: two stubby rounded custard-yellow horns and two small round ears, soft and squishy. Only the accessory itself, as a standalone object: no head, no hair, no face, no person, no mannequin. Seen from the front as it would be worn, its bottom edge where it would meet the hairline. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
+  "prompt": "A cute plush baby-dragon hood headband, an original design: a squishy custard-yellow band with two tiny rounded orange horns and two soft round ears, glossy soft toy look. Only the accessory itself, as a standalone object: no head, no hair, no face, no person, no mannequin. Seen from the front as it would be worn, its bottom edge where it would meet the hairline. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
  },
  "stickers/gothic-crown": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
   "prompt": "An ornate antique-silver gothic filigree crown with a short black lace veil and tiny dark-purple gems. Shown exactly as it would sit on top of a person's head, seen from the front, the bottom edge is where it meets the hairline. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
- },
- "stickers/hero-crest": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "A sleek silver-and-red metallic hero helmet crest: a central aerodynamic fin with gold trim and a small glowing blue gem, worn above the forehead like a tiara. An original design. Shown exactly as it would sit on top of a person's head, seen from the front, the bottom edge is where it meets the hairline. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
  },
  "stickers/beanie": {
   "model": "gpt-image-2.6-sunburst",
@@ -197,13 +177,13 @@
  "styles/dragon/mei": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
-  "prompt": "Turn this person into Nailong (奶龙), the viral chubby milky-yellow baby dragon from the Chinese cartoon: a round squishy custard-yellow dragon body with a big soft belly, stubby little arms and legs, tiny orange nub horns and a short tail, wearing it like a cute costume with their own face clearly recognisable, pulling Nailong's iconic huge, wide, cheeky open-mouth grin. Glossy soft 3D cartoon rendering, saturated sunny yellow, meme-sticker energy, made to be shared. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: glossy candy-like highlights; a solid, flat sunny-yellow background; a thick white die-cut sticker outline around the character, on a solid colour background. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "prompt": "Turn this person into a cute chubby baby-dragon mascot, an original character design: a round, squishy, custard-yellow baby-dragon onesie hood with two tiny rounded horns, soft little wings and a stubby tail, a big soft belly, their own face clearly showing in the hood opening with a cheeky, wide open-mouth grin. Glossy soft 3D cartoon rendering, saturated sunny colours, playful meme-sticker energy, made to be shared. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: glossy candy-like highlights; a solid, flat sunny-yellow background; a thick white die-cut sticker outline around them, on a solid colour background. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
   "source": "people/mei"
  },
  "styles/dragon/jun": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
-  "prompt": "Turn this person into Nailong (奶龙), the viral chubby milky-yellow baby dragon from the Chinese cartoon: a round squishy custard-yellow dragon body with a big soft belly, stubby little arms and legs, tiny orange nub horns and a short tail, wearing it like a cute costume with their own face clearly recognisable, pulling Nailong's iconic huge, wide, cheeky open-mouth grin. Glossy soft 3D cartoon rendering, saturated sunny yellow, meme-sticker energy, made to be shared. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: glossy candy-like highlights; a solid, flat sunny-yellow background; a thick white die-cut sticker outline around the character, on a solid colour background. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "prompt": "Turn this person into a cute chubby baby-dragon mascot, an original character design: a round, squishy, custard-yellow baby-dragon onesie hood with two tiny rounded horns, soft little wings and a stubby tail, a big soft belly, their own face clearly showing in the hood opening with a cheeky, wide open-mouth grin. Glossy soft 3D cartoon rendering, saturated sunny colours, playful meme-sticker energy, made to be shared. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: glossy candy-like highlights; a solid, flat sunny-yellow background; a thick white die-cut sticker outline around them, on a solid colour background. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
   "source": "people/jun"
  },
  "styles/bighead/priya": {
@@ -227,7 +207,7 @@
  "styles/dragon/kai": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
-  "prompt": "Turn this person into Nailong (奶龙), the viral chubby milky-yellow baby dragon from the Chinese cartoon: a round squishy custard-yellow dragon body with a big soft belly, stubby little arms and legs, tiny orange nub horns and a short tail, wearing it like a cute costume with their own face clearly recognisable, pulling Nailong's iconic huge, wide, cheeky open-mouth grin. Glossy soft 3D cartoon rendering, saturated sunny yellow, meme-sticker energy, made to be shared. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: glossy candy-like highlights; a solid, flat sunny-yellow background; a thick white die-cut sticker outline around the character, on a solid colour background. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "prompt": "Turn this person into a cute chubby baby-dragon mascot, an original character design: a round, squishy, custard-yellow baby-dragon onesie hood with two tiny rounded horns, soft little wings and a stubby tail, a big soft belly, their own face clearly showing in the hood opening with a cheeky, wide open-mouth grin. Glossy soft 3D cartoon rendering, saturated sunny colours, playful meme-sticker energy, made to be shared. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: glossy candy-like highlights; a solid, flat sunny-yellow background; a thick white die-cut sticker outline around them, on a solid colour background. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
   "source": "people/kai"
  },
  "styles/faceart/kai": {
@@ -283,42 +263,6 @@
   "made": "2026-11-20",
   "prompt": "Blend this person playfully with a cute pet: soft fluffy animal ears, faint whisker marks and a tiny pink nose tip on their own face, keeping their features and expression clearly them, with a matching fluffy pet beside their face mirroring their exact expression. Soft, bright, cosy and adorable photo-illustration. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Apply the style fully and confidently. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: cat ears and a kitten; a soft fluffy glow; a cosy blanket nest. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border.",
   "source": "people/kai"
- },
- "styles/giant/mei": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "Turn this person into an Ultraman: the classic Ultraman suit in gleaming silver and red with its flowing curved stripes, the round glowing blue color timer in the centre of the chest, the iconic silver Ultraman crest-fin helmet with the face open so their own face stays clearly recognisable, cinematic rim light, heroic low angle, an epic Showa-era tokusatsu film still. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: the silver Ultraman crest fin shining on the helmet; the color timer glowing bright blue and lighting the face; a city at dusk with a giant kaiju silhouette in the smoke behind. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
-  "source": "people/mei"
- },
- "styles/giant/aiman": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "Turn this person into an Ultraman: the classic Ultraman suit in gleaming silver and red with its flowing curved stripes, the round glowing blue color timer in the centre of the chest, the iconic silver Ultraman crest-fin helmet with the face open so their own face stays clearly recognisable, cinematic rim light, heroic low angle, an epic Showa-era tokusatsu film still. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: the silver Ultraman crest fin shining on the helmet; the color timer glowing bright blue and lighting the face; a city at dusk with a giant kaiju silhouette in the smoke behind. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
-  "source": "people/aiman"
- },
- "styles/giant/jun": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "Turn this person into an Ultraman: the classic Ultraman suit in gleaming silver and red with its flowing curved stripes, the round glowing blue color timer in the centre of the chest, the iconic silver Ultraman crest-fin helmet with the face open so their own face stays clearly recognisable, cinematic rim light, heroic low angle, an epic Showa-era tokusatsu film still. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: the silver Ultraman crest fin shining on the helmet; the color timer glowing bright blue and lighting the face; a city at dusk with a giant kaiju silhouette in the smoke behind. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
-  "source": "people/jun"
- },
- "styles/robocat/mei": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "Turn this person into a Doraemon cosplay drawn in the classic Doraemon anime style: the round blue-and-white robot-cat hood with Doraemon's face on top (big round eyes, red nose, whiskers), the red collar with the golden bell and the white 4D pocket on the belly, their own face clearly visible in the hood opening with a big happy grin. Bright retro 1980s cel animation, thick soft outlines, flat cheerful colours, clean transparent cel shading. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a little yellow Take-copter (bamboo-copter) spinning on top of the head; crisp two-tone cel shading; the pink Anywhere Door standing open on a grassy field behind. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
-  "source": "people/mei"
- },
- "styles/robocat/kai": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "Turn this person into a Doraemon cosplay drawn in the classic Doraemon anime style: the round blue-and-white robot-cat hood with Doraemon's face on top (big round eyes, red nose, whiskers), the red collar with the golden bell and the white 4D pocket on the belly, their own face clearly visible in the hood opening with a big happy grin. Bright retro 1980s cel animation, thick soft outlines, flat cheerful colours, clean transparent cel shading. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a little yellow Take-copter (bamboo-copter) spinning on top of the head; crisp two-tone cel shading; the pink Anywhere Door standing open on a grassy field behind. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
-  "source": "people/kai"
- },
- "styles/robocat/nur": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "Turn this person into a Doraemon cosplay drawn in the classic Doraemon anime style: the round blue-and-white robot-cat hood with Doraemon's face on top (big round eyes, red nose, whiskers), the red collar with the golden bell and the white 4D pocket on the belly, their own face clearly visible in the hood opening with a big happy grin. Bright retro 1980s cel animation, thick soft outlines, flat cheerful colours, clean transparent cel shading. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a little yellow Take-copter (bamboo-copter) spinning on top of the head; crisp two-tone cel shading; the pink Anywhere Door standing open on a grassy field behind. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
-  "source": "people/nur"
  },
  "styles/pilot/mei": {
   "model": "gpt-image-2.6-sunburst",
@@ -500,11 +444,6 @@
   "prompt": "Restyle this person as a cyberpunk neon portrait: hard magenta and cyan rim lights carving the face, glittering rain droplets, a rain-soaked night city with glowing signs dissolved into bokeh behind, subtle holographic accents, cinematic contrast and film grain. Keep them clearly recognisable. No readable text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: hard magenta and cyan rim light; rain droplets catching the neon; a rainy neon street. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border.",
   "source": "people/kai"
  },
- "stickers/ultra-crest": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "The silver Ultraman crest fin: the iconic smooth silver central fin of Ultraman's head with its red side stripes, as a headpiece worn above the forehead. Only the accessory itself, as a standalone object: no head, no hair, no face, no person, no mannequin. Seen from the front as it would be worn, its bottom edge where it would meet the hairline. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
- },
  "bg/vtuber": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
@@ -515,58 +454,33 @@
   "made": "2026-11-20",
   "prompt": "A 90s magical-girl anime backdrop: a starry pastel night sky with a huge glowing crescent moon, swirling ribbons of light, falling stars, tiny hearts and sparkles, pink and lavender gradients, cel-shaded 2D anime. No people, no faces, no characters, no text, no logos. Soft, plenty of calm space in the middle for interface elements, tall phone-wallpaper composition."
  },
- "stickers/take-copter": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "Doraemon's yellow Take-copter (bamboo-copter): a small yellow propeller on a short stalk with a round base, seen from the front, flat retro anime cel style. Only the accessory itself, as a standalone object: no head, no hair, no face, no person, no mannequin. Seen from the front as it would be worn, its bottom edge where it would meet the hairline. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
- },
- "stickers/nailong-hood": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "A cute plush headband in the style of Nailong, the chubby milky-yellow baby dragon: two tiny orange nub horns and soft round yellow ears on a squishy yellow band. Only the accessory itself, as a standalone object: no head, no hair, no face, no person, no mannequin. Seen from the front as it would be worn, its bottom edge where it would meet the hairline. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
- },
  "bg/shonen": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
   "prompt": "A shonen battle-anime backdrop: a dark ruined battlefield at a blood-red sunset, erupting golden energy aura and flames, dramatic speed lines radiating outwards, flying debris, bold cel-shaded 2D anime key frame. No people, no faces, no characters, no text, no logos. Soft, plenty of calm space in the middle for interface elements, tall phone-wallpaper composition."
  },
- "bg/ghibli": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "A hand-painted Studio Ghibli style backdrop: a lush green summer countryside with rice fields, a little country bus stop, towering fluffy cumulus clouds in a bright blue sky, soft gouache and watercolour, warm nostalgic light. No people, no faces, no characters, no text, no logos. Soft, plenty of calm space in the middle for interface elements, tall phone-wallpaper composition."
- },
  "stickers/magic-tiara": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
-  "prompt": "A 90s magical-girl tiara: a golden tiara with a glowing pink crescent moon jewel in the centre, tiny stars and two small ribbon bows. Only the accessory itself, as a standalone object: no head, no hair, no face, no person, no mannequin. Seen from the front as it would be worn, its bottom edge where it would meet the hairline. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
+  "prompt": "A 90s magical-girl tiara: a golden tiara with a glowing pink star jewel in the centre, tiny stars and two small ribbon bows. Only the accessory itself, as a standalone object: no head, no hair, no face, no person, no mannequin. Seen from the front as it would be worn, its bottom edge where it would meet the hairline. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
  },
  "styles/dragon/aiman": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
-  "prompt": "Turn this person into Nailong (奶龙), the viral chubby milky-yellow baby dragon from the Chinese cartoon: a round squishy custard-yellow dragon body with a big soft belly, stubby little arms and legs, tiny orange nub horns and a short tail, wearing it like a cute costume with their own face clearly recognisable, pulling Nailong's iconic huge, wide, cheeky open-mouth grin. Glossy soft 3D cartoon rendering, saturated sunny yellow, meme-sticker energy, made to be shared. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: glossy candy-like highlights; a solid, flat sunny-yellow background; a thick white die-cut sticker outline around the character, on a solid colour background. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "prompt": "Turn this person into a cute chubby baby-dragon mascot, an original character design: a round, squishy, custard-yellow baby-dragon onesie hood with two tiny rounded horns, soft little wings and a stubby tail, a big soft belly, their own face clearly showing in the hood opening with a cheeky, wide open-mouth grin. Glossy soft 3D cartoon rendering, saturated sunny colours, playful meme-sticker energy, made to be shared. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: glossy candy-like highlights; a solid, flat sunny-yellow background; a thick white die-cut sticker outline around them, on a solid colour background. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
   "source": "people/aiman"
  },
  "styles/dragon/priya": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
-  "prompt": "Turn this person into Nailong (奶龙), the viral chubby milky-yellow baby dragon from the Chinese cartoon: a round squishy custard-yellow dragon body with a big soft belly, stubby little arms and legs, tiny orange nub horns and a short tail, wearing it like a cute costume with their own face clearly recognisable, pulling Nailong's iconic huge, wide, cheeky open-mouth grin. Glossy soft 3D cartoon rendering, saturated sunny yellow, meme-sticker energy, made to be shared. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: glossy candy-like highlights; a solid, flat sunny-yellow background; a thick white die-cut sticker outline around the character, on a solid colour background. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "prompt": "Turn this person into a cute chubby baby-dragon mascot, an original character design: a round, squishy, custard-yellow baby-dragon onesie hood with two tiny rounded horns, soft little wings and a stubby tail, a big soft belly, their own face clearly showing in the hood opening with a cheeky, wide open-mouth grin. Glossy soft 3D cartoon rendering, saturated sunny colours, playful meme-sticker energy, made to be shared. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: glossy candy-like highlights; a solid, flat sunny-yellow background; a thick white die-cut sticker outline around them, on a solid colour background. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
   "source": "people/priya"
- },
- "stickers/ninja-band": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "A ninja forehead-protector headband: a dark blue cloth band with a polished engraved metal plate in the centre (a simple swirl leaf symbol), tails fluttering. Only the accessory itself, as a standalone object: no head, no hair, no face, no person, no mannequin. Seen from the front as it would be worn, its bottom edge where it would meet the hairline. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
  },
  "styles/dragon/nur": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
-  "prompt": "Turn this person into Nailong (奶龙), the viral chubby milky-yellow baby dragon from the Chinese cartoon: a round squishy custard-yellow dragon body with a big soft belly, stubby little arms and legs, tiny orange nub horns and a short tail, wearing it like a cute costume with their own face clearly recognisable, pulling Nailong's iconic huge, wide, cheeky open-mouth grin. Glossy soft 3D cartoon rendering, saturated sunny yellow, meme-sticker energy, made to be shared. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: glossy candy-like highlights; a solid, flat sunny-yellow background; a thick white die-cut sticker outline around the character, on a solid colour background. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "prompt": "Turn this person into a cute chubby baby-dragon mascot, an original character design: a round, squishy, custard-yellow baby-dragon onesie hood with two tiny rounded horns, soft little wings and a stubby tail, a big soft belly, their own face clearly showing in the hood opening with a cheeky, wide open-mouth grin. Glossy soft 3D cartoon rendering, saturated sunny colours, playful meme-sticker energy, made to be shared. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: glossy candy-like highlights; a solid, flat sunny-yellow background; a thick white die-cut sticker outline around them, on a solid colour background. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
   "source": "people/nur"
- },
- "stickers/leaf-umbrella": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "A huge glossy green taro leaf held over the head like an umbrella, its stem pointing down, hand-painted anime style. Only the accessory itself, as a standalone object: no head, no hair, no face, no person, no mannequin. Seen from the front as it would be worn, its bottom edge where it would meet the hairline. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
  },
  "stickers/cat-headset": {
   "model": "gpt-image-2.6-sunburst",
@@ -645,47 +559,11 @@
   "prompt": "Blend this person playfully with a cute pet: soft fluffy animal ears, faint whisker marks and a tiny pink nose tip on their own face, keeping their features and expression clearly them, with a matching fluffy pet beside their face mirroring their exact expression. Soft, bright, cosy and adorable photo-illustration. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Apply the style fully and confidently. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: cat ears and a kitten; a soft fluffy glow; a cosy blanket nest. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
   "source": "people/priya"
  },
- "styles/giant/priya": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "Turn this person into an Ultraman: the classic Ultraman suit in gleaming silver and red with its flowing curved stripes, the round glowing blue color timer in the centre of the chest, the iconic silver Ultraman crest-fin helmet with the face open so their own face stays clearly recognisable, cinematic rim light, heroic low angle, an epic Showa-era tokusatsu film still. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: the silver Ultraman crest fin shining on the helmet; the color timer glowing bright blue and lighting the face; a city at dusk with a giant kaiju silhouette in the smoke behind. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
-  "source": "people/priya"
- },
- "styles/giant/kai": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "Turn this person into an Ultraman: the classic Ultraman suit in gleaming silver and red with its flowing curved stripes, the round glowing blue color timer in the centre of the chest, the iconic silver Ultraman crest-fin helmet with the face open so their own face stays clearly recognisable, cinematic rim light, heroic low angle, an epic Showa-era tokusatsu film still. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: the silver Ultraman crest fin shining on the helmet; the color timer glowing bright blue and lighting the face; a city at dusk with a giant kaiju silhouette in the smoke behind. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
-  "source": "people/kai"
- },
- "styles/giant/nur": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "Turn this person into an Ultraman: the classic Ultraman suit in gleaming silver and red with its flowing curved stripes, the round glowing blue color timer in the centre of the chest, the iconic silver Ultraman crest-fin helmet with the face open so their own face stays clearly recognisable, cinematic rim light, heroic low angle, an epic Showa-era tokusatsu film still. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: the silver Ultraman crest fin shining on the helmet; the color timer glowing bright blue and lighting the face; a city at dusk with a giant kaiju silhouette in the smoke behind. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
-  "source": "people/nur"
- },
- "styles/robocat/aiman": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "Turn this person into a Doraemon cosplay drawn in the classic Doraemon anime style: the round blue-and-white robot-cat hood with Doraemon's face on top (big round eyes, red nose, whiskers), the red collar with the golden bell and the white 4D pocket on the belly, their own face clearly visible in the hood opening with a big happy grin. Bright retro 1980s cel animation, thick soft outlines, flat cheerful colours, clean transparent cel shading. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a little yellow Take-copter (bamboo-copter) spinning on top of the head; crisp two-tone cel shading; the pink Anywhere Door standing open on a grassy field behind. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
-  "source": "people/aiman"
- },
  "styles/figure/priya": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
   "prompt": "Recreate this person as a premium designer art-toy blind-box figure: smooth matte vinyl, chibi proportions with a big head, large glossy expressive eyes, simplified cute features that still read clearly as them, standing on a small round base, soft studio softbox lighting, a clean pastel backdrop, high-end product photography. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: soft softbox studio light; a macaron-pastel backdrop. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
   "source": "people/priya"
- },
- "styles/robocat/priya": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "Turn this person into a Doraemon cosplay drawn in the classic Doraemon anime style: the round blue-and-white robot-cat hood with Doraemon's face on top (big round eyes, red nose, whiskers), the red collar with the golden bell and the white 4D pocket on the belly, their own face clearly visible in the hood opening with a big happy grin. Bright retro 1980s cel animation, thick soft outlines, flat cheerful colours, clean transparent cel shading. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a little yellow Take-copter (bamboo-copter) spinning on top of the head; crisp two-tone cel shading; the pink Anywhere Door standing open on a grassy field behind. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
-  "source": "people/priya"
- },
- "styles/robocat/jun": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "Turn this person into a Doraemon cosplay drawn in the classic Doraemon anime style: the round blue-and-white robot-cat hood with Doraemon's face on top (big round eyes, red nose, whiskers), the red collar with the golden bell and the white 4D pocket on the belly, their own face clearly visible in the hood opening with a big happy grin. Bright retro 1980s cel animation, thick soft outlines, flat cheerful colours, clean transparent cel shading. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a little yellow Take-copter (bamboo-copter) spinning on top of the head; crisp two-tone cel shading; the pink Anywhere Door standing open on a grassy field behind. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
-  "source": "people/jun"
  },
  "styles/figure/jun": {
   "model": "gpt-image-2.6-sunburst",
@@ -810,109 +688,73 @@
  "styles/magical/priya": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
-  "prompt": "Transform this person into a 90s-style magical girl anime heroine caught mid-transformation, in the spirit of Sailor Moon and Cardcaptor Sakura: a frilly pastel sailor-style costume with big ribbon bows, a jewelled moon-and-star tiara, a sparkling star wand, glittering stars and ribbons of light swirling around them, huge luminous anime eyes, hair lifted by magic. Hand-drawn 2D cel-shaded anime (not photorealistic), still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. Polished, glowing skin and bright eyes, still natural. Include: holding a jewelled star wand; a dazzling transformation light swirling around them; a starry night sky with a huge glowing crescent moon. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "prompt": "Transform this person into a 90s-style magical-girl anime heroine caught mid-transformation, an original design: a frilly pastel magical costume with big ribbon bows and layered petticoats, a jewelled star tiara, a sparkling heart-and-star wand, glittering stars and ribbons of light swirling around them, huge luminous anime eyes, hair lifted by magic. Hand-drawn 2D cel-shaded anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. Polished, glowing skin and bright eyes, still natural. Include: holding a jewelled star wand; a dazzling transformation light swirling around them; a starry night sky with a huge glowing crescent moon. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
   "source": "people/priya"
  },
  "styles/magical/nur": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
-  "prompt": "Transform this person into a 90s-style magical girl anime heroine caught mid-transformation, in the spirit of Sailor Moon and Cardcaptor Sakura: a frilly pastel sailor-style costume with big ribbon bows, a jewelled moon-and-star tiara, a sparkling star wand, glittering stars and ribbons of light swirling around them, huge luminous anime eyes, hair lifted by magic. Hand-drawn 2D cel-shaded anime (not photorealistic), still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. Polished, glowing skin and bright eyes, still natural. Include: holding a jewelled star wand; a dazzling transformation light swirling around them; a starry night sky with a huge glowing crescent moon. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "prompt": "Transform this person into a 90s-style magical-girl anime heroine caught mid-transformation, an original design: a frilly pastel magical costume with big ribbon bows and layered petticoats, a jewelled star tiara, a sparkling heart-and-star wand, glittering stars and ribbons of light swirling around them, huge luminous anime eyes, hair lifted by magic. Hand-drawn 2D cel-shaded anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. Polished, glowing skin and bright eyes, still natural. Include: holding a jewelled star wand; a dazzling transformation light swirling around them; a starry night sky with a huge glowing crescent moon. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
   "source": "people/nur"
  },
  "styles/magical/mei": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
-  "prompt": "Transform this person into a 90s-style magical girl anime heroine caught mid-transformation, in the spirit of Sailor Moon and Cardcaptor Sakura: a frilly pastel sailor-style costume with big ribbon bows, a jewelled moon-and-star tiara, a sparkling star wand, glittering stars and ribbons of light swirling around them, huge luminous anime eyes, hair lifted by magic. Hand-drawn 2D cel-shaded anime (not photorealistic), still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. Polished, glowing skin and bright eyes, still natural. Include: holding a jewelled star wand; a dazzling transformation light swirling around them; a starry night sky with a huge glowing crescent moon. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "prompt": "Transform this person into a 90s-style magical-girl anime heroine caught mid-transformation, an original design: a frilly pastel magical costume with big ribbon bows and layered petticoats, a jewelled star tiara, a sparkling heart-and-star wand, glittering stars and ribbons of light swirling around them, huge luminous anime eyes, hair lifted by magic. Hand-drawn 2D cel-shaded anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. Polished, glowing skin and bright eyes, still natural. Include: holding a jewelled star wand; a dazzling transformation light swirling around them; a starry night sky with a huge glowing crescent moon. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
   "source": "people/mei"
  },
  "styles/magical/jun": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
-  "prompt": "Transform this person into a 90s-style magical girl anime heroine caught mid-transformation, in the spirit of Sailor Moon and Cardcaptor Sakura: a frilly pastel sailor-style costume with big ribbon bows, a jewelled moon-and-star tiara, a sparkling star wand, glittering stars and ribbons of light swirling around them, huge luminous anime eyes, hair lifted by magic. Hand-drawn 2D cel-shaded anime (not photorealistic), still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. Polished, glowing skin and bright eyes, still natural. Include: holding a jewelled star wand; a dazzling transformation light swirling around them; a starry night sky with a huge glowing crescent moon. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "prompt": "Transform this person into a 90s-style magical-girl anime heroine caught mid-transformation, an original design: a frilly pastel magical costume with big ribbon bows and layered petticoats, a jewelled star tiara, a sparkling heart-and-star wand, glittering stars and ribbons of light swirling around them, huge luminous anime eyes, hair lifted by magic. Hand-drawn 2D cel-shaded anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. Polished, glowing skin and bright eyes, still natural. Include: holding a jewelled star wand; a dazzling transformation light swirling around them; a starry night sky with a huge glowing crescent moon. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
   "source": "people/jun"
  },
  "styles/magical/aiman": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
-  "prompt": "Transform this person into a 90s-style magical girl anime heroine caught mid-transformation, in the spirit of Sailor Moon and Cardcaptor Sakura: a frilly pastel sailor-style costume with big ribbon bows, a jewelled moon-and-star tiara, a sparkling star wand, glittering stars and ribbons of light swirling around them, huge luminous anime eyes, hair lifted by magic. Hand-drawn 2D cel-shaded anime (not photorealistic), still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. Polished, glowing skin and bright eyes, still natural. Include: holding a jewelled star wand; a dazzling transformation light swirling around them; a starry night sky with a huge glowing crescent moon. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "prompt": "Transform this person into a 90s-style magical-girl anime heroine caught mid-transformation, an original design: a frilly pastel magical costume with big ribbon bows and layered petticoats, a jewelled star tiara, a sparkling heart-and-star wand, glittering stars and ribbons of light swirling around them, huge luminous anime eyes, hair lifted by magic. Hand-drawn 2D cel-shaded anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. Polished, glowing skin and bright eyes, still natural. Include: holding a jewelled star wand; a dazzling transformation light swirling around them; a starry night sky with a huge glowing crescent moon. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
   "source": "people/aiman"
  },
  "styles/magical/kai": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
-  "prompt": "Transform this person into a 90s-style magical girl anime heroine caught mid-transformation, in the spirit of Sailor Moon and Cardcaptor Sakura: a frilly pastel sailor-style costume with big ribbon bows, a jewelled moon-and-star tiara, a sparkling star wand, glittering stars and ribbons of light swirling around them, huge luminous anime eyes, hair lifted by magic. Hand-drawn 2D cel-shaded anime (not photorealistic), still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. Polished, glowing skin and bright eyes, still natural. Include: holding a jewelled star wand; a dazzling transformation light swirling around them; a starry night sky with a huge glowing crescent moon. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "prompt": "Transform this person into a 90s-style magical-girl anime heroine caught mid-transformation, an original design: a frilly pastel magical costume with big ribbon bows and layered petticoats, a jewelled star tiara, a sparkling heart-and-star wand, glittering stars and ribbons of light swirling around them, huge luminous anime eyes, hair lifted by magic. Hand-drawn 2D cel-shaded anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. Polished, glowing skin and bright eyes, still natural. Include: holding a jewelled star wand; a dazzling transformation light swirling around them; a starry night sky with a huge glowing crescent moon. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
   "source": "people/kai"
  },
  "styles/shonen/aiman": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
-  "prompt": "Redraw this person as the hero of a hot-blooded shonen battle anime, in the spirit of Naruto, Dragon Ball and Demon Slayer: intense determined eyes, wind-swept hair, a blazing aura of energy flames erupting around them, dynamic speed lines, a dramatic low-angle final-battle key frame, bold ink lines and punchy cel shading. 2D anime (not photorealistic), still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a ninja forehead-protector headband with a metal plate; a blazing golden energy aura; a ruined battlefield with rising dust. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "prompt": "Redraw this person as the hero of a hot-blooded shonen battle anime, an original character: intense determined eyes, wind-swept hair, a blazing aura of energy flames erupting around them, dynamic speed lines, a dramatic low-angle final-battle key frame, bold ink lines and punchy cel shading. 2D anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a red cloth headband tied around the forehead, its long tails fluttering; a blazing golden energy aura; a ruined battlefield with rising dust. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
   "source": "people/aiman"
  },
  "styles/shonen/mei": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
-  "prompt": "Redraw this person as the hero of a hot-blooded shonen battle anime, in the spirit of Naruto, Dragon Ball and Demon Slayer: intense determined eyes, wind-swept hair, a blazing aura of energy flames erupting around them, dynamic speed lines, a dramatic low-angle final-battle key frame, bold ink lines and punchy cel shading. 2D anime (not photorealistic), still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a ninja forehead-protector headband with a metal plate; a blazing golden energy aura; a ruined battlefield with rising dust. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "prompt": "Redraw this person as the hero of a hot-blooded shonen battle anime, an original character: intense determined eyes, wind-swept hair, a blazing aura of energy flames erupting around them, dynamic speed lines, a dramatic low-angle final-battle key frame, bold ink lines and punchy cel shading. 2D anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a red cloth headband tied around the forehead, its long tails fluttering; a blazing golden energy aura; a ruined battlefield with rising dust. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
   "source": "people/mei"
  },
  "styles/shonen/priya": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
-  "prompt": "Redraw this person as the hero of a hot-blooded shonen battle anime, in the spirit of Naruto, Dragon Ball and Demon Slayer: intense determined eyes, wind-swept hair, a blazing aura of energy flames erupting around them, dynamic speed lines, a dramatic low-angle final-battle key frame, bold ink lines and punchy cel shading. 2D anime (not photorealistic), still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a ninja forehead-protector headband with a metal plate; a blazing golden energy aura; a ruined battlefield with rising dust. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "prompt": "Redraw this person as the hero of a hot-blooded shonen battle anime, an original character: intense determined eyes, wind-swept hair, a blazing aura of energy flames erupting around them, dynamic speed lines, a dramatic low-angle final-battle key frame, bold ink lines and punchy cel shading. 2D anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a red cloth headband tied around the forehead, its long tails fluttering; a blazing golden energy aura; a ruined battlefield with rising dust. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
   "source": "people/priya"
  },
  "styles/shonen/jun": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
-  "prompt": "Redraw this person as the hero of a hot-blooded shonen battle anime, in the spirit of Naruto, Dragon Ball and Demon Slayer: intense determined eyes, wind-swept hair, a blazing aura of energy flames erupting around them, dynamic speed lines, a dramatic low-angle final-battle key frame, bold ink lines and punchy cel shading. 2D anime (not photorealistic), still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a ninja forehead-protector headband with a metal plate; a blazing golden energy aura; a ruined battlefield with rising dust. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "prompt": "Redraw this person as the hero of a hot-blooded shonen battle anime, an original character: intense determined eyes, wind-swept hair, a blazing aura of energy flames erupting around them, dynamic speed lines, a dramatic low-angle final-battle key frame, bold ink lines and punchy cel shading. 2D anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a red cloth headband tied around the forehead, its long tails fluttering; a blazing golden energy aura; a ruined battlefield with rising dust. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
   "source": "people/jun"
  },
  "styles/shonen/nur": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
-  "prompt": "Redraw this person as the hero of a hot-blooded shonen battle anime, in the spirit of Naruto, Dragon Ball and Demon Slayer: intense determined eyes, wind-swept hair, a blazing aura of energy flames erupting around them, dynamic speed lines, a dramatic low-angle final-battle key frame, bold ink lines and punchy cel shading. 2D anime (not photorealistic), still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a ninja forehead-protector headband with a metal plate; a blazing golden energy aura; a ruined battlefield with rising dust. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "prompt": "Redraw this person as the hero of a hot-blooded shonen battle anime, an original character: intense determined eyes, wind-swept hair, a blazing aura of energy flames erupting around them, dynamic speed lines, a dramatic low-angle final-battle key frame, bold ink lines and punchy cel shading. 2D anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a red cloth headband tied around the forehead, its long tails fluttering; a blazing golden energy aura; a ruined battlefield with rising dust. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
   "source": "people/nur"
  },
  "styles/shonen/kai": {
   "model": "gpt-image-2.6-sunburst",
   "made": "2026-11-20",
-  "prompt": "Redraw this person as the hero of a hot-blooded shonen battle anime, in the spirit of Naruto, Dragon Ball and Demon Slayer: intense determined eyes, wind-swept hair, a blazing aura of energy flames erupting around them, dynamic speed lines, a dramatic low-angle final-battle key frame, bold ink lines and punchy cel shading. 2D anime (not photorealistic), still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a ninja forehead-protector headband with a metal plate; a blazing golden energy aura; a ruined battlefield with rising dust. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
-  "source": "people/kai"
- },
- "styles/ghibli/mei": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "Repaint this person as a character in a gentle hand-painted Studio Ghibli film, in the spirit of My Neighbor Totoro and Kiki's Delivery Service: soft gouache and watercolour backgrounds, a lush summer countryside, towering fluffy cumulus clouds, warm nostalgic light, simple expressive anime features with gentle cel shading, painterly and heart-warming. 2D anime (not photorealistic), still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: dappled summer sunlight; green rice fields and a country bus stop; a soft watercolour edge fading into paper. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
-  "source": "people/mei"
- },
- "styles/ghibli/nur": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "Repaint this person as a character in a gentle hand-painted Studio Ghibli film, in the spirit of My Neighbor Totoro and Kiki's Delivery Service: soft gouache and watercolour backgrounds, a lush summer countryside, towering fluffy cumulus clouds, warm nostalgic light, simple expressive anime features with gentle cel shading, painterly and heart-warming. 2D anime (not photorealistic), still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: dappled summer sunlight; green rice fields and a country bus stop; a soft watercolour edge fading into paper. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
-  "source": "people/nur"
- },
- "styles/ghibli/aiman": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "Repaint this person as a character in a gentle hand-painted Studio Ghibli film, in the spirit of My Neighbor Totoro and Kiki's Delivery Service: soft gouache and watercolour backgrounds, a lush summer countryside, towering fluffy cumulus clouds, warm nostalgic light, simple expressive anime features with gentle cel shading, painterly and heart-warming. 2D anime (not photorealistic), still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: dappled summer sunlight; green rice fields and a country bus stop; a soft watercolour edge fading into paper. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
-  "source": "people/aiman"
- },
- "styles/ghibli/priya": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "Repaint this person as a character in a gentle hand-painted Studio Ghibli film, in the spirit of My Neighbor Totoro and Kiki's Delivery Service: soft gouache and watercolour backgrounds, a lush summer countryside, towering fluffy cumulus clouds, warm nostalgic light, simple expressive anime features with gentle cel shading, painterly and heart-warming. 2D anime (not photorealistic), still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: dappled summer sunlight; green rice fields and a country bus stop; a soft watercolour edge fading into paper. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
-  "source": "people/priya"
- },
- "styles/ghibli/jun": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "Repaint this person as a character in a gentle hand-painted Studio Ghibli film, in the spirit of My Neighbor Totoro and Kiki's Delivery Service: soft gouache and watercolour backgrounds, a lush summer countryside, towering fluffy cumulus clouds, warm nostalgic light, simple expressive anime features with gentle cel shading, painterly and heart-warming. 2D anime (not photorealistic), still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: dappled summer sunlight; green rice fields and a country bus stop; a soft watercolour edge fading into paper. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
-  "source": "people/jun"
- },
- "styles/ghibli/kai": {
-  "model": "gpt-image-2.6-sunburst",
-  "made": "2026-11-20",
-  "prompt": "Repaint this person as a character in a gentle hand-painted Studio Ghibli film, in the spirit of My Neighbor Totoro and Kiki's Delivery Service: soft gouache and watercolour backgrounds, a lush summer countryside, towering fluffy cumulus clouds, warm nostalgic light, simple expressive anime features with gentle cel shading, painterly and heart-warming. 2D anime (not photorealistic), still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: dappled summer sunlight; green rice fields and a country bus stop; a soft watercolour edge fading into paper. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "prompt": "Redraw this person as the hero of a hot-blooded shonen battle anime, an original character: intense determined eyes, wind-swept hair, a blazing aura of energy flames erupting around them, dynamic speed lines, a dramatic low-angle final-battle key frame, bold ink lines and punchy cel shading. 2D anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a red cloth headband tied around the forehead, its long tails fluttering; a blazing golden energy aura; a ruined battlefield with rising dust. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
   "source": "people/kai"
  },
  "styles/vtuber/mei": {
@@ -1004,5 +846,760 @@
   "made": "2026-11-20",
   "prompt": "Restyle this person as a cyberpunk neon portrait: hard magenta and cyan rim lights carving the face, glittering rain droplets, a rain-soaked night city with glowing signs dissolved into bokeh behind, subtle holographic accents, cinematic contrast and film grain. Keep them clearly recognisable. No readable text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: hard magenta and cyan rim light; rain droplets catching the neon; a rainy neon street. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
   "source": "people/nur"
+ },
+ "styles/robot/kai": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into a cute retro cartoon robot, an original design: a round, chubby robot suit in glossy sky-blue and white with simple rounded shapes and a few friendly bolts, a round robot helmet-hood with a tiny antenna and two glowing cheek lights, their own face clearly visible in the hood opening with a big happy grin. Bright 1980s TV-cartoon cel animation, thick soft outlines, flat cheerful colours, clean two-tone cel shading. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a little spinning propeller on top of the robot hood; crisp two-tone cel shading; a sky-blue sky with round puffy clouds over a grassy field. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/kai"
+ },
+ "styles/robot/mei": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into a cute retro cartoon robot, an original design: a round, chubby robot suit in glossy sky-blue and white with simple rounded shapes and a few friendly bolts, a round robot helmet-hood with a tiny antenna and two glowing cheek lights, their own face clearly visible in the hood opening with a big happy grin. Bright 1980s TV-cartoon cel animation, thick soft outlines, flat cheerful colours, clean two-tone cel shading. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a little spinning propeller on top of the robot hood; crisp two-tone cel shading; a sky-blue sky with round puffy clouds over a grassy field. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/mei"
+ },
+ "styles/hero/aiman": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into the hero of a classic Japanese tokusatsu sci-fi TV show, an entirely original suit design: sleek armour of brushed silver with sharp angular crimson plates and glowing cyan circuit lines, a glowing hexagonal energy core in the centre of the chest, a visor-style open-face helmet with two swept-back angular side wings so their own face stays clearly recognisable, cinematic rim light and lens flares, a heroic low angle, an epic retro special-effects film still. Not any existing character. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: the chest energy core glowing bright cyan and lighting the face; a city skyline at dusk with searchlights sweeping through drifting smoke. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/aiman"
+ },
+ "styles/hero/mei": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into the hero of a classic Japanese tokusatsu sci-fi TV show, an entirely original suit design: sleek armour of brushed silver with sharp angular crimson plates and glowing cyan circuit lines, a glowing hexagonal energy core in the centre of the chest, a visor-style open-face helmet with two swept-back angular side wings so their own face stays clearly recognisable, cinematic rim light and lens flares, a heroic low angle, an epic retro special-effects film still. Not any existing character. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: the chest energy core glowing bright cyan and lighting the face; a city skyline at dusk with searchlights sweeping through drifting smoke. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/mei"
+ },
+ "styles/inkfairy/mei": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as an ethereal immortal in a classical Chinese gongbi and ink-wash painting with a refined modern finish: flowing silk robes and translucent gauze sleeves drifting on the wind, delicate gold hair ornaments, ink-wash mountains and rolling auspicious clouds, accents of vermilion lacquer and shimmering gold leaf, warm palace-lantern glow, fine elegant linework, poetic, serene and luminous. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: an exquisite gold hairpin with dangling pearl tassels; the warm glow of red palace lanterns; ink-wash mountains above a sea of clouds. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/mei"
+ },
+ "bg/robot": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A bright retro 1980s TV-cartoon backdrop in flat cel animation style: a sky-blue sky with round puffy white clouds over a green grassy hill, little floating gears and stars, cheerful flat colours, thick soft outlines. No people, no faces, no characters, no text, no logos. Soft, plenty of calm space in the middle for interface elements, tall phone-wallpaper composition."
+ },
+ "bg/hero": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "An epic retro tokusatsu sci-fi backdrop: a city skyline at dusk under a deep blue sky, distant smoke and searchlights, silver and red light streaks, a brilliant cyan beam of light and lens flares, a cinematic 1970s special-effects film still. No people, no faces, no characters, no text, no logos. Soft, plenty of calm space in the middle for interface elements, tall phone-wallpaper composition."
+ },
+ "bg/handdrawn": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A hand-painted animated-film backdrop: a lush green summer countryside with rice fields, a little country bus stop, towering fluffy cumulus clouds in a bright blue sky, soft gouache and watercolour, warm nostalgic light. No people, no faces, no characters, no text, no logos. Soft, plenty of calm space in the middle for interface elements, tall phone-wallpaper composition."
+ },
+ "bg/shoujo": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A shoujo-manga backdrop: a dreamy pastel pink and lilac haze, cascading roses and lilies, floating bubbles and star sparkles, soft screentone gradients, romantic and sparkling. No people, no faces, no characters, no text, no logos. Soft, plenty of calm space in the middle for interface elements, tall phone-wallpaper composition."
+ },
+ "bg/retro": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A 1990s TV-anime backdrop: a city skyline glowing at sunset, purple and orange sky, telephone wires and a quiet train platform, hand-painted cel background with faded VHS colours and soft grain. No people, no faces, no characters, no text, no logos. Soft, plenty of calm space in the middle for interface elements, tall phone-wallpaper composition."
+ },
+ "bg/inkfairy": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A classical Chinese painting backdrop: ink-wash mountains and rolling auspicious clouds on warm rice paper, a few red palace lanterns glowing softly, drifting peach blossoms, gold-leaf flecks and vermilion accents, poetic and airy. No people, no faces, no characters, no text, no logos. Soft, plenty of calm space in the middle for interface elements, tall phone-wallpaper composition."
+ },
+ "bg/wuxia": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A cinematic wuxia backdrop: a towering misty bamboo forest at dawn, shafts of soft light, drifting bamboo leaves, distant ink-wash mountain cliffs, jade green and stone grey, painterly and serene. No people, no faces, no characters, no text, no logos. Soft, plenty of calm space in the middle for interface elements, tall phone-wallpaper composition."
+ },
+ "bg/tarot": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A mystical tarot backdrop: a midnight-blue and violet night sky full of stars and moon phases, ornate gold art-nouveau curls and filigree around the edges, soft glowing dust, luxurious and enchanting. No people, no faces, no characters, no text, no logos. Soft, plenty of calm space in the middle for interface elements, tall phone-wallpaper composition."
+ },
+ "bg/hkfilm": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A 1990s Hong Kong film backdrop: a dense night street of glowing red and green neon signs dissolved into soft bokeh, warm tungsten street light, wet pavement, rich film grain and halation, moody and nostalgic. No readable text. No people, no faces, no characters, no text, no logos. Soft, plenty of calm space in the middle for interface elements, tall phone-wallpaper composition."
+ },
+ "bg/storybook": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A children's picture-book backdrop: soft watercolour washes on textured cotton paper, a whimsical forest of round trees, little hand-drawn stars and clouds, warm pastel palette. No people, no faces, no characters, no text, no logos. Soft, plenty of calm space in the middle for interface elements, tall phone-wallpaper composition."
+ },
+ "bg/oil": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "An Old Master painting backdrop: a deep dark warm umber background with soft glazed oil-paint texture, a hint of a heavy velvet curtain, subtle craquelure, candlelit museum atmosphere. No people, no faces, no characters, no text, no logos. Soft, plenty of calm space in the middle for interface elements, tall phone-wallpaper composition."
+ },
+ "bg/woodblock": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "An ukiyo-e woodblock-print backdrop: stylised curling indigo waves, ochre clouds and a large vermilion sun disc on textured washi paper, carved outlines, visible wood grain. No people, no faces, no characters, no text, no logos. Soft, plenty of calm space in the middle for interface elements, tall phone-wallpaper composition."
+ },
+ "bg/calendar": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A 1930s Nanyang calendar-poster backdrop: a soft airbrushed pastel garden with frangipani and palm fronds, a colonial balcony with art-deco railings, warm nostalgic light, aged paper texture. No people, no faces, no characters, no text, no logos. Soft, plenty of calm space in the middle for interface elements, tall phone-wallpaper composition."
+ },
+ "bg/peranakan": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A Peranakan heritage backdrop: rows of pastel ceramic tiles with intricate floral motifs, a colourful shophouse facade with wooden shutters and potted orchids, bright tropical daylight, joyful and detailed. No people, no faces, no characters, no text, no logos. Soft, plenty of calm space in the middle for interface elements, tall phone-wallpaper composition."
+ },
+ "stickers/hero-visor": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A sleek futuristic hero headpiece, an original design: a silver and red streamlined band with a glowing cyan lens strip across the front, worn above the forehead like a crown. Only the accessory itself, as a standalone object: no head, no hair, no face, no person, no mannequin. Seen from the front as it would be worn, its bottom edge where it would meet the hairline. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
+ },
+ "stickers/robot-antenna": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A cute cartoon robot antenna headband: a glossy sky-blue band with two little bolts and one springy antenna topped with a glowing yellow ball, flat cel cartoon style. Only the accessory itself, as a standalone object: no head, no hair, no face, no person, no mannequin. Seen from the front as it would be worn, its bottom edge where it would meet the hairline. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
+ },
+ "stickers/fight-band": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A red cloth martial-arts headband tied around the head with two long fluttering tails, plain cloth with no symbol. Only the accessory itself, as a standalone object: no head, no hair, no face, no person, no mannequin. Seen from the front as it would be worn, its bottom edge where it would meet the hairline. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
+ },
+ "stickers/straw-hat": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A summery straw sun hat with a wide brim and a red ribbon band, hand-painted anime style. Only the accessory itself, as a standalone object: no head, no hair, no face, no person, no mannequin. Seen from the front as it would be worn, its bottom edge where it would meet the hairline. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
+ },
+ "stickers/douli": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A woven bamboo conical hat with a short sheer white veil around the brim, wuxia style. Only the accessory itself, as a standalone object: no head, no hair, no face, no person, no mannequin. Seen from the front as it would be worn, its bottom edge where it would meet the hairline. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
+ },
+ "stickers/buyao": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "An exquisite classical Chinese gold hair ornament: a phoenix-and-flower hairpin crown with dangling pearl and jade tassels, gongbi painting style. Only the accessory itself, as a standalone object: no head, no hair, no face, no person, no mannequin. Seen from the front as it would be worn, its bottom edge where it would meet the hairline. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
+ },
+ "stickers/flower-clip": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A cluster of pastel pink roses, tiny white flowers and a satin ribbon on a hair clip, shoujo-manga style. Only the accessory itself, as a standalone object: no head, no hair, no face, no person, no mannequin. Seen from the front as it would be worn, its bottom edge where it would meet the hairline. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
+ },
+ "stickers/tarot-card": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A single ornate tarot card standing upright, its back decorated with gold stars and a crescent moon on midnight blue, art-nouveau border, nothing legible. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
+ },
+ "stickers/lantern": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A glowing red Chinese palace lantern with gold trim and a red silk tassel, gongbi painting style. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
+ },
+ "stickers/film-reel": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A small vintage film reel with a curl of film strip, warm metallic finish. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
+ },
+ "stickers/cassette": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A cute retro cassette tape with a pastel label (blank, nothing written) and a little sparkle, 90s anime style. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
+ },
+ "stickers/paintbrush": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A classic artist's paintbrush with a dab of gold paint and a small wooden palette. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
+ },
+ "stickers/flower": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A single pastel watercolour flower with soft petals, hand-painted storybook style. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
+ },
+ "stickers/wave": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A small stylised ukiyo-e wave crest in indigo and white, woodblock-print style. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
+ },
+ "scenes/beach": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A golden sunset over a tropical beach with gentle waves and palm silhouettes. Photographic, beautiful light, no people, no faces, no text, square composition."
+ },
+ "scenes/galaxy": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A breathtaking starry night sky with the Milky Way over a quiet hill. Photographic, beautiful light, no people, no faces, no text, square composition."
+ },
+ "stickers/tile": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A single square pastel Peranakan ceramic tile with an intricate pink and teal floral motif. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
+ },
+ "scenes/sakura": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "An avenue of blooming cherry trees with petals drifting in soft spring light. Photographic, beautiful light, no people, no faces, no text, square composition."
+ },
+ "scenes/neonstreet": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A rainy night street glowing with magenta and cyan neon signs dissolved into bokeh, no readable text. Photographic, beautiful light, no people, no faces, no text, square composition."
+ },
+ "scenes/moon": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "The grey surface of the moon with the blue Earth rising over the horizon. Photographic, beautiful light, no people, no faces, no text, square composition."
+ },
+ "scenes/snow": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Snowy mountains under a clear blue sky, soft powder snow in the air. Photographic, beautiful light, no people, no faces, no text, square composition."
+ },
+ "stickers/bamboo": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A sprig of green bamboo leaves painted with ink-wash brush strokes. Isolated on a fully transparent background, front view, centred, crisp high-quality product render, no shadow on the ground, no text."
+ },
+ "scenes/flowers": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "An endless field of pastel flowers under a dreamy pink sky. Photographic, beautiful light, no people, no faces, no text, square composition."
+ },
+ "scenes/cafe": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A cosy café corner with warm lamps, plants and a big window. Photographic, beautiful light, no people, no faces, no text, square composition."
+ },
+ "scenes/nightmarket": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A lively Asian night market with glowing lanterns and food stalls softly blurred, no readable text. Photographic, beautiful light, no people, no faces, no text, square composition."
+ },
+ "scenes/studio": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A clean soft-gradient photo studio backdrop in warm pastel tones, softbox light. Photographic, beautiful light, no people, no faces, no text, square composition."
+ },
+ "scenes/skyline": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A modern waterfront city skyline at blue hour with glowing towers reflected in the bay. Photographic, beautiful light, no people, no faces, no text, square composition."
+ },
+ "scenes/funfair": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A colourful funfair at dusk with a glowing ferris wheel and carousel lights. Photographic, beautiful light, no people, no faces, no text, square composition."
+ },
+ "styles/hero/jun": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into the hero of a classic Japanese tokusatsu sci-fi TV show, an entirely original suit design: sleek armour of brushed silver with sharp angular crimson plates and glowing cyan circuit lines, a glowing hexagonal energy core in the centre of the chest, a visor-style open-face helmet with two swept-back angular side wings so their own face stays clearly recognisable, cinematic rim light and lens flares, a heroic low angle, an epic retro special-effects film still. Not any existing character. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: the chest energy core glowing bright cyan and lighting the face; a city skyline at dusk with searchlights sweeping through drifting smoke. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/jun"
+ },
+ "styles/hero/priya": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into the hero of a classic Japanese tokusatsu sci-fi TV show, an entirely original suit design: sleek armour of brushed silver with sharp angular crimson plates and glowing cyan circuit lines, a glowing hexagonal energy core in the centre of the chest, a visor-style open-face helmet with two swept-back angular side wings so their own face stays clearly recognisable, cinematic rim light and lens flares, a heroic low angle, an epic retro special-effects film still. Not any existing character. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: the chest energy core glowing bright cyan and lighting the face; a city skyline at dusk with searchlights sweeping through drifting smoke. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/priya"
+ },
+ "styles/hero/kai": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into the hero of a classic Japanese tokusatsu sci-fi TV show, an entirely original suit design: sleek armour of brushed silver with sharp angular crimson plates and glowing cyan circuit lines, a glowing hexagonal energy core in the centre of the chest, a visor-style open-face helmet with two swept-back angular side wings so their own face stays clearly recognisable, cinematic rim light and lens flares, a heroic low angle, an epic retro special-effects film still. Not any existing character. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: the chest energy core glowing bright cyan and lighting the face; a city skyline at dusk with searchlights sweeping through drifting smoke. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/kai"
+ },
+ "styles/robot/aiman": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into a cute retro cartoon robot, an original design: a round, chubby robot suit in glossy sky-blue and white with simple rounded shapes and a few friendly bolts, a round robot helmet-hood with a tiny antenna and two glowing cheek lights, their own face clearly visible in the hood opening with a big happy grin. Bright 1980s TV-cartoon cel animation, thick soft outlines, flat cheerful colours, clean two-tone cel shading. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a little spinning propeller on top of the robot hood; crisp two-tone cel shading; a sky-blue sky with round puffy clouds over a grassy field. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/aiman"
+ },
+ "styles/robot/nur": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into a cute retro cartoon robot, an original design: a round, chubby robot suit in glossy sky-blue and white with simple rounded shapes and a few friendly bolts, a round robot helmet-hood with a tiny antenna and two glowing cheek lights, their own face clearly visible in the hood opening with a big happy grin. Bright 1980s TV-cartoon cel animation, thick soft outlines, flat cheerful colours, clean two-tone cel shading. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a little spinning propeller on top of the robot hood; crisp two-tone cel shading; a sky-blue sky with round puffy clouds over a grassy field. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/nur"
+ },
+ "styles/robot/priya": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into a cute retro cartoon robot, an original design: a round, chubby robot suit in glossy sky-blue and white with simple rounded shapes and a few friendly bolts, a round robot helmet-hood with a tiny antenna and two glowing cheek lights, their own face clearly visible in the hood opening with a big happy grin. Bright 1980s TV-cartoon cel animation, thick soft outlines, flat cheerful colours, clean two-tone cel shading. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a little spinning propeller on top of the robot hood; crisp two-tone cel shading; a sky-blue sky with round puffy clouds over a grassy field. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/priya"
+ },
+ "styles/robot/jun": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into a cute retro cartoon robot, an original design: a round, chubby robot suit in glossy sky-blue and white with simple rounded shapes and a few friendly bolts, a round robot helmet-hood with a tiny antenna and two glowing cheek lights, their own face clearly visible in the hood opening with a big happy grin. Bright 1980s TV-cartoon cel animation, thick soft outlines, flat cheerful colours, clean two-tone cel shading. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a little spinning propeller on top of the robot hood; crisp two-tone cel shading; a sky-blue sky with round puffy clouds over a grassy field. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/jun"
+ },
+ "styles/hero/nur": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into the hero of a classic Japanese tokusatsu sci-fi TV show, an entirely original suit design: sleek armour of brushed silver with sharp angular crimson plates and glowing cyan circuit lines, a glowing hexagonal energy core in the centre of the chest, a visor-style open-face helmet with two swept-back angular side wings so their own face stays clearly recognisable, cinematic rim light and lens flares, a heroic low angle, an epic retro special-effects film still. Not any existing character. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: the chest energy core glowing bright cyan and lighting the face; a city skyline at dusk with searchlights sweeping through drifting smoke. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/nur"
+ },
+ "styles/wuxia/mei": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into a wuxia martial-arts hero from a cinematic Chinese fantasy epic: flowing layered robes inspired by traditional Chinese dress whipping in the wind, a sword hilt over the shoulder, wind-swept hair, a misty bamboo forest and distant mountain cliffs, drifting leaves, dynamic cinematic composition, painterly realism with a hint of ink wash. Still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: soft morning mist and god rays; a towering misty bamboo forest. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/mei"
+ },
+ "styles/wuxia/jun": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into a wuxia martial-arts hero from a cinematic Chinese fantasy epic: flowing layered robes inspired by traditional Chinese dress whipping in the wind, a sword hilt over the shoulder, wind-swept hair, a misty bamboo forest and distant mountain cliffs, drifting leaves, dynamic cinematic composition, painterly realism with a hint of ink wash. Still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: soft morning mist and god rays; a towering misty bamboo forest. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/jun"
+ },
+ "styles/wuxia/priya": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into a wuxia martial-arts hero from a cinematic Chinese fantasy epic: flowing layered robes inspired by traditional Chinese dress whipping in the wind, a sword hilt over the shoulder, wind-swept hair, a misty bamboo forest and distant mountain cliffs, drifting leaves, dynamic cinematic composition, painterly realism with a hint of ink wash. Still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: soft morning mist and god rays; a towering misty bamboo forest. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/priya"
+ },
+ "styles/wuxia/aiman": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into a wuxia martial-arts hero from a cinematic Chinese fantasy epic: flowing layered robes inspired by traditional Chinese dress whipping in the wind, a sword hilt over the shoulder, wind-swept hair, a misty bamboo forest and distant mountain cliffs, drifting leaves, dynamic cinematic composition, painterly realism with a hint of ink wash. Still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: soft morning mist and god rays; a towering misty bamboo forest. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/aiman"
+ },
+ "styles/wuxia/nur": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into a wuxia martial-arts hero from a cinematic Chinese fantasy epic: flowing layered robes inspired by traditional Chinese dress whipping in the wind, a sword hilt over the shoulder, wind-swept hair, a misty bamboo forest and distant mountain cliffs, drifting leaves, dynamic cinematic composition, painterly realism with a hint of ink wash. Still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: soft morning mist and god rays; a towering misty bamboo forest. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/nur"
+ },
+ "styles/wuxia/kai": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into a wuxia martial-arts hero from a cinematic Chinese fantasy epic: flowing layered robes inspired by traditional Chinese dress whipping in the wind, a sword hilt over the shoulder, wind-swept hair, a misty bamboo forest and distant mountain cliffs, drifting leaves, dynamic cinematic composition, painterly realism with a hint of ink wash. Still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: soft morning mist and god rays; a towering misty bamboo forest. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/kai"
+ },
+ "styles/inkfairy/aiman": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as an ethereal immortal in a classical Chinese gongbi and ink-wash painting with a refined modern finish: flowing silk robes and translucent gauze sleeves drifting on the wind, delicate gold hair ornaments, ink-wash mountains and rolling auspicious clouds, accents of vermilion lacquer and shimmering gold leaf, warm palace-lantern glow, fine elegant linework, poetic, serene and luminous. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: an exquisite gold hairpin with dangling pearl tassels; the warm glow of red palace lanterns; ink-wash mountains above a sea of clouds. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/aiman"
+ },
+ "styles/inkfairy/nur": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as an ethereal immortal in a classical Chinese gongbi and ink-wash painting with a refined modern finish: flowing silk robes and translucent gauze sleeves drifting on the wind, delicate gold hair ornaments, ink-wash mountains and rolling auspicious clouds, accents of vermilion lacquer and shimmering gold leaf, warm palace-lantern glow, fine elegant linework, poetic, serene and luminous. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: an exquisite gold hairpin with dangling pearl tassels; the warm glow of red palace lanterns; ink-wash mountains above a sea of clouds. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/nur"
+ },
+ "styles/inkfairy/priya": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as an ethereal immortal in a classical Chinese gongbi and ink-wash painting with a refined modern finish: flowing silk robes and translucent gauze sleeves drifting on the wind, delicate gold hair ornaments, ink-wash mountains and rolling auspicious clouds, accents of vermilion lacquer and shimmering gold leaf, warm palace-lantern glow, fine elegant linework, poetic, serene and luminous. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: an exquisite gold hairpin with dangling pearl tassels; the warm glow of red palace lanterns; ink-wash mountains above a sea of clouds. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/priya"
+ },
+ "styles/inkfairy/jun": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as an ethereal immortal in a classical Chinese gongbi and ink-wash painting with a refined modern finish: flowing silk robes and translucent gauze sleeves drifting on the wind, delicate gold hair ornaments, ink-wash mountains and rolling auspicious clouds, accents of vermilion lacquer and shimmering gold leaf, warm palace-lantern glow, fine elegant linework, poetic, serene and luminous. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: an exquisite gold hairpin with dangling pearl tassels; the warm glow of red palace lanterns; ink-wash mountains above a sea of clouds. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/jun"
+ },
+ "styles/tarot/mei": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into the figure on an ornate art-nouveau tarot card: elegant flowing decorative linework, a halo of stars and moon phases behind their head, shimmering gold-foil ornaments, rich jewel tones of midnight blue, violet and gold, symbolic floral motifs curling around them, a mystical, luxurious illustration. No readable text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a radiant halo of stars; a deep starry cosmos with moon phases; an ornate tarot-card border with an empty title cartouche and a small roman-numeral-like ornament, nothing legible. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/mei"
+ },
+ "styles/inkfairy/kai": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as an ethereal immortal in a classical Chinese gongbi and ink-wash painting with a refined modern finish: flowing silk robes and translucent gauze sleeves drifting on the wind, delicate gold hair ornaments, ink-wash mountains and rolling auspicious clouds, accents of vermilion lacquer and shimmering gold leaf, warm palace-lantern glow, fine elegant linework, poetic, serene and luminous. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: an exquisite gold hairpin with dangling pearl tassels; the warm glow of red palace lanterns; ink-wash mountains above a sea of clouds. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/kai"
+ },
+ "styles/tarot/priya": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into the figure on an ornate art-nouveau tarot card: elegant flowing decorative linework, a halo of stars and moon phases behind their head, shimmering gold-foil ornaments, rich jewel tones of midnight blue, violet and gold, symbolic floral motifs curling around them, a mystical, luxurious illustration. No readable text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a radiant halo of stars; a deep starry cosmos with moon phases; an ornate tarot-card border with an empty title cartouche and a small roman-numeral-like ornament, nothing legible. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/priya"
+ },
+ "styles/tarot/jun": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into the figure on an ornate art-nouveau tarot card: elegant flowing decorative linework, a halo of stars and moon phases behind their head, shimmering gold-foil ornaments, rich jewel tones of midnight blue, violet and gold, symbolic floral motifs curling around them, a mystical, luxurious illustration. No readable text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a radiant halo of stars; a deep starry cosmos with moon phases; an ornate tarot-card border with an empty title cartouche and a small roman-numeral-like ornament, nothing legible. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/jun"
+ },
+ "styles/tarot/aiman": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into the figure on an ornate art-nouveau tarot card: elegant flowing decorative linework, a halo of stars and moon phases behind their head, shimmering gold-foil ornaments, rich jewel tones of midnight blue, violet and gold, symbolic floral motifs curling around them, a mystical, luxurious illustration. No readable text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a radiant halo of stars; a deep starry cosmos with moon phases; an ornate tarot-card border with an empty title cartouche and a small roman-numeral-like ornament, nothing legible. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/aiman"
+ },
+ "styles/tarot/kai": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into the figure on an ornate art-nouveau tarot card: elegant flowing decorative linework, a halo of stars and moon phases behind their head, shimmering gold-foil ornaments, rich jewel tones of midnight blue, violet and gold, symbolic floral motifs curling around them, a mystical, luxurious illustration. No readable text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a radiant halo of stars; a deep starry cosmos with moon phases; an ornate tarot-card border with an empty title cartouche and a small roman-numeral-like ornament, nothing legible. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/kai"
+ },
+ "styles/tarot/nur": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into the figure on an ornate art-nouveau tarot card: elegant flowing decorative linework, a halo of stars and moon phases behind their head, shimmering gold-foil ornaments, rich jewel tones of midnight blue, violet and gold, symbolic floral motifs curling around them, a mystical, luxurious illustration. No readable text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a radiant halo of stars; a deep starry cosmos with moon phases; an ornate tarot-card border with an empty title cartouche and a small roman-numeral-like ornament, nothing legible. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/nur"
+ },
+ "styles/handdrawn/mei": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a character in a gentle hand-painted 2D animated film: soft gouache and watercolour backgrounds, a lush summer countryside, towering fluffy cumulus clouds, warm nostalgic light, simple expressive anime features with gentle cel shading, painterly and heart-warming. 2D anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: dappled summer sunlight; green rice fields and a little country bus stop; a soft watercolour edge fading into paper. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/mei"
+ },
+ "styles/handdrawn/aiman": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a character in a gentle hand-painted 2D animated film: soft gouache and watercolour backgrounds, a lush summer countryside, towering fluffy cumulus clouds, warm nostalgic light, simple expressive anime features with gentle cel shading, painterly and heart-warming. 2D anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: dappled summer sunlight; green rice fields and a little country bus stop; a soft watercolour edge fading into paper. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/aiman"
+ },
+ "styles/handdrawn/priya": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a character in a gentle hand-painted 2D animated film: soft gouache and watercolour backgrounds, a lush summer countryside, towering fluffy cumulus clouds, warm nostalgic light, simple expressive anime features with gentle cel shading, painterly and heart-warming. 2D anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: dappled summer sunlight; green rice fields and a little country bus stop; a soft watercolour edge fading into paper. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/priya"
+ },
+ "styles/handdrawn/nur": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a character in a gentle hand-painted 2D animated film: soft gouache and watercolour backgrounds, a lush summer countryside, towering fluffy cumulus clouds, warm nostalgic light, simple expressive anime features with gentle cel shading, painterly and heart-warming. 2D anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: dappled summer sunlight; green rice fields and a little country bus stop; a soft watercolour edge fading into paper. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/nur"
+ },
+ "styles/handdrawn/kai": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a character in a gentle hand-painted 2D animated film: soft gouache and watercolour backgrounds, a lush summer countryside, towering fluffy cumulus clouds, warm nostalgic light, simple expressive anime features with gentle cel shading, painterly and heart-warming. 2D anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: dappled summer sunlight; green rice fields and a little country bus stop; a soft watercolour edge fading into paper. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/kai"
+ },
+ "styles/handdrawn/jun": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a character in a gentle hand-painted 2D animated film: soft gouache and watercolour backgrounds, a lush summer countryside, towering fluffy cumulus clouds, warm nostalgic light, simple expressive anime features with gentle cel shading, painterly and heart-warming. 2D anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: dappled summer sunlight; green rice fields and a little country bus stop; a soft watercolour edge fading into paper. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/jun"
+ },
+ "styles/shoujo/mei": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Redraw this person as the lead of a classic shoujo manga: delicate fine linework, huge sparkling eyes with star-shaped highlights, flowing glossy hair, floating roses, bubbles and sparkles around them, soft screentone shading, a dreamy pastel pink and lilac palette, romantic and heart-fluttering. 2D manga illustration (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. Polished, glowing skin and bright eyes, still natural. Include: star-shaped sparkles in the eyes; soft floating bubbles and a glowing haze; a cascade of roses and lilies. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/mei"
+ },
+ "styles/shoujo/aiman": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Redraw this person as the lead of a classic shoujo manga: delicate fine linework, huge sparkling eyes with star-shaped highlights, flowing glossy hair, floating roses, bubbles and sparkles around them, soft screentone shading, a dreamy pastel pink and lilac palette, romantic and heart-fluttering. 2D manga illustration (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. Polished, glowing skin and bright eyes, still natural. Include: star-shaped sparkles in the eyes; soft floating bubbles and a glowing haze; a cascade of roses and lilies. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/aiman"
+ },
+ "styles/shoujo/nur": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Redraw this person as the lead of a classic shoujo manga: delicate fine linework, huge sparkling eyes with star-shaped highlights, flowing glossy hair, floating roses, bubbles and sparkles around them, soft screentone shading, a dreamy pastel pink and lilac palette, romantic and heart-fluttering. 2D manga illustration (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. Polished, glowing skin and bright eyes, still natural. Include: star-shaped sparkles in the eyes; soft floating bubbles and a glowing haze; a cascade of roses and lilies. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/nur"
+ },
+ "styles/shoujo/priya": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Redraw this person as the lead of a classic shoujo manga: delicate fine linework, huge sparkling eyes with star-shaped highlights, flowing glossy hair, floating roses, bubbles and sparkles around them, soft screentone shading, a dreamy pastel pink and lilac palette, romantic and heart-fluttering. 2D manga illustration (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. Polished, glowing skin and bright eyes, still natural. Include: star-shaped sparkles in the eyes; soft floating bubbles and a glowing haze; a cascade of roses and lilies. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/priya"
+ },
+ "styles/shoujo/jun": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Redraw this person as the lead of a classic shoujo manga: delicate fine linework, huge sparkling eyes with star-shaped highlights, flowing glossy hair, floating roses, bubbles and sparkles around them, soft screentone shading, a dreamy pastel pink and lilac palette, romantic and heart-fluttering. 2D manga illustration (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. Polished, glowing skin and bright eyes, still natural. Include: star-shaped sparkles in the eyes; soft floating bubbles and a glowing haze; a cascade of roses and lilies. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/jun"
+ },
+ "styles/retro/kai": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Redraw this person as a character in a 1990s television anime: hand-painted cel animation with slightly faded nostalgic colours, retro character design with big glossy hair highlights and sharp angular eyes, a city skyline glowing at sunset behind them, soft analogue VHS blur, subtle film grain and colour bleed. 2D anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a warm orange sunset glow; a retro city skyline at dusk. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/kai"
+ },
+ "styles/retro/mei": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Redraw this person as a character in a 1990s television anime: hand-painted cel animation with slightly faded nostalgic colours, retro character design with big glossy hair highlights and sharp angular eyes, a city skyline glowing at sunset behind them, soft analogue VHS blur, subtle film grain and colour bleed. 2D anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a warm orange sunset glow; a retro city skyline at dusk. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/mei"
+ },
+ "styles/shoujo/kai": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Redraw this person as the lead of a classic shoujo manga: delicate fine linework, huge sparkling eyes with star-shaped highlights, flowing glossy hair, floating roses, bubbles and sparkles around them, soft screentone shading, a dreamy pastel pink and lilac palette, romantic and heart-fluttering. 2D manga illustration (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. Polished, glowing skin and bright eyes, still natural. Include: star-shaped sparkles in the eyes; soft floating bubbles and a glowing haze; a cascade of roses and lilies. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/kai"
+ },
+ "styles/retro/aiman": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Redraw this person as a character in a 1990s television anime: hand-painted cel animation with slightly faded nostalgic colours, retro character design with big glossy hair highlights and sharp angular eyes, a city skyline glowing at sunset behind them, soft analogue VHS blur, subtle film grain and colour bleed. 2D anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a warm orange sunset glow; a retro city skyline at dusk. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/aiman"
+ },
+ "styles/retro/priya": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Redraw this person as a character in a 1990s television anime: hand-painted cel animation with slightly faded nostalgic colours, retro character design with big glossy hair highlights and sharp angular eyes, a city skyline glowing at sunset behind them, soft analogue VHS blur, subtle film grain and colour bleed. 2D anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a warm orange sunset glow; a retro city skyline at dusk. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/priya"
+ },
+ "styles/retro/jun": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Redraw this person as a character in a 1990s television anime: hand-painted cel animation with slightly faded nostalgic colours, retro character design with big glossy hair highlights and sharp angular eyes, a city skyline glowing at sunset behind them, soft analogue VHS blur, subtle film grain and colour bleed. 2D anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a warm orange sunset glow; a retro city skyline at dusk. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/jun"
+ },
+ "styles/hkfilm/mei": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Make this a cinematic 1990s Hong Kong film still: warm tungsten light, red and green neon reflections on the skin, a slight step-printed motion blur, rich film grain and halation, a moody nostalgic romantic atmosphere, a crowded night street or a narrow neon-lit stairwell softly out of focus behind. Keep the real person exactly. No readable text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: warm tungsten street light; a dense neon-lit night street. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/mei"
+ },
+ "styles/retro/nur": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Redraw this person as a character in a 1990s television anime: hand-painted cel animation with slightly faded nostalgic colours, retro character design with big glossy hair highlights and sharp angular eyes, a city skyline glowing at sunset behind them, soft analogue VHS blur, subtle film grain and colour bleed. 2D anime (not photorealistic), still clearly them. Keep their face, features, skin tone and expression clearly recognisable as them, plus any glasses or head covering they wear. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a warm orange sunset glow; a retro city skyline at dusk. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/nur"
+ },
+ "styles/hkfilm/aiman": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Make this a cinematic 1990s Hong Kong film still: warm tungsten light, red and green neon reflections on the skin, a slight step-printed motion blur, rich film grain and halation, a moody nostalgic romantic atmosphere, a crowded night street or a narrow neon-lit stairwell softly out of focus behind. Keep the real person exactly. No readable text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: warm tungsten street light; a dense neon-lit night street. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/aiman"
+ },
+ "styles/hkfilm/jun": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Make this a cinematic 1990s Hong Kong film still: warm tungsten light, red and green neon reflections on the skin, a slight step-printed motion blur, rich film grain and halation, a moody nostalgic romantic atmosphere, a crowded night street or a narrow neon-lit stairwell softly out of focus behind. Keep the real person exactly. No readable text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: warm tungsten street light; a dense neon-lit night street. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/jun"
+ },
+ "styles/hkfilm/nur": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Make this a cinematic 1990s Hong Kong film still: warm tungsten light, red and green neon reflections on the skin, a slight step-printed motion blur, rich film grain and halation, a moody nostalgic romantic atmosphere, a crowded night street or a narrow neon-lit stairwell softly out of focus behind. Keep the real person exactly. No readable text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: warm tungsten street light; a dense neon-lit night street. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/nur"
+ },
+ "styles/hkfilm/priya": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Make this a cinematic 1990s Hong Kong film still: warm tungsten light, red and green neon reflections on the skin, a slight step-printed motion blur, rich film grain and halation, a moody nostalgic romantic atmosphere, a crowded night street or a narrow neon-lit stairwell softly out of focus behind. Keep the real person exactly. No readable text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: warm tungsten street light; a dense neon-lit night street. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/priya"
+ },
+ "styles/hkfilm/kai": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Make this a cinematic 1990s Hong Kong film still: warm tungsten light, red and green neon reflections on the skin, a slight step-printed motion blur, rich film grain and halation, a moody nostalgic romantic atmosphere, a crowded night street or a narrow neon-lit stairwell softly out of focus behind. Keep the real person exactly. No readable text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: warm tungsten street light; a dense neon-lit night street. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/kai"
+ },
+ "styles/oil/aiman": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as an Old Master oil portrait: rich glazed oil paint with visible confident brushwork and fine craquelure, dramatic chiaroscuro light falling from a high window, deep warm earth tones, a dark atmospheric background, a sumptuous velvet garment with a delicate lace collar, museum-quality fine art. Still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: soft light from a high window; a deep dark atmospheric background; an ornate carved gilt picture frame. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/aiman"
+ },
+ "styles/oil/mei": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as an Old Master oil portrait: rich glazed oil paint with visible confident brushwork and fine craquelure, dramatic chiaroscuro light falling from a high window, deep warm earth tones, a dark atmospheric background, a sumptuous velvet garment with a delicate lace collar, museum-quality fine art. Still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: soft light from a high window; a deep dark atmospheric background; an ornate carved gilt picture frame. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/mei"
+ },
+ "styles/oil/priya": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as an Old Master oil portrait: rich glazed oil paint with visible confident brushwork and fine craquelure, dramatic chiaroscuro light falling from a high window, deep warm earth tones, a dark atmospheric background, a sumptuous velvet garment with a delicate lace collar, museum-quality fine art. Still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: soft light from a high window; a deep dark atmospheric background; an ornate carved gilt picture frame. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/priya"
+ },
+ "styles/oil/nur": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as an Old Master oil portrait: rich glazed oil paint with visible confident brushwork and fine craquelure, dramatic chiaroscuro light falling from a high window, deep warm earth tones, a dark atmospheric background, a sumptuous velvet garment with a delicate lace collar, museum-quality fine art. Still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: soft light from a high window; a deep dark atmospheric background; an ornate carved gilt picture frame. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/nur"
+ },
+ "styles/oil/jun": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as an Old Master oil portrait: rich glazed oil paint with visible confident brushwork and fine craquelure, dramatic chiaroscuro light falling from a high window, deep warm earth tones, a dark atmospheric background, a sumptuous velvet garment with a delicate lace collar, museum-quality fine art. Still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: soft light from a high window; a deep dark atmospheric background; an ornate carved gilt picture frame. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/jun"
+ },
+ "styles/oil/kai": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as an Old Master oil portrait: rich glazed oil paint with visible confident brushwork and fine craquelure, dramatic chiaroscuro light falling from a high window, deep warm earth tones, a dark atmospheric background, a sumptuous velvet garment with a delicate lace collar, museum-quality fine art. Still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: soft light from a high window; a deep dark atmospheric background; an ornate carved gilt picture frame. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/kai"
+ },
+ "styles/storybook/mei": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as an illustration from a gentle children's picture book: loose watercolour washes blooming on textured cotton paper, soft coloured-pencil linework, whimsical warm little details, an airy pastel palette, cosy and heart-warming. Still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: warm afternoon light; a whimsical storybook forest; soft watercolour edges fading into paper. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/mei"
+ },
+ "styles/storybook/nur": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as an illustration from a gentle children's picture book: loose watercolour washes blooming on textured cotton paper, soft coloured-pencil linework, whimsical warm little details, an airy pastel palette, cosy and heart-warming. Still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: warm afternoon light; a whimsical storybook forest; soft watercolour edges fading into paper. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/nur"
+ },
+ "styles/storybook/jun": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as an illustration from a gentle children's picture book: loose watercolour washes blooming on textured cotton paper, soft coloured-pencil linework, whimsical warm little details, an airy pastel palette, cosy and heart-warming. Still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: warm afternoon light; a whimsical storybook forest; soft watercolour edges fading into paper. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/jun"
+ },
+ "styles/storybook/aiman": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as an illustration from a gentle children's picture book: loose watercolour washes blooming on textured cotton paper, soft coloured-pencil linework, whimsical warm little details, an airy pastel palette, cosy and heart-warming. Still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: warm afternoon light; a whimsical storybook forest; soft watercolour edges fading into paper. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/aiman"
+ },
+ "styles/storybook/priya": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as an illustration from a gentle children's picture book: loose watercolour washes blooming on textured cotton paper, soft coloured-pencil linework, whimsical warm little details, an airy pastel palette, cosy and heart-warming. Still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: warm afternoon light; a whimsical storybook forest; soft watercolour edges fading into paper. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/priya"
+ },
+ "styles/pop/mei": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into a bold 1960s pop-art screen print: flat saturated blocks of colour, thick black outlines, Ben-Day halftone dots, a punchy contrasting background, graphic and iconic. Still clearly them. No text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: Ben-Day dot shading; a single bold contrasting colour background. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/mei"
+ },
+ "styles/pop/kai": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into a bold 1960s pop-art screen print: flat saturated blocks of colour, thick black outlines, Ben-Day halftone dots, a punchy contrasting background, graphic and iconic. Still clearly them. No text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: Ben-Day dot shading; a single bold contrasting colour background. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/kai"
+ },
+ "styles/pop/aiman": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into a bold 1960s pop-art screen print: flat saturated blocks of colour, thick black outlines, Ben-Day halftone dots, a punchy contrasting background, graphic and iconic. Still clearly them. No text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: Ben-Day dot shading; a single bold contrasting colour background. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/aiman"
+ },
+ "styles/storybook/kai": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as an illustration from a gentle children's picture book: loose watercolour washes blooming on textured cotton paper, soft coloured-pencil linework, whimsical warm little details, an airy pastel palette, cosy and heart-warming. Still clearly them. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: warm afternoon light; a whimsical storybook forest; soft watercolour edges fading into paper. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/kai"
+ },
+ "styles/pop/priya": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into a bold 1960s pop-art screen print: flat saturated blocks of colour, thick black outlines, Ben-Day halftone dots, a punchy contrasting background, graphic and iconic. Still clearly them. No text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: Ben-Day dot shading; a single bold contrasting colour background. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/priya"
+ },
+ "styles/pop/nur": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into a bold 1960s pop-art screen print: flat saturated blocks of colour, thick black outlines, Ben-Day halftone dots, a punchy contrasting background, graphic and iconic. Still clearly them. No text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: Ben-Day dot shading; a single bold contrasting colour background. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/nur"
+ },
+ "styles/pop/jun": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Turn this person into a bold 1960s pop-art screen print: flat saturated blocks of colour, thick black outlines, Ben-Day halftone dots, a punchy contrasting background, graphic and iconic. Still clearly them. No text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: Ben-Day dot shading; a single bold contrasting colour background. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/jun"
+ },
+ "styles/woodblock/mei": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a traditional Japanese ukiyo-e woodblock print: flat areas of colour, elegant carved outlines, subtle wood-grain texture and visible paper fibres, a limited palette of indigo, vermilion and ochre, stylised waves and clouds around them, beautiful and timeless. Still clearly them. No text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a large vermilion sun disc behind them; stylised curling waves. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/mei"
+ },
+ "styles/woodblock/nur": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a traditional Japanese ukiyo-e woodblock print: flat areas of colour, elegant carved outlines, subtle wood-grain texture and visible paper fibres, a limited palette of indigo, vermilion and ochre, stylised waves and clouds around them, beautiful and timeless. Still clearly them. No text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a large vermilion sun disc behind them; stylised curling waves. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/nur"
+ },
+ "styles/woodblock/jun": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a traditional Japanese ukiyo-e woodblock print: flat areas of colour, elegant carved outlines, subtle wood-grain texture and visible paper fibres, a limited palette of indigo, vermilion and ochre, stylised waves and clouds around them, beautiful and timeless. Still clearly them. No text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a large vermilion sun disc behind them; stylised curling waves. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/jun"
+ },
+ "styles/woodblock/aiman": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a traditional Japanese ukiyo-e woodblock print: flat areas of colour, elegant carved outlines, subtle wood-grain texture and visible paper fibres, a limited palette of indigo, vermilion and ochre, stylised waves and clouds around them, beautiful and timeless. Still clearly them. No text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a large vermilion sun disc behind them; stylised curling waves. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/aiman"
+ },
+ "styles/woodblock/priya": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a traditional Japanese ukiyo-e woodblock print: flat areas of colour, elegant carved outlines, subtle wood-grain texture and visible paper fibres, a limited palette of indigo, vermilion and ochre, stylised waves and clouds around them, beautiful and timeless. Still clearly them. No text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a large vermilion sun disc behind them; stylised curling waves. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/priya"
+ },
+ "styles/woodblock/kai": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a traditional Japanese ukiyo-e woodblock print: flat areas of colour, elegant carved outlines, subtle wood-grain texture and visible paper fibres, a limited palette of indigo, vermilion and ochre, stylised waves and clouds around them, beautiful and timeless. Still clearly them. No text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a large vermilion sun disc behind them; stylised curling waves. Head and shoulders, centred, looking at the viewer, a tall portrait. No text, no lettering, no watermark, no border. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/kai"
+ },
+ "styles/calendar/mei": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a 1930s Shanghai and Nanyang calendar-poster painting: soft airbrushed gouache with luminous rosy skin, an elegant vintage outfit of the era (a qipao, a kebaya or a sharp suit, whichever suits them), art-deco ornaments, a gentle pastel garden or balcony backdrop with tropical plants, nostalgic and glamorous. Keep any glasses or head covering they wear. No text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: soft airbrushed light; a lush tropical garden with frangipani; an art-deco poster border. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/mei"
+ },
+ "styles/calendar/aiman": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a 1930s Shanghai and Nanyang calendar-poster painting: soft airbrushed gouache with luminous rosy skin, an elegant vintage outfit of the era (a qipao, a kebaya or a sharp suit, whichever suits them), art-deco ornaments, a gentle pastel garden or balcony backdrop with tropical plants, nostalgic and glamorous. Keep any glasses or head covering they wear. No text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: soft airbrushed light; a lush tropical garden with frangipani; an art-deco poster border. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/aiman"
+ },
+ "styles/calendar/priya": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a 1930s Shanghai and Nanyang calendar-poster painting: soft airbrushed gouache with luminous rosy skin, an elegant vintage outfit of the era (a qipao, a kebaya or a sharp suit, whichever suits them), art-deco ornaments, a gentle pastel garden or balcony backdrop with tropical plants, nostalgic and glamorous. Keep any glasses or head covering they wear. No text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: soft airbrushed light; a lush tropical garden with frangipani; an art-deco poster border. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/priya"
+ },
+ "styles/calendar/jun": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a 1930s Shanghai and Nanyang calendar-poster painting: soft airbrushed gouache with luminous rosy skin, an elegant vintage outfit of the era (a qipao, a kebaya or a sharp suit, whichever suits them), art-deco ornaments, a gentle pastel garden or balcony backdrop with tropical plants, nostalgic and glamorous. Keep any glasses or head covering they wear. No text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: soft airbrushed light; a lush tropical garden with frangipani; an art-deco poster border. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/jun"
+ },
+ "styles/calendar/nur": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a 1930s Shanghai and Nanyang calendar-poster painting: soft airbrushed gouache with luminous rosy skin, an elegant vintage outfit of the era (a qipao, a kebaya or a sharp suit, whichever suits them), art-deco ornaments, a gentle pastel garden or balcony backdrop with tropical plants, nostalgic and glamorous. Keep any glasses or head covering they wear. No text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: soft airbrushed light; a lush tropical garden with frangipani; an art-deco poster border. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/nur"
+ },
+ "styles/calendar/kai": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a 1930s Shanghai and Nanyang calendar-poster painting: soft airbrushed gouache with luminous rosy skin, an elegant vintage outfit of the era (a qipao, a kebaya or a sharp suit, whichever suits them), art-deco ornaments, a gentle pastel garden or balcony backdrop with tropical plants, nostalgic and glamorous. Keep any glasses or head covering they wear. No text. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: soft airbrushed light; a lush tropical garden with frangipani; an art-deco poster border. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/kai"
+ },
+ "styles/peranakan/mei": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a vibrant Peranakan heritage portrait: pastel Peranakan ceramic tiles with intricate floral motifs framing the scene, finely embroidered kebaya or a batik shirt, ornate gold brooches and beadwork, a colourful shophouse façade with wooden shutters behind, joyful, richly patterned and refined, a detailed illustration. Keep any glasses or head covering they wear. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a set of ornate gold kerosang brooches; bright tropical daylight; a row of pastel shophouses; a border of pastel Peranakan tiles. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/mei"
+ },
+ "styles/peranakan/priya": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a vibrant Peranakan heritage portrait: pastel Peranakan ceramic tiles with intricate floral motifs framing the scene, finely embroidered kebaya or a batik shirt, ornate gold brooches and beadwork, a colourful shophouse façade with wooden shutters behind, joyful, richly patterned and refined, a detailed illustration. Keep any glasses or head covering they wear. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a set of ornate gold kerosang brooches; bright tropical daylight; a row of pastel shophouses; a border of pastel Peranakan tiles. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/priya"
+ },
+ "styles/peranakan/aiman": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a vibrant Peranakan heritage portrait: pastel Peranakan ceramic tiles with intricate floral motifs framing the scene, finely embroidered kebaya or a batik shirt, ornate gold brooches and beadwork, a colourful shophouse façade with wooden shutters behind, joyful, richly patterned and refined, a detailed illustration. Keep any glasses or head covering they wear. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a set of ornate gold kerosang brooches; bright tropical daylight; a row of pastel shophouses; a border of pastel Peranakan tiles. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/aiman"
+ },
+ "styles/peranakan/jun": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a vibrant Peranakan heritage portrait: pastel Peranakan ceramic tiles with intricate floral motifs framing the scene, finely embroidered kebaya or a batik shirt, ornate gold brooches and beadwork, a colourful shophouse façade with wooden shutters behind, joyful, richly patterned and refined, a detailed illustration. Keep any glasses or head covering they wear. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a set of ornate gold kerosang brooches; bright tropical daylight; a row of pastel shophouses; a border of pastel Peranakan tiles. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/jun"
+ },
+ "styles/peranakan/nur": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a vibrant Peranakan heritage portrait: pastel Peranakan ceramic tiles with intricate floral motifs framing the scene, finely embroidered kebaya or a batik shirt, ornate gold brooches and beadwork, a colourful shophouse façade with wooden shutters behind, joyful, richly patterned and refined, a detailed illustration. Keep any glasses or head covering they wear. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a set of ornate gold kerosang brooches; bright tropical daylight; a row of pastel shophouses; a border of pastel Peranakan tiles. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/nur"
+ },
+ "styles/peranakan/kai": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "Repaint this person as a vibrant Peranakan heritage portrait: pastel Peranakan ceramic tiles with intricate floral motifs framing the scene, finely embroidered kebaya or a batik shirt, ornate gold brooches and beadwork, a colourful shophouse façade with wooden shutters behind, joyful, richly patterned and refined, a detailed illustration. Keep any glasses or head covering they wear. Stay very faithful to the photo: the exact same face, proportions, skin tone, expression, and any glasses or head covering they wear; only the style changes. Push the style all the way: bold, unmistakable and dramatic. Rich, carefully crafted details and textures. A subtle, natural retouch. Include: a set of ornate gold kerosang brooches; bright tropical daylight; a row of pastel shophouses; a border of pastel Peranakan tiles. Head and shoulders, centred, looking at the viewer, a tall portrait. No watermark, no signature, no logos. A fully painted, opaque image: never a transparency checkerboard.",
+  "source": "people/kai"
+ },
+ "bg/pop": {
+  "model": "gpt-image-2.6-sunburst",
+  "made": "2026-11-20",
+  "prompt": "A playful retro graphic backdrop: flat bright yellow, hot pink and cobalt blue colour blocks, large round halftone dots, thick black outlines and a starburst shape, cheerful 1960s print style. No people, no faces, no characters, no text, no logos. Soft, plenty of calm space in the middle for interface elements, tall phone-wallpaper composition."
  }
 }

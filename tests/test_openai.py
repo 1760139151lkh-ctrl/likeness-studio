@@ -46,6 +46,8 @@ class FakeAPI(BaseHTTPRequestHandler):
             return
         if self.path.endswith("/chat/completions"):
             answer = {"name": "Velvet hour", "line": "Late light", "prompt": "warm", "ramp": ["#220000", "#ffddaa"], "keep": .5, "grain": .2, "bloom": .3, "vignette": .4}
+            if b'"suggestions"' in body:   # the studio's reply, asked for alongside the picture
+                answer = {"reply": "搞定啦，美到发光", "suggestions": ["背景换成星空", "加个小皇冠", "换成甜笑"]}
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self.end_headers()
@@ -59,6 +61,16 @@ class FakeAPI(BaseHTTPRequestHandler):
         for i, colour in enumerate([(40, 40, 40), (120, 80, 80)]):
             self.wfile.write(f"event: {kind}.partial_image\ndata: {json.dumps({'type': kind + '.partial_image', 'partial_image_index': i, 'b64_json': _jpeg(size, colour)})}\n\n".encode())
         self.wfile.write(f"event: {kind}.completed\ndata: {json.dumps({'type': kind + '.completed', 'b64_json': _jpeg(size, (220, 120, 160))})}\n\n".encode())
+
+
+def _image_calls(api) -> list[dict]:
+    """The calls that asked for a picture, in order (the reply's words are asked for alongside them, in parallel)."""
+    return [s for s in api.seen if "/images/" in s["path"]]
+
+
+def _image_call(api) -> dict:
+    """The last call that asked for a picture."""
+    return _image_calls(api)[-1]
 
 
 @pytest.fixture
@@ -88,7 +100,7 @@ def test_a_portrait_streams_as_it_develops_and_arrives_in_the_format_asked(live,
     result = next(e for e in events if e["type"] == "result")
     assert result["provenance"]["kind"] == "render" and "gpt-image" in result["provenance"]["detail"]
     assert picture(live, result["url"]).size == (1024, 1024)
-    sent = api.seen[-1]
+    sent = _image_call(api)
     assert sent["path"] == "/v1/images/edits" and sent["auth"] == "Bearer sk-test-not-real"
     assert b'name="size"\r\n\r\n1024x1024' in sent["body"] and b'name="stream"\r\n\r\ntrue' in sent["body"]
     assert b"storybook royal portrait" in sent["body"]
@@ -97,7 +109,7 @@ def test_a_portrait_streams_as_it_develops_and_arrives_in_the_format_asked(live,
 def test_words_alone_are_painted_by_the_generations_endpoint(live, api):
     events = follow(live, live.post("/api/turns", json={"id": "p2", "text": "a lighthouse in a teacup", "pace": "quick", "intent": {"op": "create"}}).json()["job"])
     assert any(e["type"] == "result" for e in events)
-    sent = api.seen[-1]
+    sent = _image_call(api)
     assert sent["path"] == "/v1/images/generations"
     body = json.loads(sent["body"])
     assert body["stream"] is True and body["model"] == "gpt-image-2.6-flare" and body["quality"] == "low"
@@ -108,13 +120,33 @@ def test_marked_regions_go_as_a_mask_transparent_where_it_may_change(live, api):
     mask = upload(live, png((120, 180), (0, 0, 0), box=(0, 0, 59, 59)), "mask")
     turn = {"id": "p3", "text": "", "handles": {"A": subject}, "intent": {"op": "region", "subject": subject}, "pins": [{"n": 1, "note": "a red bow", "mask": mask}]}
     follow(live, live.post("/api/turns", json=turn).json()["job"])
-    body = api.seen[-1]["body"]
+    body = _image_call(api)["body"]
     start = body.index(b'name="mask"')
     data = body[body.index(b"\r\n\r\n", start) + 4:]
     with Image.open(io.BytesIO(data)) as m:
         alpha = m.convert("RGBA").getchannel("A")
         assert alpha.getpixel((10, 10)) == 0 and alpha.getpixel((100, 160)) == 255
     assert b"a red bow" in body
+
+
+def test_the_reply_and_three_ideas_are_written_alongside_the_picture(live, api):
+    photo = upload(live, png((300, 400), (200, 170, 140)))
+    turn = {"id": "r1", "text": "Make the background a beach at sunset.", "say": "背景换成海边日落", "pace": "quick",
+            "handles": {"A": photo}, "intent": {"op": "edit", "subject": photo}}
+    events = follow(live, live.post("/api/turns", json=turn).json()["job"])
+    reply = next(e for e in events if e["type"] == "reply")
+    assert reply["text"] == "搞定啦，美到发光" and reply["suggestions"] == ["背景换成星空", "加个小皇冠", "换成甜笑"]
+    words = json.loads(next(s for s in api.seen if s["path"].endswith("/chat/completions"))["body"])
+    assert "背景换成海边日落" in words["messages"][0]["content"][0]["text"]
+
+
+def test_without_an_answer_in_time_the_reply_falls_back_to_the_styles_voice(live, api, monkeypatch):
+    monkeypatch.setattr(OpenAIImages, "_talk", lambda self, turn: None)
+    photo = upload(live, png((300, 400), (200, 170, 140)))
+    turn = {"id": "r2", "text": "Repaint.", "pace": "quick", "handles": {"A": photo}, "intent": {"op": "restyle", "subject": photo},
+            "room": {"voice": ["出片啦，美翻"]}}
+    reply = next(e for e in follow(live, live.post("/api/turns", json=turn).json()["job"]) if e["type"] == "reply")
+    assert reply["text"] == "出片啦，美翻" and len(reply["suggestions"]) == 3
 
 
 def test_refusals_are_said_plainly(live, api):
@@ -139,7 +171,7 @@ def test_a_photo_goes_up_to_the_api_as_jpeg_not_a_re_encoded_png(live, api):
     turn = {"id": "p5", "text": "Repaint.", "pace": "quick", "aspect": "portrait", "preset": "princess",
             "handles": {"A": photo}, "intent": {"op": "restyle", "subject": photo}}
     follow(live, live.post("/api/turns", json=turn).json()["job"])
-    body = api.seen[-1]["body"]
+    body = _image_call(api)["body"]
     assert b'filename="A.jpg"' in body and b"Content-Type: image/jpeg" in body and b"image/png" not in body
 
 
@@ -184,7 +216,7 @@ def test_every_angle_is_asked_for_on_its_own(live, api):
     turn = {"id": "a1", "text": "", "n": 3, "aspect": "portrait", "handles": {"A": photo}, "intent": {"op": "angles", "subject": photo}}
     events = follow(live, live.post("/api/turns", json=turn).json()["job"])
     assert sum(e["type"] == "result" for e in events) == 3
-    prompts = [s["body"] for s in api.seen[-3:]]
+    prompts = [s["body"] for s in _image_calls(api)[-3:]]
     assert any(b"three-quarter view, the head turned so the nose points toward the right" in p for p in prompts)
     assert any(b"full side profile" in p for p in prompts)
     assert any(b"toward the left edge" in p for p in prompts)
@@ -194,7 +226,7 @@ def test_a_landscape_photo_is_edited_in_its_own_shape(live, api):
     photo = upload(live, png((600, 400), (120, 130, 140)))
     turn = {"id": "l1", "text": "make it sunset", "handles": {"A": photo}, "intent": {"op": "edit", "subject": photo}}
     follow(live, live.post("/api/turns", json=turn).json()["job"])
-    assert b'name="size"\r\n\r\n1536x1024' in api.seen[-1]["body"]
+    assert b'name="size"\r\n\r\n1536x1024' in _image_call(api)["body"]
 
 
 def test_a_style_invented_from_words_is_complete_and_safe(live, api):

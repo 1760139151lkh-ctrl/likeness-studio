@@ -4,14 +4,20 @@
 import { h, iconBtn, stageEl, reduced } from '../core/dom.js';
 import { overlay } from '../core/nav.js';
 
+/** 有没有抽屉开着（Esc 先关抽屉）。 */
+export const sheetOpen = () => open.length > 0;
 /**
  * @param {(close: () => void) => any[]} build
  * @param {{ title: string, cls?: string, onClose?: () => void, tall?: boolean }} o
  */
+const open = /** @type {HTMLElement[]} */ ([]);
 export function sheet(build, o) {
   let gone = false;
+  const onKey = (/** @type {KeyboardEvent} */ e) => { if (e.key === 'Escape' && open.at(-1) === panel) { e.preventDefault(); dismiss(); } };
   const remove = () => {
     if (gone) return; gone = true;
+    document.removeEventListener('keydown', onKey);
+    open.splice(open.indexOf(panel), 1);
     panel.classList.remove('is-in'); scrim.classList.remove('is-in');
     setTimeout(() => { panel.remove(); scrim.remove(); }, reduced ? 0 : 260);
     o.onClose?.();
@@ -23,8 +29,9 @@ export function sheet(build, o) {
     h('header.sheet__head', null, h('h2.sheet__title', null, o.title), iconBtn('close', '关闭', () => dismiss(), 'sheet__close')),
     h('div.sheet__body', null, ...build(() => dismiss())));
   stageEl().append(scrim, panel);
+  open.push(panel);
   requestAnimationFrame(() => { scrim.classList.add('is-in'); panel.classList.add('is-in'); });
-  panel.addEventListener('keydown', e => { if (e.key === 'Escape') dismiss(); });
+  document.addEventListener('keydown', onKey);
   setTimeout(() => /** @type {HTMLElement | null} */ (panel.querySelector('.sheet__close'))?.focus({ preventScroll: true }), 60);
   return { close: () => dismiss(), panel };
 }
