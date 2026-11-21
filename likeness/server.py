@@ -235,6 +235,9 @@ def create_app(engine: engines.Engine | None = None, home: Path | None = None, o
     }
     if bundle:
         public_assets.add(f'/{builds["bundle"]}/bundle/studio.js')
+    # The app's name, icons and service worker: "Add to Home Screen" fetches them without the owner's cookie. They are
+    # the same for everyone and say nothing about anyone; the page, the API and every picture stay behind the link.
+    public_assets |= {"/" + name for name in ROOT_FILES}
 
     def owner_device(cookie: str) -> str | None:
         device, sep, mac = cookie.partition(".")

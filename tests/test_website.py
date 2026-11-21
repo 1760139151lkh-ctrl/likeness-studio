@@ -100,6 +100,14 @@ def test_a_stranger_is_turned_away_and_the_owner_link_lets_a_browser_in(website)
     assert client.get("/").status_code == 200
 
 
+def test_add_to_home_screen_works_without_the_cookie_but_nothing_private_does(website):
+    client, _ = website
+    for name in ("manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png", "icon.svg", "sw.js"):
+        assert client.get("/" + name).status_code == 200, name
+    for path in ("/", "/index.html", "/studio.json", "/api/health", "/api/sync"):
+        assert client.get(path).status_code == 401, path
+
+
 def test_another_site_cannot_make_changes_with_the_owners_browser(website):
     client, token = website
     client.get("/open/" + token)
